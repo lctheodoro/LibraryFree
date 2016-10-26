@@ -77,3 +77,10 @@ Para instalar e executar, siga os seguintes passos:
     ```
     $ deactivate
     ```
+
+## Ajuda
+Para compreender a forma como essa API funciona, por favor referir-se aos seguintes tutoriais:
+* [APIs RESTful com Python e Flask](https://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask)
+* [APIs RESTful com Flask-RESTful](https://blog.miguelgrinberg.com/post/designing-a-restful-api-using-flask-restful)
+* [Autenticação RESTful com Flask](https://blog.miguelgrinberg.com/post/restful-authentication-with-flask)
+

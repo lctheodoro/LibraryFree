@@ -1,3 +1,6 @@
-__pycache__/*
-migrations/*
-flask/*
+*.pyc
+*.pyo
+__pycache__/
+
+migrations/
+flask/

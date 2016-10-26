@@ -1,4 +1,7 @@
-from app import db
+from app import app, db
+from passlib.apps import custom_app_context as pwd_context
+from itsdangerous import (TimedJSONWebSignatureSerializer
+                          as Serializer, BadSignature, SignatureExpired)
 
 # Relationship table for many-to-many relation between books and users
 owned_books = db.Table("owned_books",
@@ -29,8 +32,38 @@ class User(db.Model):
     # The list of books an user have
     books = db.relationship('Book', secondary=owned_books, backref='owners')
 
-    # The list of loans the user is participating
-    loans = db.relationship('Book_loan', lazy='dynamic')
+    # The lists of loans the user is participating
+    my_loans = db.relationship('Book_loan', foreign_keys='Book_loan.user_id')
+    loaned = db.relationship('Book_loan', foreign_keys='Book_loan.owner_id')
+
+    # encrypts user's new password
+    def hash_password(self, password):
+        self.password = pwd_context.encrypt(password)
+
+    # verifies if the password is correct
+    def verify_password(self, password):
+        return pwd_context.verify(password, self.password)
+
+    # generate an auth token so the user doesn't need to pass credentials
+    def generate_auth_token(self, expiration=3600):
+        # the token has an expiration time set to 3600
+        # if the user logged time exceeds the expiration, the user have to
+        # generate another token
+        s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
+        return s.dumps({'id': self.id})
+
+    @staticmethod
+    def verify_auth_token(token):
+        # check if the token is valid and returns user info if it is
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            return None  # valid token expired
+        except BadSignature:
+            return None  # invalid token
+        user = User.query.get(data['id'])
+        return user
 
     def __repr__(self):
         return "<User %r>" % self.name
