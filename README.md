@@ -22,15 +22,15 @@ Para instalar e executar, siga os seguintes passos:
         ```
         $ cd libraryfree
         ```
-3. Instale o `virtualenv`  
+3. Instale o virtualenv  
         ```
         $ pip install virtualenv
         ```
-4. Crie um novo `virtualenv`  
+4. Crie um novo virtualenv  
         ```
         $ virtualenv -p python3 flask
         ```
-5. Execute o `virtualenv`  
+5. Execute o virtualenv  
         ```
         $ . flask/bin/activate
         ```
@@ -46,13 +46,13 @@ Para instalar e executar, siga os seguintes passos:
         $ export LIBRARYFREE_DB_URI="postgres:///libraryfree"  
         ```
 8. Crie o banco de dados *libraryfree* no seu PostgreSQL local
-9. Realizar as *migrations* do banco de dados
+9. Realizar as *migrations* do banco de dados  
         ```
         $ python3 run.py db init
-        ```
+        ```  
         ```
         $ python3 run.py db migrate
-        ```
+        ```  
         ```
         $ python3 run.py db upgrade
         ```
@@ -86,4 +86,4 @@ Para compreender a forma como essa API funciona, por favor referir-se abaixo.
         4.1 [Vídeo aulas - Designing RESTful APIs](https://br.udacity.com/course/designing-restful-apis--ud388/)  
         4.2 [Artigo - APIs RESTful com Python e Flask](https://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask)  
         4.3 [Artigo - APIs RESTful com Flask-RESTful](https://blog.miguelgrinberg.com/post/designing-a-restful-api-using-flask-restful)  
-        4.4 [Artigo - Autenticação RESTful com Flask](https://blog.miguelgrinberg.com/post/restful-authentication-with-flask)  
+        4.4 [Artigo - Autenticação RESTful com Flask](https://blog.miguelgrinberg.com/post/restful-authentication-with-flask)
