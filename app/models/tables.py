@@ -92,7 +92,7 @@ class Organization(db.Model):
     # insert image field
 
     # The organization managers are available in this field
-    managers = db.relationship('User', backref='organization', lazy='dynamic')
+    managers = db.relationship('User', backref='organization')
 
     @property
     def serialize(self):
@@ -153,9 +153,9 @@ class Book_loan(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    book = db.relationship('Book', lazy='dynamic')
-    owner = db.relationship('User', foreign_keys=owner_id, lazy='dynamic')
-    user = db.relationship('User', foreign_keys=user_id, lazy='dynamic')
+    book = db.relationship('Book')
+    owner = db.relationship('User', foreign_keys=owner_id)
+    user = db.relationship('User', foreign_keys=user_id)
 
     # Transaction info
     loan_date = db.Column(db.Date, nullable=False)
@@ -167,8 +167,8 @@ class Book_loan(db.Model):
     # refused - owner refused user request
     # queue - user is in the queue
     loan_status = db.Column(db.Enum('requested', 'accepted',
-                                     'refused', 'queue',
-                                     name="loan_status"))
+                                    'refused', 'queue',
+                                    name="loan_status"))
 
     @property
     def serialize(self):

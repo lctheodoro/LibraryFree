@@ -1,5 +1,6 @@
 from flask import g, jsonify
-from app import app, db, auth
+from flask_restful import Resource, reqparse
+from app import app, db, auth, api
 from app.models.tables import User
 
 
@@ -27,3 +28,38 @@ def verify_password(email_or_token, password):
 def get_auth_token():
     token = g.user.generate_auth_token()
     return jsonify({'token': token.decode('ascii')})
+
+
+class UsersApi(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("name", type=str, required=True,
+                                   location='json')
+        self.reqparse.add_argument("email", type=str, required=True,
+                                   location='json')
+        self.reqparse.add_argument("password", type=str, required=True,
+                                   location='json')
+        self.reqparse.add_argument("city", type=str, location='json')
+        self.reqparse.add_argument("phone", type=str, location='json')
+        super(UsersApi, self).__init__()
+
+    def get(self):
+        users = User.query.all()
+        return {'data': [u.serialize for u in users]}, 200
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        user = User(**args)
+        user.hash_password(args['password'])
+        db.session.add(user)
+        try:
+            db.session.commit()
+            return {'data': user.serialize}, 201
+        except Exception as error:
+            if "duplicate key value in error":
+                return {'data': {'message': 'User already exists'}}, 409
+            else:
+                return {'data':
+                        {'message': 'Could\'nt complete the request'}}, 503
+
+api.add_resource(UsersApi, '/api/v1/users', endpoint='users')
