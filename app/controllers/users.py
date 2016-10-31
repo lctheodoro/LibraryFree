@@ -2,6 +2,7 @@ from flask import g, jsonify
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
 from app.models.tables import User
+from app.models.decorators import is_user
 
 
 @auth.verify_password
@@ -31,6 +32,8 @@ def get_auth_token():
 
 
 class UsersApi(Resource):
+    decorators = [auth.login_required]
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("name", type=str, required=True,
@@ -64,6 +67,8 @@ class UsersApi(Resource):
 
 
 class ModifyUsersApi(Resource):
+    decorators = [auth.login_required]
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("name", type=str, location='json')
@@ -77,6 +82,7 @@ class ModifyUsersApi(Resource):
         user = User.query.get_or_404(id)
         return {'data': user.serialize}, 200
 
+    @is_user
     def put(self, id):
         user = User.query.get_or_404(id)
         args = self.reqparse.parse_args()
@@ -88,6 +94,7 @@ class ModifyUsersApi(Resource):
         db.session.commit()
         return {'data': user.serialize}, 200
 
+    @is_user
     def delete(self, id):
         user = User.query.get_or_404(id)
         db.session.delete(user)

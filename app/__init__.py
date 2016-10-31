@@ -26,6 +26,10 @@ app_errors = {
     'UnexpectedError': {
         'message': 'Something unexpected happened.',
         'status': 500,
+    },
+    'Unauthorized': {
+        'message': 'You are not authorized to access this area.',
+        'status': 401,
     }
 }
 
