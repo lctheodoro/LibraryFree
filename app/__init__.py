@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, make_response, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
@@ -17,7 +17,19 @@ manager = Manager(app)
 manager.add_command("db", MigrateCommand)
 
 auth = HTTPBasicAuth()
-api = Api(app)
+
+app_errors = {
+    'NotFound': {
+        'message': 'The object you are looking for was not found.',
+        'status': 404,
+    },
+    'UnexpectedError': {
+        'message': 'Something unexpected happened.',
+        'status': 500,
+    }
+}
+
+api = Api(app, errors=app_errors)
 
 from app.models import tables
 from app.controllers import users

@@ -62,4 +62,37 @@ class UsersApi(Resource):
                 return {'data':
                         {'message': 'Could\'nt complete the request'}}, 503
 
+
+class ModifyUsersApi(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("name", type=str, location='json')
+        self.reqparse.add_argument("email", type=str, location='json')
+        self.reqparse.add_argument("password", type=str, location='json')
+        self.reqparse.add_argument("city", type=str, location='json')
+        self.reqparse.add_argument("phone", type=str, location='json')
+        super(ModifyUsersApi, self).__init__()
+
+    def get(self, id):
+        user = User.query.get_or_404(id)
+        return {'data': user.serialize}, 200
+
+    def put(self, id):
+        user = User.query.get_or_404(id)
+        args = self.reqparse.parse_args()
+        for key, value in args.items():
+            if key == 'password' and value is not None:
+                user.hash_password(value)
+            elif value is not None:
+                setattr(user, key, value)
+        db.session.commit()
+        return {'data': user.serialize}, 200
+
+    def delete(self, id):
+        user = User.query.get_or_404(id)
+        db.session.delete(user)
+        db.session.commit()
+        return 204
+
 api.add_resource(UsersApi, '/api/v1/users', endpoint='users')
+api.add_resource(ModifyUsersApi, '/api/v1/users/<int:id>', endpoint='modify_users')

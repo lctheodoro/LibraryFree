@@ -10,6 +10,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ['LIBRARYFREE_DB_URI']
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     BUNDLE_ERRORS = True  # related to Flask-RESTful errors, see docs
+    ERROR_404_HELP = False
 
 
 class DevelopmentConfig(Config):
