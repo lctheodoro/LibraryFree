@@ -195,8 +195,8 @@ class Book_return(db.Model):
     # Return info
     book_loan_id = db.Column(db.Integer, db.ForeignKey('book_loans.id'))
     returned_date = db.Column(db.Date, nullable=False)
-    user_confirmation = db.Column(db.Boolean)
-    owner_confirmation = db.Column(db.Boolean)
+    user_confirmation = db.Column(db.Boolean, default=False)
+    owner_confirmation = db.Column(db.Boolean, default=False)
 
     book_loan = db.relationship('Book_loan', foreign_keys=book_loan_id)
 
