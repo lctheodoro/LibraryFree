@@ -32,8 +32,6 @@ def get_auth_token():
 
 
 class UsersApi(Resource):
-    decorators = [auth.login_required]
-
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("name", type=str, required=True,
