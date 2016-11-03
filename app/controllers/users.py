@@ -1,8 +1,8 @@
 from flask import g, jsonify
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
-from app.models.tables import User
-from app.models.decorators import is_user
+from app.models.tables import User, Organization
+from app.models.decorators import is_user, is_manager
 
 
 @auth.verify_password
@@ -99,5 +99,73 @@ class ModifyUsersApi(Resource):
         db.session.commit()
         return 204
 
+
+class OrganizationsApi(Resource):
+    decorators = [auth.login_required]
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("name", type=str, required=True,
+                                   location='json')
+        self.reqparse.add_argument("description", type=str, location='json')
+        self.reqparse.add_argument("managers", type=list, required=True,
+                                   location='json')
+        super(OrganizationsApi, self).__init__()
+
+    def get(self):
+        organizations = Organization.query.all()
+        return {'data': [org.serialize for org in organizations]}, 200
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        org = Organization(name=args['name'],
+                           description=args['description'])
+        db.session.add(org)
+
+        for user in User.query.filter(User.id.in_(args['managers'])).all():
+            user.organization_id = org.id
+
+        db.session.commit()
+
+        return {'data': org.serialize}, 200
+
+
+class ModifyOrganizationsApi(Resource):
+    decorators = [auth.login_required]
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("name", type=str, location='json')
+        self.reqparse.add_argument("description", type=str, location='json')
+        self.reqparse.add_argument("managers", type=str, location='json')
+
+        super(ModifyOrganizationsApi, self).__init__()
+
+    def get(self, id):
+        org = Organization.query.get_or_404(id)
+        return {'data': org.serialize}, 200
+
+    @is_manager
+    def put(self, id):
+        args = self.reqparse.parse_args()
+        org = Organization.query.get_or_404(id)
+        for key, value in args.items():
+            if value is not None:
+                setattr(org, key, value)
+        db.session.commit()
+        return {'data': org.serialize}, 200
+
+    @is_manager
+    def delete(self, id):
+        org = Organization.query.get_or_404(id)
+        db.session.delete(org)
+        db.session.commit()
+        return 204
+
 api.add_resource(UsersApi, '/api/v1/users', endpoint='users')
-api.add_resource(ModifyUsersApi, '/api/v1/users/<int:id>', endpoint='modify_users')
+api.add_resource(ModifyUsersApi, '/api/v1/users/<int:id>',
+                 endpoint='modify_users')
+api.add_resource(OrganizationsApi, '/api/v1/organizations',
+                 endpoint='organizations')
+api.add_resource(ModifyOrganizationsApi, '/api/v1/organizations/<int:id>',
+                 endpoint='modify_organizations')

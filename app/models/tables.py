@@ -67,13 +67,17 @@ class User(db.Model):
 
     @property
     def serialize(self):
+        if self.organization:
+            org = self.organization.id
+        else:
+            org = None
         return {
             'id': self.id,
             'name': self.name,
             'email': self.email,
             'city': self.city,
             'phone': self.phone,
-            'organization': self.organization
+            'organization_id': org
         }
 
     def __repr__(self):
@@ -100,7 +104,7 @@ class Organization(db.Model):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'managers': [m.serialize() for m in self.managers]
+            'managers': [m.serialize for m in self.managers]
         }
 
     def __repr__(self):
@@ -174,9 +178,9 @@ class Book_loan(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'book': self.book.serialize(),
-            'owner': self.owner.serialize(),
-            'user': self.user.serialize(),
+            'book': self.book.serialize,
+            'owner': self.owner.serialize,
+            'user': self.user.serialize,
             'loan_date': self.loan_date,
             'return_date': self.return_date,
             'loan_status': self.loan_status
@@ -204,7 +208,7 @@ class Book_return(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'book_loan': self.book_loan.serialize(),
+            'book_loan': self.book_loan.serialize,
             'returned_date': self.returned_date,
             'user_confirmation': self.user_confirmation,
             'owner_confirmation': self.owner_confirmation
@@ -237,7 +241,7 @@ class Delayed_return(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'book_loan': self.book_loan.serialize(),
+            'book_loan': self.book_loan.serialize,
             'requested_date': self.requested_date,
             'status': self.status
         }
@@ -266,7 +270,7 @@ class Feedback(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'book_loan': self.book_loan.serialize(),
+            'book_loan': self.book_loan.serialize,
             'user_type': self.user,
             'user_evaluation': self.user_evaluation,
             'time_evaluation': self.time_evaluation,
