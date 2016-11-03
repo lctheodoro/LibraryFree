@@ -8,7 +8,7 @@ from app.models.decorators import is_user, is_manager
 @auth.verify_password
 def verify_password(email_or_token, password):
     """
-    This function verifies if the user has the correct credentials.
+    This function verify if the user has the correct credentials.
     If it has, we can confirm the login and every login_required
     decorator will pass.
     """
@@ -27,12 +27,18 @@ def verify_password(email_or_token, password):
 @app.route('/api/v1/tokens', methods=['GET'])
 @auth.login_required
 def get_auth_token():
+    """
+        This function returns a token for authentication.
+        It guarantees the security of user's information.
+    """
     token = g.user.generate_auth_token()
     return jsonify({'token': token.decode('ascii')})
 
 
 class UsersApi(Resource):
     def __init__(self):
+        # whenever we want to receive arguments from other parts
+        # we need to use the RequestParser
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("name", type=str, required=True,
                                    location='json')
@@ -45,12 +51,17 @@ class UsersApi(Resource):
         super(UsersApi, self).__init__()
 
     def get(self):
+        # Table.query makes a search (select) in the database
         users = User.query.all()
+        # we should return serialized objects because they are ready to
+        # be converted to JSON
+        # an HTTP status code is also important
         return {'data': [u.serialize for u in users]}, 200
 
     def post(self):
         args = self.reqparse.parse_args()
         user = User(**args)
+        # we will ALWAYS encrypt a new password
         user.hash_password(args['password'])
         db.session.add(user)
         try:
@@ -80,12 +91,19 @@ class ModifyUsersApi(Resource):
         user = User.query.get_or_404(id)
         return {'data': user.serialize}, 200
 
+    # this decorator verify if the object belongs to the user
+    # if so, it can be edited, else the user is unauthorized
     @is_user
     def put(self, id):
         user = User.query.get_or_404(id)
         args = self.reqparse.parse_args()
+        # when we have an update to do, we can't simply update all information
+        # using the arguments from reqparse, because some may be empty
+        # then we have to keep the information
         for key, value in args.items():
+            # this will filter only valid values
             if key == 'password' and value is not None:
+                # we will ALWAYS encrypt a new password
                 user.hash_password(value)
             elif value is not None:
                 setattr(user, key, value)
@@ -122,6 +140,7 @@ class OrganizationsApi(Resource):
                            description=args['description'])
         db.session.add(org)
 
+        # we receive a list of IDs and select all users that have one of them
         for user in User.query.filter(User.id.in_(args['managers'])).all():
             user.organization_id = org.id
 
@@ -145,6 +164,8 @@ class ModifyOrganizationsApi(Resource):
         org = Organization.query.get_or_404(id)
         return {'data': org.serialize}, 200
 
+    # this decorator verify if the user is one of the company managers
+    # if so, it can be edited, else the user is unauthorized
     @is_manager
     def put(self, id):
         args = self.reqparse.parse_args()
@@ -162,6 +183,8 @@ class ModifyOrganizationsApi(Resource):
         db.session.commit()
         return 204
 
+# for each resource we need to specify an URI and an endpoint
+# the endpoint is a "reference" to each resource
 api.add_resource(UsersApi, '/api/v1/users', endpoint='users')
 api.add_resource(ModifyUsersApi, '/api/v1/users/<int:id>',
                  endpoint='modify_users')
@@ -169,3 +192,7 @@ api.add_resource(OrganizationsApi, '/api/v1/organizations',
                  endpoint='organizations')
 api.add_resource(ModifyOrganizationsApi, '/api/v1/organizations/<int:id>',
                  endpoint='modify_organizations')
+
+# if you want to test any resource, try using CURL in the terminal, like:
+# $ curl -u USERAME:PASSWORD -H "Content-Type: application/json" -d '{"key": "value", "key": "value"}' -X GET/POST/PUT/DELETE -i http://localhost:5000/RESOURCE_URI
+# or try to use a visual tool like Postman
