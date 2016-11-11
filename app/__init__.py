@@ -36,4 +36,4 @@ app_errors = {
 api = Api(app, errors=app_errors)
 
 from app.models import tables
-from app.controllers import users
+from app.controllers import users, books
