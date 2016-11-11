@@ -1,32 +1,6 @@
 from flask import g, jsonify
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
-<<<<<<< HEAD
-from app.models.tables import Book_loan, Book_return
-
-
-class BooksAvailabilityApi(Resource):
-    def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("book_id", type=int, required=True,
-                                   location='json')
-        self.reqparse.add_argument("user_id", type=int, required=True,
-                                   location='json')
-        super(BooksAvailabilityApi, self).__init__()
-
-    def get(self):
-        args = self.reqparse.parse_args()
-        query = Book_loan.query.filter_by(book_id=args['book_id'],
-                                                  user_id=args['user_id']).first()
-        if not query:
-            return {'data': {'message': 'Erro inesperado!'}}, 500
-        else:
-            return {'status': query.loan_status},200
-
-class ReturnApi(Resource):
-    def __init__(self):
-
-=======
 from app.models.tables import Book, Book_loan, Book_return
 from sqlalchemy.sql import and_, or_
 
@@ -129,14 +103,26 @@ class ModifyBooksApi(Resource):
         db.session.commit()
         return 204
 
-api.add_resource(BooksApi, '/api/v1/books', endpoint='books')
-api.add_resource(ModifyBooksApi, '/api/v1/books/<int:id>',
-                 endpoint='modify_books')
+class BooksAvailabilityApi(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("book_id", type=int, required=True,
+                                   location='json')
+        self.reqparse.add_argument("user_id", type=int, required=True,
+                                   location='json')
+        super(BooksAvailabilityApi, self).__init__()
 
+    def get(self):
+        args = self.reqparse.parse_args()
+        query = Book_loan.query.filter_by(book_id=args['book_id'],
+                                                  user_id=args['user_id']).first()
+        if not query:
+            return {'data': {'message': 'Erro inesperado!'}}, 500
+        else:
+            return {'data': query.loan_status},200
 
 class ReturnApi(Resource):
     def __init__(self):
->>>>>>> 361847929f750db4a6d357062a6757466522a5ca
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("book_id", type=int, required=True,
                                    location='json')
@@ -147,8 +133,6 @@ class ReturnApi(Resource):
         self.reqparse.add_argument("confirmed_by", type=str,
                                    location='json')
         super(ReturnApi, self).__init__()
-
-<<<<<<< HEAD
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -166,27 +150,6 @@ class ReturnApi(Resource):
             return_record.owner_confirmation=True
         elif(args['confirmed_by']=='user'):
             return_record.user_confirmation=True
-=======
-    def post(self):
-        args = self.reqparse.parse_args()
-        loan_record = Book_loan.query.filter_by(book_id=args['book_id'],
-                                                owner_id=args['owner_id'],
-                                                user_id=args['user_id']
-                                                ).first()
-        return_record = Book_return.query.filter_by(
-                            book_loan_id=loan_record.id
-                        ).first()
-
-        if not (return_record):
-            return_record = Book_return(book_loan_id=loan_record.id,
-                                        returned_date=datetime.now())
-            db.session.add(book_return)
-
-        if(args['confirmed_by'] == 'owner'):
-            return_record.owner_confirmation = True
-        elif(args['confirmed_by'] == 'user'):
-            return_record.user_confirmation = True
->>>>>>> 361847929f750db4a6d357062a6757466522a5ca
         else:
             abort(400)
         db.session.commit()
@@ -195,28 +158,16 @@ class ReturnApi(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-<<<<<<< HEAD
         loan_record_search = Book_loan.query.filter_by(book_id=args['book_id'],
                                                   owner_id=args['owner_id'],
                                                   user_id= args['user_id']).first()
         return_record_search = Book_return.query.filter_by(book_loan_id =
                                                     loan_record.id).first()
-=======
-        loan_record_search = Book_loan.query.filter_by(
-                                book_id=args['book_id'],
-                                owner_id=args['owner_id'],
-                                user_id=args['user_id']
-                             ).first()
-        return_record_search = Book_return.query.filter_by(
-                                book_loan_id=loan_record.id
-                               ).first()
->>>>>>> 361847929f750db4a6d357062a6757466522a5ca
 
         return {'data': [return_record_search.serialize]}, 200
 
 
-<<<<<<< HEAD
+api.add_resource(BooksApi, '/api/v1/books', endpoint='books')
+api.add_resource(ModifyBooksApi, '/api/v1/books/<int:id>', endpoint='modify_books')
 api.add_resource(BooksAvailabilityApi, '/api/v1/books/availability', endpoint='books_availability')
-=======
->>>>>>> 361847929f750db4a6d357062a6757466522a5ca
 api.add_resource(ReturnApi, '/api/v1/books/return', endpoint='return')
