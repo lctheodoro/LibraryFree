@@ -183,6 +183,24 @@ class ModifyOrganizationsApi(Resource):
         db.session.commit()
         return 204
 
+
+class FeedbackApi(Resource):
+    decorators = [auth.login_required]
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("book_loan", type=str, location='json')
+
+        super(FeedbackApi, self).__init__()
+
+    def post(self):
+        pass
+
+
+class ModifyFeedbackApi(Resource):
+    decorators = [auth.login_required]
+
+
 # for each resource we need to specify an URI and an endpoint
 # the endpoint is a "reference" to each resource
 api.add_resource(UsersApi, '/api/v1/users', endpoint='users')
@@ -192,6 +210,9 @@ api.add_resource(OrganizationsApi, '/api/v1/organizations',
                  endpoint='organizations')
 api.add_resource(ModifyOrganizationsApi, '/api/v1/organizations/<int:id>',
                  endpoint='modify_organizations')
+api.add_resource(FeedbackApi, '/api/v1/feedbacks', endpoint='feedback')
+api.add_resource(ModifyFeedbackApi, '/api/v1/feedbacks/<int:id>',
+                 endpoint='modify_feedback')
 
 # if you want to test any resource, try using CURL in the terminal, like:
 # $ curl -u USERAME:PASSWORD -H "Content-Type: application/json" -d '{"key": "value", "key": "value"}' -X GET/POST/PUT/DELETE -i http://localhost:5000/RESOURCE_URI
