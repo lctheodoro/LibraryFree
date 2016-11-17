@@ -1,7 +1,7 @@
-from flask import g, jsonify
+from flask import g, jsonif
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
-from app.models.tables import Book, Book_loan, Book_return
+from app.models.tables import Book, Book_loan, Book_return, owned_books
 from sqlalchemy.sql import and_, or_
 
 
@@ -114,12 +114,24 @@ class BooksAvailabilityApi(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        query = Book_loan.query.filter_by(book_id=args['book_id'],
-                                                  user_id=args['user_id']).first()
-        if not query:
-            return {'data': {'message': 'Erro inesperado!'}}, 500
-        else:
-            return {'data': query.loan_status},200
+        book = owned_books.query.filter_by(book_id=args['book_id'],
+                                            owner_id=args['user_id']).first()
+
+        if(book): # Book found
+            book_loans = Book_loan.query.filter_by(book_id=book.book_id).all()
+            if(book_loans): # If any book loan
+                for loan in book_loans: # Search for all loans
+                    book_return = Book_return.query.filter_by(book_loan_id=loan.id).first()
+                    if(book_return):
+                        if(not book_return.user_confirmation or not book_return.owner_confirmation):
+                            return {'data': {'status': 'unavaiable'}}, 200
+                    else: # Book not returned yet
+                        return {'data': {'status': 'unavaiable'}}, 200
+                return {'data': {'status': 'available'}}, 200 # All loans returned and confirmed
+            else: # Book not loaned yet
+                return {'data': {'status': 'available'}}, 200
+        else: # Book not found
+            return 500
 
 class ReturnApi(Resource):
     def __init__(self):
