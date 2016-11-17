@@ -1,7 +1,7 @@
 from flask import g, jsonify
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
-from app.models.tables import User, Organization
+from app.models.tables import User, Organization, Feedback
 from app.models.decorators import is_user, is_manager
 
 
@@ -189,17 +189,39 @@ class FeedbackApi(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("book_loan", type=str, location='json')
+        self.reqparse.add_argument("transaction_id", type=int, location='json')
+        self.reqparse.add_argument("user_id", type=int, location='json')
+        self.reqparse.add_argument("user_type", type=str, location='json')
+        self.reqparse.add_argument("time_evaluation", type=int, location='json')
+        self.reqparse.add_argument("user_evaluation", type=int, location='json')
+        self.reqparse.add_argument("book_evaluation", type=int, location='json')
+        self.reqparse.add_argument("comments", type=int, location='json')
 
         super(FeedbackApi, self).__init__()
 
     def post(self):
-        pass
+        args = self.reqparse.parse_args()
+        feedback = Feedback(**args)
+        db.session.add(feedback)
+        try:
+            db.session.commit()
+            return { 'data': feedback.serialize }, 204
+        except Exception:
+            return { 'data': { 'message': 'Unexpected Error' } }, 500
 
 
 class ModifyFeedbackApi(Resource):
     decorators = [auth.login_required]
 
+    def get(self, id):
+        org = Feedback.query.get_or_404(id)
+        return { 'data': org.serialize }, 200
+
+    def delete(self, id):
+        org = Feedback.query.get_or_404(id)
+        db.session.delete(org)
+        db.session.commit()
+        return 204
 
 # for each resource we need to specify an URI and an endpoint
 # the endpoint is a "reference" to each resource

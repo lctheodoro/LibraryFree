@@ -1,4 +1,4 @@
-from flask import g, jsonif
+from flask import g, jsonify
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
 from app.models.tables import Book, Book_loan, Book_return, owned_books
