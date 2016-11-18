@@ -190,23 +190,26 @@ class FeedbackApi(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("transaction_id", type=int, location='json')
-        self.reqparse.add_argument("user_id", type=int, location='json')
-        self.reqparse.add_argument("user_type", type=str, location='json')
-        self.reqparse.add_argument("time_evaluation", type=int, location='json')
+        self.reqparse.add_argument("user", type=str, location='json')
+        #self.reqparse.add_argument("user_type", type=str, location='json')
         self.reqparse.add_argument("user_evaluation", type=int, location='json')
+        self.reqparse.add_argument("time_evaluation", type=int, location='json')
         self.reqparse.add_argument("book_evaluation", type=int, location='json')
-        self.reqparse.add_argument("comments", type=int, location='json')
+        self.reqparse.add_argument("comments", type=str, location='json')
 
         super(FeedbackApi, self).__init__()
 
     def post(self):
         args = self.reqparse.parse_args()
+        print(args)
         feedback = Feedback(**args)
+        print(feedback)
         db.session.add(feedback)
         try:
             db.session.commit()
             return { 'data': feedback.serialize }, 204
-        except Exception:
+        except Exception as error:
+            print(error)
             return { 'data': { 'message': 'Unexpected Error' } }, 500
 
 

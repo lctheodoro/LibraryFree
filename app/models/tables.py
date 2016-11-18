@@ -181,8 +181,8 @@ class Book_loan(db.Model):
             'book': self.book.serialize,
             'owner': self.owner.serialize,
             'user': self.user.serialize,
-            'loan_date': self.loan_date,
-            'return_date': self.return_date,
+            'loan_date': self.loan_date.strftime('%Y-%m-%d'),
+            'return_date': self.return_date.strftime('%Y-%m-%d'),
             'loan_status': self.loan_status
         }
 
