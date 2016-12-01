@@ -12,7 +12,6 @@ class Config(object):
     BUNDLE_ERRORS = True  # related to Flask-RESTful errors, see docs
     ERROR_404_HELP = False
 
-
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True

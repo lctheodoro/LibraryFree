@@ -119,9 +119,12 @@ class Book(db.Model):
 
     # Description fields
     title = db.Column(db.String, nullable=False)
+    isbn = db.Column(db.Integer)
     synopsis = db.Column(db.Text)
     # insert image field
     author = db.Column(db.String, nullable=False)
+    author2 = db.Column(db.String)
+    author3 = db.Column(db.String)
     publisher = db.Column(db.String, nullable=False)
     edition = db.Column(db.Integer)
     year = db.Column(db.Integer)
@@ -133,8 +136,11 @@ class Book(db.Model):
         return {
             'id': self.id,
             'title': self.title,
+            'isbn' : self.isbn,
             'synopsis': self.synopsis,
             'author': self.author,
+            'author2': self.author2,
+            'author3': self.author3,
             'publisher': self.publisher,
             'edition': self.edition,
             'year': self.year,

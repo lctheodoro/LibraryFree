@@ -1,22 +1,25 @@
-from flask import g, jsonif
+from flask import g, jsonify, json
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
 from app.models.tables import Book, Book_loan, Book_return, owned_books
 from sqlalchemy.sql import and_, or_
-
+from isbnlib import *
+from isbnlib.registry import bibformatters
 
 class BooksApi(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("title", type=str, required=True,
                                    location='json')
+        self.reqparse.add_argument("isbn", type=str, location = 'json')
         self.reqparse.add_argument("synopsis", type=str, location='json')
-        self.reqparse.add_argument("author", type=str, required=True,
-                                   location='json')
+        self.reqparse.add_argument("author", type=str, location='json')
+        self.reqparse.add_argument("author2", type=str, location='json')
+        self.reqparse.add_argument("author3", type=str, location='json')
         self.reqparse.add_argument("publisher", type=str, required=True,
                                    location='json')
         self.reqparse.add_argument("edition", type=int, location='json')
-        self.reqparse.add_argument("year", type=int, location='json')
+        self.reqparse.add_argument("year", type=int)
         self.reqparse.add_argument("language", type=str, location='json')
         self.reqparse.add_argument("genre", type=str, location='json')
         super(BooksApi, self).__init__()
@@ -26,7 +29,10 @@ class BooksApi(Resource):
         # because they are not mandatory
         search_reqparse = reqparse.RequestParser()
         search_reqparse.add_argument("title", type=str, location='json')
+        search_reqparse.add_argument("isbn", type=str, location='json')
         search_reqparse.add_argument("author", type=str, location='json')
+        search_reqparse.add_argument("author2", type=str, location='json')
+        search_reqparse.add_argument("author3", type=str, location='json')
         search_reqparse.add_argument("publisher", type=str, location='json')
         search_reqparse.add_argument("genre", type=str, location='json')
 
@@ -40,9 +46,24 @@ class BooksApi(Resource):
                 Book.title.ilike("%{0}%".format(args['title']))
             )
 
+        if args['isbn'] :
+            filters_list.append(
+                Book.title.ilike("%{0}%".format(args['isbn']))
+            )
+
         if args['author']:
             filters_list.append(
                 Book.author.ilike("%{0}%".format(args['author']))
+            )
+
+        if args['author2']:
+            filters_list.append(
+                Book.author2.ilike("%{0}%".format(args['author2']))
+            )
+
+        if args['author3']:
+            filters_list.append(
+                Book.author3.ilike("%{0}%".format(args['author3']))
             )
 
         if args['publisher']:
@@ -64,6 +85,38 @@ class BooksApi(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         book = Book(**args)
+
+        #Generate the isbn code with title like a parameter
+        code_isbn = isbn_from_words(book.title)
+        book.isbn = code_isbn
+
+        #set the format to json
+        bibtex = bibformatters['json']
+        consult = meta(code_isbn)
+
+        if not consult:
+            return 300
+
+        consult = bibtex(consult)
+        aux = json.loads(consult)
+
+        book.author = aux['author'][0]['name']
+
+        tam = 0
+        for i in aux['author']:
+            tam += 1
+
+        if tam >= 3:
+            book.author2 = aux['author'][1]['name']
+            book.author3 = aux['author'][2]['name']
+        elif tam == 2:
+            book.author2 = aux['author'][1]['name']
+
+        if aux['year']:
+            book.year = aux['year']
+        else:
+            book.year = 0
+
         db.session.add(book)
         db.session.commit()
         return {'data': book.serialize}, 200
@@ -74,10 +127,8 @@ class ModifyBooksApi(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("title", type=str, location='json')
         self.reqparse.add_argument("synopsis", type=str, location='json')
-        self.reqparse.add_argument("author", type=str, location='json')
         self.reqparse.add_argument("publisher", type=str, location='json')
         self.reqparse.add_argument("edition", type=int, location='json')
-        self.reqparse.add_argument("year", type=int, location='json')
         self.reqparse.add_argument("language", type=str, location='json')
         self.reqparse.add_argument("genre", type=str, location='json')
         super(ModifyBooksApi, self).__init__()
@@ -93,6 +144,35 @@ class ModifyBooksApi(Resource):
         for key, value in args.items():
             if value is not None:
                 setattr(book, key, value)
+
+        code_isbn = isbn_from_words(book.title)
+        book.isbn = code_isbn
+
+        bibtex = bibformatters['json']
+        consult = meta(code_isbn)
+
+        if not consult:
+            return 300
+
+        consult = bibtex(consult)
+        aux = json.loads(consult)
+
+        book.author = aux['author'][0]['name']
+
+        tam = 0
+        for i in aux['author']:
+            tam += 1
+
+        if tam >= 3:
+            book.author2 = aux['author'][1]['name']
+            book.author3 = aux['author'][2]['name']
+        elif tam == 2:
+            book.author2 = aux['author'][1]['name']
+
+        if aux['year']:
+            book.year = aux['year']
+        else:
+            book.year = 0
 
         db.session.commit()
         return {'data': book.serialize}, 200
