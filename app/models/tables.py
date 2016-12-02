@@ -36,6 +36,13 @@ class User(db.Model):
     my_loans = db.relationship('Book_loan', foreign_keys='Book_loan.user_id')
     loaned = db.relationship('Book_loan', foreign_keys='Book_loan.owner_id')
 
+    # User evaluation from feedback
+    evaluation = db.Column(db.Integer)
+
+    @validates('evaluation')
+    def update_user_evaluation(self, key, value):
+        self.evaluation = value
+
     # encrypts user's new password
     def hash_password(self, password):
         self.password = pwd_context.encrypt(password)
@@ -77,6 +84,7 @@ class User(db.Model):
             'email': self.email,
             'city': self.city,
             'phone': self.phone,
+            'rating': self.rating,
             'organization_id': org
         }
 
@@ -279,4 +287,4 @@ class Feedback(db.Model):
         }
 
     def __repr__(self):
-        return "<Feedback %r>" % self.id
+        return "<Feedback %r to user %r>" % (self.id, self.user.id)
