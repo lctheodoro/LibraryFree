@@ -1,7 +1,7 @@
 from flask import g, jsonify
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
-from app.models.tables import User, Organization, Feedback
+from app.models.tables import User, Organization, Feedback, Book_loan
 from app.models.decorators import is_user, is_manager
 
 
@@ -194,6 +194,7 @@ class FeedbackApi(Resource):
         self.reqparse.add_argument("user_evaluation", type=int, location='json')
         self.reqparse.add_argument("time_evaluation", type=int, location='json')
         self.reqparse.add_argument("book_evaluation", type=int, location='json')
+        self.reqparse.add_argument("interaction_evaluation", type=int, location='json')
         self.reqparse.add_argument("comments", type=str, location='json')
 
         super(FeedbackApi, self).__init__()
@@ -202,13 +203,16 @@ class FeedbackApi(Resource):
         args = self.reqparse.parse_args()
         print(args)
         feedback = Feedback(**args)
-        #print(feedback)
+        print(feedback)
         db.session.add(feedback)
         try:
+            loan = Book_loan.query.filter_by(id=feedback.transaction_id).first()
+            user = User.query.filter_by(id=loan.user_id).first()
+            user.evaluation = (user.evaluation + feedback.user_evaluation) // 2
             db.session.commit()
             return { 'data': feedback.serialize }, 204
-        except Exception:
-            #print(error)
+        except Exception as error:
+            print(error)
             return { 'data': { 'message': 'Unexpected Error' } }, 500
 
 

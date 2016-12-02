@@ -37,11 +37,7 @@ class User(db.Model):
     loaned = db.relationship('Book_loan', foreign_keys='Book_loan.owner_id')
 
     # User evaluation from feedback
-    evaluation = db.Column(db.Integer)
-
-    @validates('evaluation')
-    def update_user_evaluation(self, key, value):
-        self.evaluation = value
+    evaluation = db.Column(db.Integer, default=0)
 
     # encrypts user's new password
     def hash_password(self, password):
@@ -84,7 +80,7 @@ class User(db.Model):
             'email': self.email,
             'city': self.city,
             'phone': self.phone,
-            'rating': self.rating,
+            'evaluation': self.evaluation,
             'organization_id': org
         }
 
@@ -270,6 +266,7 @@ class Feedback(db.Model):
     user_evaluation = db.Column(db.Integer)
     time_evaluation = db.Column(db.Integer)
     book_evaluation = db.Column(db.Integer)
+    interaction_evaluation = db.Column(db.Integer)
     comments = db.Column(db.Text)
 
     book_loan = db.relationship('Book_loan', foreign_keys=transaction_id)
@@ -283,8 +280,9 @@ class Feedback(db.Model):
             'user_evaluation': self.user_evaluation,
             'time_evaluation': self.time_evaluation,
             'book_evaluation': self.book_evaluation,
+            'interaction_evaluation' : self.interaction_evaluation,
             'comments': self.comments
         }
 
     def __repr__(self):
-        return "<Feedback %r to user %r>" % (self.id, self.user.id)
+        return "<Feedback %r>" % self.id
