@@ -68,6 +68,7 @@ class UsersApi(Resource):
             db.session.commit()
             return {'data': user.serialize}, 201
         except Exception as error:
+            print(error)
             if "duplicate key value in error":
                 return {'data': {'message': 'User already exists'}}, 409
             else:
@@ -201,16 +202,18 @@ class FeedbackApi(Resource):
 
     def post(self):
         args = self.reqparse.parse_args()
-        print(args)
         feedback = Feedback(**args)
-        print(feedback)
         db.session.add(feedback)
         try:
             loan = Book_loan.query.filter_by(id=feedback.transaction_id).first()
             user = User.query.filter_by(id=loan.user_id).first()
-            user.evaluation = (user.evaluation + feedback.user_evaluation) // 2
+            if user.evaluation == 0:
+                user.evaluation = feedback.user_evaluation
+            else:
+                user.evaluation = ((user.evaluation +
+                                   feedback.user_evaluation) // 2) + 1
             db.session.commit()
-            return { 'data': feedback.serialize }, 204
+            return { 'data': feedback.serialize }, 200
         except Exception as error:
             print(error)
             return { 'data': { 'message': 'Unexpected Error' } }, 500
@@ -220,12 +223,12 @@ class ModifyFeedbackApi(Resource):
     decorators = [auth.login_required]
 
     def get(self, id):
-        org = Feedback.query.get_or_404(id)
-        return { 'data': org.serialize }, 200
+        feedback = Feedback.query.get_or_404(id)
+        return { 'data': feedback.serialize }, 200
 
     def delete(self, id):
-        org = Feedback.query.get_or_404(id)
-        db.session.delete(org)
+        feedback = Feedback.query.get_or_404(id)
+        db.session.delete(feedback)
         db.session.commit()
         return 204
 
