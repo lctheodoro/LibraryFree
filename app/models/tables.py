@@ -261,9 +261,9 @@ class Feedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     # Feedback info
-    transaction_id = db.Column(db.Integer, db.ForeignKey('book_loans.id'))
-    user = db.Column(db.Enum("owner", "user", name="user_feedback"))
-    user_evaluation = db.Column(db.Integer)
+    transaction_id = db.Column(db.Integer, db.ForeignKey('book_loans.id'), nullable=False)
+    user = db.Column(db.Enum("owner", "user", name="user_feedback"), nullable=False)
+    user_evaluation = db.Column(db.Integer, nullable=False)
     time_evaluation = db.Column(db.Integer)
     book_evaluation = db.Column(db.Integer)
     interaction_evaluation = db.Column(db.Integer)

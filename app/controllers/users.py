@@ -3,7 +3,7 @@ from flask_restful import Resource, reqparse
 from app import app, db, auth, api
 from app.models.tables import User, Organization, Feedback, Book_loan
 from app.models.decorators import is_user, is_manager
-
+from math import ceil
 
 @auth.verify_password
 def verify_password(email_or_token, password):
@@ -206,12 +206,16 @@ class FeedbackApi(Resource):
         db.session.add(feedback)
         try:
             loan = Book_loan.query.filter_by(id=feedback.transaction_id).first()
-            user = User.query.filter_by(id=loan.user_id).first()
+            if feedback.user == "user":
+                user = User.query.filter_by(id=loan.owner_id).first()
+            else:
+                user = User.query.filter_by(id=loan.user_id).first()
+
             if user.evaluation == 0:
                 user.evaluation = feedback.user_evaluation
             else:
-                user.evaluation = ((user.evaluation +
-                                   feedback.user_evaluation) // 2) + 1
+                user.evaluation = ceil((user.evaluation +
+                                   feedback.user_evaluation) / 2)
             db.session.commit()
             return { 'data': feedback.serialize }, 200
         except Exception as error:
