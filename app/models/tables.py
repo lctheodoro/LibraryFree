@@ -36,9 +36,6 @@ class User(db.Model):
     my_loans = db.relationship('Book_loan', foreign_keys='Book_loan.user_id')
     loaned = db.relationship('Book_loan', foreign_keys='Book_loan.owner_id')
 
-    # User evaluation from feedback
-    evaluation = db.Column(db.Integer, default=0)
-
     # encrypts user's new password
     def hash_password(self, password):
         self.password = pwd_context.encrypt(password)
@@ -80,7 +77,6 @@ class User(db.Model):
             'email': self.email,
             'city': self.city,
             'phone': self.phone,
-            'evaluation': self.evaluation,
             'organization_id': org
         }
 
@@ -123,7 +119,7 @@ class Book(db.Model):
 
     # Description fields
     title = db.Column(db.String, nullable=False)
-    isbn = db.Column(db.Integer)
+    isbn = db.Column(db.String)
     synopsis = db.Column(db.Text)
     # insert image field
     author = db.Column(db.String, nullable=False)
@@ -191,8 +187,8 @@ class Book_loan(db.Model):
             'book': self.book.serialize,
             'owner': self.owner.serialize,
             'user': self.user.serialize,
-            'loan_date': self.loan_date.strftime('%Y-%m-%d'),
-            'return_date': self.return_date.strftime('%Y-%m-%d'),
+            'loan_date': self.loan_date,
+            'return_date': self.return_date,
             'loan_status': self.loan_status
         }
 
@@ -267,12 +263,11 @@ class Feedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     # Feedback info
-    transaction_id = db.Column(db.Integer, db.ForeignKey('book_loans.id'), nullable=False)
-    user = db.Column(db.Enum("owner", "user", name="user_feedback"), nullable=False)
-    user_evaluation = db.Column(db.Integer, nullable=False)
+    transaction_id = db.Column(db.Integer, db.ForeignKey('book_loans.id'))
+    user = db.Column(db.Enum("owner", "user", name="user_feedback"))
+    user_evaluation = db.Column(db.Integer)
     time_evaluation = db.Column(db.Integer)
     book_evaluation = db.Column(db.Integer)
-    interaction_evaluation = db.Column(db.Integer)
     comments = db.Column(db.Text)
 
     book_loan = db.relationship('Book_loan', foreign_keys=transaction_id)
@@ -286,7 +281,6 @@ class Feedback(db.Model):
             'user_evaluation': self.user_evaluation,
             'time_evaluation': self.time_evaluation,
             'book_evaluation': self.book_evaluation,
-            'interaction_evaluation' : self.interaction_evaluation,
             'comments': self.comments
         }
 
