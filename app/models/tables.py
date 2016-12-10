@@ -123,7 +123,7 @@ class Book(db.Model):
 
     # Description fields
     title = db.Column(db.String, nullable=False)
-    isbn = db.Column(db.Integer)
+    isbn = db.Column(db.String)
     synopsis = db.Column(db.Text)
     # insert image field
     author = db.Column(db.String, nullable=False)
