@@ -186,18 +186,18 @@ class ModifyBooksApi(Resource):
 class BooksAvailabilityApi(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("book_id", type=int, required=True,
+        self.reqparse.add_argument("isbn", type=int, required=True,
                                    location='json')
-        self.reqparse.add_argument("user_id", type=int,
+        self.reqparse.add_argument("user_id", type=int, required=True,
                                    location='json')
         super(BooksAvailabilityApi, self).__init__()
 
     def get(self):
         args = self.reqparse.parse_args()
-        book = Book.query.filter_by(id=args['book_id']).first()
+        book = Book.query.filter_by(isbn=args['isbn']).first()
 
         if(book): # Book found
-            book_loans = Book_loan.query.filter_by(book_id=book.id).all()
+            book_loans = Book_loan.query.filter_by(book_id=book.id, owner_id=args['user_id']).all()
             if(book_loans): # If any book loan
                 for loan in book_loans: # Search for all loans
                     book_return = Book_return.query.filter_by(book_loan_id=loan.id).first()
@@ -206,7 +206,7 @@ class BooksAvailabilityApi(Resource):
                             return {'data': {'status': 'unavaiable'}}, 200
                     else: # Book not returned yet
                         return {'data': {'status': 'unavaiable'}}, 200
-                return {'data': {'status': 'available'}}, 200 # All loans returned and confirmed
+                return {'data': {'status': 'available'}}, 200 # All loans returned
             else: # Book not loaned yet
                 return {'data': {'status': 'available'}}, 200
         else: # Book not found
@@ -259,6 +259,8 @@ class ReturnApi(Resource):
 
 
 class WishlistApi(Resource):
+    decorators = [auth.login_required]
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("isbn", type=int, location='json')
@@ -268,29 +270,34 @@ class WishlistApi(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        wish = Wishlist.query.filter_by(isbn=args['isbn']).all()
+        wish = Wishlist.query.filter_by(isbn=args['isbn']).first()
 
         if(wish):
-            return {'data': [w.serialize for w in wish]}
+            return {'data': wish.serialize}, 200
         else:
             return {'data': 'Wishlist not found'}, 404
 
     def post(self):
         self.reqparse.add_argument("isbn", type=int, required=True, location='json')
         self.reqparse.add_argument("title", type=str, required=True, location='json')
-        self.reqparse.add_argument("user", type=int, required=True, location='json')
+        self.reqparse.add_argument("user", type=User, required=True, location='json')
 
         args = self.reqparse.parse_args()
-        wish = Wishlist.query.filter_by(isbn=args['isbn'],
-                                        user=args['user']).first()
+        wish = Wishlist.query.filter_by(isbn=args['isbn']).first()
 
-        if(not wish):
-            wish = Wishlist(**args)
-            db.session.add(wish)
-            db.session.commit()
-            return {'data': wish.serialize}, 200
-        else:
-            return {'data': 'Wish already exists'}, 500
+        try:
+            if(wish):
+                if(args['user'] not in wish.user): # Add user in the list
+                    wish.user.append(args['user'])
+                    db.session.commit()
+                return {'data': wish.serialize}, 200
+            else: # If wishlist doesn't exist
+                new_wish = Wishlist(**args)
+                db.session.add(new_wish)
+                db.session.commit()
+                return {'data': new_wish.serialize}, 200
+        except Exception:
+            return {'data': 'Unexpected error'}, 500
 
 api.add_resource(BooksApi, '/api/v1/books', endpoint='books')
 api.add_resource(ModifyBooksApi, '/api/v1/books/<int:id>', endpoint='modify_books')

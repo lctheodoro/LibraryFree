@@ -299,7 +299,8 @@ class Wishlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     isbn = db.Column(db.Integer, nullable=False)
     title = db.Column(db.String, nullable=False)
-    user = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    user = db.relationship('User', backref='user')
 
     @property
     def serialize(self):
@@ -307,8 +308,8 @@ class Wishlist(db.Model):
             'id': self.id,
             'isbn': self.isbn,
             'title': self.title,
-            'user': self.user
+            'user': [u.serialize for u in self.user]
         }
 
     def __repr__(self):
-        return "<Wishlist %r>" % self.title
+        return "<Wishlist %r>" % self.isbn
