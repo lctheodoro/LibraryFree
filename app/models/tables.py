@@ -292,3 +292,23 @@ class Feedback(db.Model):
 
     def __repr__(self):
         return "<Feedback %r>" % self.id
+
+class Wishlist(db.Model):
+    __tablename__ = "wishlists"
+
+    id = db.Column(db.Integer, primary_key=True)
+    isbn = db.Column(db.Integer, nullable=False)
+    title = db.Column(db.String, nullable=False)
+    user = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'isbn': self.isbn,
+            'title': self.title,
+            'user': self.user
+        }
+
+    def __repr__(self):
+        return "<Wishlist %r>" % self.title
