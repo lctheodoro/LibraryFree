@@ -265,12 +265,16 @@ class WishlistApi(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("isbn", type=int, location='json')
         self.reqparse.add_argument("title", type=str, location='json')
-        self.reqparse.add_argument("user", type=User, location='json')
+        self.reqparse.add_argument("user_id", type=int, location='json')
         super(WishlistApi, self).__init__()
 
     def get(self):
+        self.reqparse.add_argument("isbn", type=str, required=True, location='json')
+        self.reqparse.add_argument("user_id", type=int, required=True, location='json')
+
         args = self.reqparse.parse_args()
-        wish = Wishlist.query.filter_by(isbn=args['isbn']).first()
+
+        wish = Wishlist.query.filter_by(isbn=args['isbn'], user=args['user_id']).first()
 
         if(wish):
             return {'data': wish.serialize}, 200
@@ -278,21 +282,24 @@ class WishlistApi(Resource):
             return {'data': 'Wishlist not found'}, 404
 
     def post(self):
-        self.reqparse.add_argument("isbn", type=int, required=True, location='json')
+        self.reqparse.add_argument("isbn", type=str, required=True, location='json')
         self.reqparse.add_argument("title", type=str, required=True, location='json')
-        self.reqparse.add_argument("user", type=User, required=True, location='json')
+        self.reqparse.add_argument("user_id", type=int, required=True, location='json')
 
         args = self.reqparse.parse_args()
-        wish = Wishlist.query.filter_by(isbn=args['isbn']).first()
+
+        user = User.query.filter_by(id=args['user_id']).first()
+
+        if(not user):
+            return {'data': 'User not found'}, 404
+
+        wish = Wishlist.query.filter_by(isbn=args['isbn'], user=user.id).first()
 
         try:
             if(wish):
-                if(args['user'] not in wish.listOfUsers): # Add user in the list
-                    wish.listOfUsers.append(args['user'])
-                    db.session.commit()
                 return {'data': wish.serialize}, 200
             else: # If wishlist doesn't exist
-                new_wish = Wishlist(**args)
+                new_wish = Wishlist(isbn=args['isbn'], title=args['title'], user=user.id)
                 db.session.add(new_wish)
                 db.session.commit()
                 return {'data': new_wish.serialize}, 200

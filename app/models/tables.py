@@ -39,6 +39,8 @@ class User(db.Model):
     # User evaluation from feedback
     evaluation = db.Column(db.Integer, default=0)
 
+    wishlist_id = db.Column(db.Integer, db.ForeignKey('wishlists.id'))
+
     # encrypts user's new password
     def hash_password(self, password):
         self.password = pwd_context.encrypt(password)
@@ -297,10 +299,9 @@ class Wishlist(db.Model):
     __tablename__ = "wishlists"
 
     id = db.Column(db.Integer, primary_key=True)
-    isbn = db.Column(db.Integer, nullable=False)
+    isbn = db.Column(db.String, nullable=False)
     title = db.Column(db.String, nullable=False)
-
-    listOfUsers = db.relationship('User', backref='user', uselist=True)
+    user = db.Column(db.Integer, nullable=False)
 
     @property
     def serialize(self):
@@ -308,7 +309,7 @@ class Wishlist(db.Model):
             'id': self.id,
             'isbn': self.isbn,
             'title': self.title,
-            'listOfUsers': [u.serialize for u in self.listOfUsers]
+            'user': self.user
         }
 
     def __repr__(self):
