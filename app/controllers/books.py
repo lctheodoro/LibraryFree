@@ -287,8 +287,8 @@ class WishlistApi(Resource):
 
         try:
             if(wish):
-                if(args['user'] not in wish.user): # Add user in the list
-                    wish.user.append(args['user'])
+                if(args['user'] not in wish.listOfUsers): # Add user in the list
+                    wish.listOfUsers.append(args['user'])
                     db.session.commit()
                 return {'data': wish.serialize}, 200
             else: # If wishlist doesn't exist
