@@ -160,10 +160,7 @@ class Book(db.Model):
 
     # Description fields
     title = db.Column(db.String, nullable=False)
-<<<<<<< HEAD
     
-=======
->>>>>>> 04153e268e2f6632c1343c3ab3e10c424610e119
     isbn = db.Column(db.String)
     synopsis = db.Column(db.Text)
     # insert image field
