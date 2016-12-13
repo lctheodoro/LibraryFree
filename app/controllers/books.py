@@ -50,6 +50,7 @@ class BooksApi(Resource):
             )
 
         if args['isbn'] :
+            print(args['isbn'])
             filters_list.append(
                 Book.isbn.ilike("%{0}%".format(args['isbn']))
             )
