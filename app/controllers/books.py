@@ -1,10 +1,13 @@
 from flask import g, jsonify, json
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
-from app.models.tables import Book, Book_loan, Book_return, owned_books
+from app.models.tables import Book, Book_loan, Book_return, owned_books,User
+from app.models.decorators import is_user, is_manager
 from sqlalchemy.sql import and_, or_
 from isbnlib import *
 from isbnlib.registry import bibformatters
+from datetime import date, timedelta
+from app.controllers import notification
 
 class BooksApi(Resource):
     def __init__(self):
@@ -48,7 +51,7 @@ class BooksApi(Resource):
 
         if args['isbn'] :
             filters_list.append(
-                Book.title.ilike("%{0}%".format(args['isbn']))
+                Book.isbn.ilike("%{0}%".format(args['isbn']))
             )
 
         if args['author']:
@@ -213,6 +216,88 @@ class BooksAvailabilityApi(Resource):
         else: # Book not found
             return 500
 
+class LoanRequestApi(Resource):
+    decorators = [auth.login_required]
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("book_id", type=int, required=True,
+                                    location='json')
+        self.reqparse.add_argument("user_id", type=int, required=True,
+                                    location='json')
+        self.reqparse.add_argument("owner_id", type=int, required=True,
+                                    location='json')
+        self.reqparse.add_argument("loan_status", type=str, default='requested',location='json')
+        super(LoanRequestApi,self).__init__()
+
+    @is_user
+    def post(self):
+        args = self.reqparse.parse_args()
+        if args['loan_status'] == 'requested':
+            try:
+                loan = Book_loan(**args)
+                owner = User.query.get_or_404(loan.owner_id)
+                book = Book.query.get_or_404(loan.book_id)
+                notification.Send([owner],"loanrequest.html","Loan Request",book)
+
+                db.session.add(loan)
+                db.session.commit()
+
+                return 204
+            except Exception as error:
+                print(error)
+                return { 'data': { 'message': 'Unexpected Error' } }, 500
+        return 500
+
+class LoanReplyApi(Resource):
+    decorators = [auth.login_required]
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("loan_status", type=str, required=True,
+                                    location='json')
+        super(LoanReplyApi,self).__init__()
+    
+    @is_user
+    def get(self,id):
+        try:
+            loan = Book_loan.get_or_404(id)
+            return { 'data': loan.serialize }, 200
+        except Exception as error:
+            print(error)
+            return { 'data': {'mesage': 'Unexpected Error'} }, 500
+
+    @is_user
+    def post(self,id):
+        args = self.reqparse.parse_args()
+        loan =  Book_loan.query.get_or_404(id)
+        if args['loan_status'] == None:
+            return { 'data ' : {'mesage': 'Empty Status'}}, 500
+        if loan.loan_status != args['loan_status']:
+            user = User.query.get_or_404(loan.user_id)
+            book = Book.query.get_or_404(loan.book_id)
+            loan.loan_status = args['loan_status']
+            
+            if loan.loan_status == 'accepted':
+                loan.loan_date = date.today()
+                return_day = date.today() + timedelta(days=10)
+
+                if return_day.strftime('%A') == 'Sunday':
+                    return_day += timedelta(days=1)
+                elif return_day.strftime('%A') == 'Saturday':
+                    return_day += timedelta(days=2)
+                loan.return_date = return_day
+              
+                user.points_update(5)
+
+                notification.Send([user],"accepted.html","Loan Reply",book,loan.return_date)
+            elif loan.loan_status == 'refused':
+                notification.Send([user],"refused.html","Loan Reply",book,loan.return_date)
+            elif loan.loan_status == 'queue':
+                notification.Send([user],"queue.html","Loan Reply",book,loan.return_date)
+            
+            db.session.commit()
+            return 204
+        return { 'data ' : {'mesage': 'Request already answered'}}, 409
+
 class ReturnApi(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -258,8 +343,9 @@ class ReturnApi(Resource):
 
         return {'data': [return_record_search.serialize]}, 200
 
-
 api.add_resource(BooksApi, '/api/v1/books', endpoint='books')
 api.add_resource(ModifyBooksApi, '/api/v1/books/<int:id>', endpoint='modify_books')
+api.add_resource(LoanRequestApi, '/api/v1/books/borrow', endpoint='loan_request')   
+api.add_resource(LoanReplyApi, '/api/v1/books/borrow/<int:id>', endpoint='loan_reply')
 api.add_resource(BooksAvailabilityApi, '/api/v1/books/availability', endpoint='books_availability')
 api.add_resource(ReturnApi, '/api/v1/books/return', endpoint='return')

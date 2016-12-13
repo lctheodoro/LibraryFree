@@ -6,12 +6,16 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 from flask_httpauth import HTTPBasicAuth
 from flask_restful import Api
+from flask_mail import Mail
+from threading import Thread
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+
+mail = Mail(app)
 
 manager = Manager(app)
 manager.add_command("db", MigrateCommand)
@@ -36,4 +40,7 @@ app_errors = {
 api = Api(app, errors=app_errors)
 
 from app.models import tables
-from app.controllers import users, books
+from app.controllers import users, books, notification
+
+notification = Thread(target=notification.Email)
+#notification.start()
