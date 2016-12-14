@@ -9,7 +9,6 @@ owned_books = db.Table("owned_books",
     db.Column('owner_id', db.Integer, db.ForeignKey('users.id'))
 )
 
-
 class User(db.Model):
     __tablename__ = "users"
 
@@ -39,7 +38,39 @@ class User(db.Model):
     # User evaluation from feedback
     evaluation = db.Column(db.Integer, default=0)
 
-    wishlist_id = db.Column(db.Integer, db.ForeignKey('wishlists.id'))
+    # User points
+    points = db.Column(db.Integer, default=0)
+    complete = db.Column(db.Boolean, default=False)
+
+    # User medals
+    medals = db.Column(db.Enum("Usuário Iniciante","Usuário Bronze","Usuário Prata",
+                                "Usuário Ouro","Usuário Diamante", name="users_medals"),
+                                    nullable=False,default="Usuário Iniciante")
+
+    # Check if user's registration is complete
+    def check_register(self):
+        if self.city != None and self.phone != None:
+            self.complete = True
+            self.points += 5
+        else:
+            if self.complete == True:
+                self.points -= 5
+            self.complete = False
+
+    # Update points and medals
+    def points_update(self,points):
+        self.points += points
+        self.check_register();
+        if self.points >= 0 and self.points <= 19:
+            self.medals = "Usuário Iniciante"
+        elif self.points >= 20 and self.points <= 49:
+            self.medals = "Usuário Bronze"
+        elif self.points >=50 and self.points <= 89:
+            self.medals = "Usuário Prata"
+        elif self.points >= 90 and self.points <= 139:
+            self.medals = "Usuário Ouro"
+        elif self.points >= 140:
+            self.medals = "Usuário Diamante"
 
     # encrypts user's new password
     def hash_password(self, password):
@@ -83,6 +114,8 @@ class User(db.Model):
             'city': self.city,
             'phone': self.phone,
             'evaluation': self.evaluation,
+            'points': self.points,
+            'medal': self.medals,
             'organization_id': org
         }
 
@@ -125,6 +158,7 @@ class Book(db.Model):
 
     # Description fields
     title = db.Column(db.String, nullable=False)
+
     isbn = db.Column(db.String)
     synopsis = db.Column(db.Text)
     # insert image field
@@ -174,8 +208,8 @@ class Book_loan(db.Model):
     user = db.relationship('User', foreign_keys=user_id)
 
     # Transaction info
-    loan_date = db.Column(db.Date, nullable=False)
-    return_date = db.Column(db.Date, nullable=False)
+    loan_date = db.Column(db.Date)
+    return_date = db.Column(db.Date)
 
     # Loan status:
     # requested - user requested the book
@@ -276,8 +310,10 @@ class Feedback(db.Model):
     book_evaluation = db.Column(db.Integer)
     interaction_evaluation = db.Column(db.Integer)
     comments = db.Column(db.Text)
+    scored = db.Column(db.Integer, default=0)
 
     book_loan = db.relationship('Book_loan', foreign_keys=transaction_id)
+
 
     @property
     def serialize(self):
