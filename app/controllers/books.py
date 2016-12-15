@@ -1,51 +1,3 @@
-<<<<<<< HEAD
-from flask import jsonify
-from flask_mail import Message
-from flask_restful import Resource, reqparse
-from app import app, db, auth, mail
-from app.models.tables import Book_loan, Book_return
-from flask import current_app,render_template
-from datetime import timedelta,date
-
-
-
-
-    class ReturnApi(Resource):
-        def __init__(self):
-
-            self.reqparse = reqparse.RequestParser()
-            self.reqparse.add_argument("book_id", type=int, required=True,
-                                       location='json')
-            self.reqparse.add_argument("user_id", type=int, required=True,
-                                       location='json')
-            self.reqparse.add_argument("owner_id", type=int, required=True,
-                                       location='json')
-            self.reqparse.add_argument("confirmed_by", type=str,
-                                       location='json')
-            super(ReturnApi, self).__init__()
-
-
-        def post(self):
-            args = self.reqparse.parse_args()
-            loan_record = Book_loan.query.filter_by(book_id=args['book_id'],
-                                                      owner_id=args['owner_id'],
-                                                      user_id= args['user_id']).
-                                                      first()
-            return_record = Book_return.query.filter_by(book_loan_id =
-                                                        loan_record.id).first()
-            if not (return_record):
-                return_record = Book_return(book_loan_id = loan_record.id,
-                                            returned_date = datetime.now())
-                db.session.add(Book_return)
-
-            if(args['confirmed_by']=='owner'):
-                return_record.owner_confirmation=True
-            else if(args['confirmed_by']=='user'):
-                return_record.user_confirmation=True
-            else:
-                abort(400)
-            db.session.commit()
-=======
 from flask import g, jsonify, json
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
@@ -184,7 +136,6 @@ class ModifyBooksApi(Resource):
         self.reqparse.add_argument("language", type=str, location='json')
         self.reqparse.add_argument("genre", type=str, location='json')
         super(ModifyBooksApi, self).__init__()
->>>>>>> 3679bb818f3d15eac947a1b37a7c79182c02b90f
 
     def get(self, id):
         book = Book.query.get_or_404(id)
@@ -392,9 +343,6 @@ class ReturnApi(Resource):
                                                     loan_record.id).first()
 
         return {'data': [return_record_search.serialize]}, 200
-
-<<<<<<< HEAD
-    api.add_resource(ReturnApi, '/api/v1/books/return', endpoint='return')
 
 
         class DelayApi(Resorce):
