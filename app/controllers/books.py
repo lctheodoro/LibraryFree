@@ -202,7 +202,7 @@ class BooksAvailabilityApi(Resource):
         owned_book = UserBooks.query.filter_by(book_id=args['book_id'], owner_id=args['owner_id']).first()
 
         if(owned_book): # Book found
-            book = Book.query.filter_by(id=owned_book.book_id)
+            book = Book.query.filter_by(id=owned_book.book_id).first()
             book_loans = Book_loan.query.filter_by(book_id=book.id, owner_id=args['owner_id']).all()
             if(book_loans): # If any book loan
                 for loan in book_loans: # Search for all loans
@@ -345,7 +345,7 @@ class ReturnApi(Resource):
 
         return {'data': [return_record_search.serialize]}, 200
 
-class DelayApi(Resorce):
+class DelayApi(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("book_id", type=int, required=True,
