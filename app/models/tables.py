@@ -2,13 +2,13 @@ from app import app, db
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
-
+"""
 # Relationship table for many-to-many relation between books and users
 owned_books = db.Table("owned_books",
     db.Column('book_id', db.Integer, db.ForeignKey('books.id')),
     db.Column('owner_id', db.Integer, db.ForeignKey('users.id'))
 )
-
+"""
 
 class User(db.Model):
     __tablename__ = "users"
@@ -280,3 +280,28 @@ class Feedback(db.Model):
 
     def __repr__(self):
         return "<Feedback %r>" % self.id
+
+
+
+class UserBooks(db.Model):
+    id= db.Column(db.Integer, primary_key=True)
+
+    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    #Books = db.relationship('Book', backref='owner')
+    book = db.relationship(Book, foreign_keys=book_id)
+    owner= db.relationship(User, foreign_keys=owner_id)
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            #'Books': [b.serialize for b in self.book]
+            'book': self.book.serialize
+            'owner': self.owner.serialize
+            }
+
+
+    def __repr__(self):
+        return "<UserBook %r>" % self.id
