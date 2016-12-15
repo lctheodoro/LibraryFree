@@ -1,9 +1,8 @@
-from flask import g, json, jsonify, current_app, render_template
-from flask_mail import Message
+from flask import json
 from flask_restful import Resource, reqparse
-from app import app, db, auth, mail, api
-from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, UserBooks
-from app.models.decorators import is_user, is_manager
+from app import db, auth, api
+from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, UserBooks, Delayed_return
+from app.models.decorators import is_user
 from datetime import timedelta, date
 from sqlalchemy.sql import and_
 from isbnlib import *
@@ -359,9 +358,7 @@ class DelayApi(Resorce):
                                     "accepted", "refused",
                                    name="delayed_return_status"),
                                     required=True,location='json')
-
         super(DelayApi, self).__init__()
-
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -392,22 +389,20 @@ class DelayApi(Resorce):
         users_email = []
         users_email += [users_mail.email]
 
-
         Send(users_email, "email.html",delay_record.status,
              book_mail.title,delay_record.requested_date)
 
         return 204
 
+    def get(self):
+        args = self.reqparse.parse_args()
+        loan_delay_search = Book_loan.query.filter_by(book_id=args['book_id'],
+                                                 owner_id=args['owner_id'],
+                                                 user_id= args['user_id']).first()
+        delay_record_search= Delayed_return.query.filter_by(book_loan_id =
+                                                    loan_delay.id).first()
 
-        def get(self):
-            args = self.reqparse.parse_args()
-            loan_delay_search = Book_loan.query.filter_by(book_id=args['book_id'],
-                                                     owner_id=args['owner_id'],
-                                                     user_id= args['user_id']).first()
-            delay_record_search= Delayed_return.query.filter_by(book_loan_id =
-                                                        loan_delay.id).first()
-
-            return {'data': [delay_record_search.serialize]}, 200
+        return {'data': [delay_record_search.serialize]}, 200
 
 class WishlistApi(Resource):
     decorators = [auth.login_required]
