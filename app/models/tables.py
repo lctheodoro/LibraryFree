@@ -36,6 +36,44 @@ class User(db.Model):
     my_loans = db.relationship('Book_loan', foreign_keys='Book_loan.user_id')
     loaned = db.relationship('Book_loan', foreign_keys='Book_loan.owner_id')
 
+    # User evaluation from feedback
+    evaluation = db.Column(db.Integer, default=0)
+
+    # User points
+    points = db.Column(db.Integer, default=0)
+    complete = db.Column(db.Boolean, default=False)
+
+    # User medals
+    medals = db.Column(db.Enum("Usuário Iniciante","Usuário Bronze","Usuário Prata",
+                                "Usuário Ouro","Usuário Diamante", name="users_medals"),
+                                    nullable=False,default="Usuário Iniciante")
+
+    # Check if user's registration is complete
+    def check_register(self):
+        if self.city != None and self.phone != None:
+            self.complete = True
+            self.points += 5
+        else:
+            if self.complete == True:
+                self.points -= 5
+            self.complete = False
+
+    # Update points and medals
+    def points_update(self,points):
+        self.points += points
+        self.check_register();
+        if self.points >= 0 and self.points <= 19:
+            self.medals = "Usuário Iniciante"
+        elif self.points >= 20 and self.points <= 49:
+            self.medals = "Usuário Bronze"
+        elif self.points >=50 and self.points <= 89:
+            self.medals = "Usuário Prata"
+        elif self.points >= 90 and self.points <= 139:
+            self.medals = "Usuário Ouro"
+        elif self.points >= 140:
+            self.medals = "Usuário Diamante"
+
+
     # encrypts user's new password
     def hash_password(self, password):
         self.password = pwd_context.encrypt(password)
@@ -77,6 +115,9 @@ class User(db.Model):
             'email': self.email,
             'city': self.city,
             'phone': self.phone,
+            'evaluation': self.evaluation,
+            'points': self.points,
+            'medal': self.medals,
             'organization_id': org
         }
 
@@ -119,9 +160,13 @@ class Book(db.Model):
 
     # Description fields
     title = db.Column(db.String, nullable=False)
+    
+    isbn = db.Column(db.String)
     synopsis = db.Column(db.Text)
     # insert image field
     author = db.Column(db.String, nullable=False)
+    author2 = db.Column(db.String)
+    author3 = db.Column(db.String)
     publisher = db.Column(db.String, nullable=False)
     edition = db.Column(db.Integer)
     year = db.Column(db.Integer)
@@ -133,8 +178,11 @@ class Book(db.Model):
         return {
             'id': self.id,
             'title': self.title,
+            'isbn' : self.isbn,
             'synopsis': self.synopsis,
             'author': self.author,
+            'author2': self.author2,
+            'author3': self.author3,
             'publisher': self.publisher,
             'edition': self.edition,
             'year': self.year,
@@ -162,8 +210,8 @@ class Book_loan(db.Model):
     user = db.relationship('User', foreign_keys=user_id)
 
     # Transaction info
-    loan_date = db.Column(db.Date, nullable=False)
-    return_date = db.Column(db.Date, nullable=False)
+    loan_date = db.Column(db.Date)
+    return_date = db.Column(db.Date)
 
     # Loan status:
     # requested - user requested the book
@@ -181,8 +229,8 @@ class Book_loan(db.Model):
             'book': self.book.serialize,
             'owner': self.owner.serialize,
             'user': self.user.serialize,
-            'loan_date': self.loan_date,
-            'return_date': self.return_date,
+            'loan_date': self.loan_date.strftime('%Y-%m-%d'),
+            'return_date': self.return_date.strftime('%Y-%m-%d'),
             'loan_status': self.loan_status
         }
 
@@ -257,14 +305,17 @@ class Feedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     # Feedback info
-    transaction_id = db.Column(db.Integer, db.ForeignKey('book_loans.id'))
-    user = db.Column(db.Enum("owner", "user", name="user_feedback"))
-    user_evaluation = db.Column(db.Integer)
+    transaction_id = db.Column(db.Integer, db.ForeignKey('book_loans.id'), nullable=False)
+    user = db.Column(db.Enum("owner", "user", name="user_feedback"), nullable=False)
+    user_evaluation = db.Column(db.Integer, nullable=False)
     time_evaluation = db.Column(db.Integer)
     book_evaluation = db.Column(db.Integer)
+    interaction_evaluation = db.Column(db.Integer)
     comments = db.Column(db.Text)
+    scored = db.Column(db.Integer, default=0)
 
     book_loan = db.relationship('Book_loan', foreign_keys=transaction_id)
+
 
     @property
     def serialize(self):
@@ -275,10 +326,12 @@ class Feedback(db.Model):
             'user_evaluation': self.user_evaluation,
             'time_evaluation': self.time_evaluation,
             'book_evaluation': self.book_evaluation,
+            'interaction_evaluation' : self.interaction_evaluation,
             'comments': self.comments
         }
 
     def __repr__(self):
+<<<<<<< HEAD
         return "<Feedback %r>" % self.id
 
 
@@ -305,3 +358,6 @@ class UserBooks(db.Model):
 
     def __repr__(self):
         return "<UserBook %r>" % self.id
+=======
+        return "<Feedback %r>" % self.id
+>>>>>>> 3679bb818f3d15eac947a1b37a7c79182c02b90f

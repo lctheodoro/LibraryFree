@@ -11,7 +11,12 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     BUNDLE_ERRORS = True  # related to Flask-RESTful errors, see docs
     ERROR_404_HELP = False
-
+    MAIL_SERVER = 'smtps.bol.com.br'
+    MAIL_PORT = 587
+    MAIL_USE_SSL = False
+    MAIL_USE_TSL = False
+    MAIL_USERNAME = 'libraryfree@bol.com.br'
+    MAIL_PASSWORD = 'Senhadolibrary'
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True

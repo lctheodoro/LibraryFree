@@ -1,9 +1,9 @@
 from flask import g, jsonify
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
-from app.models.tables import User, Organization
+from app.models.tables import User, Organization, Feedback, Book_loan
 from app.models.decorators import is_user, is_manager
-
+from math import ceil
 
 @auth.verify_password
 def verify_password(email_or_token, password):
@@ -64,10 +64,15 @@ class UsersApi(Resource):
         # we will ALWAYS encrypt a new password
         user.hash_password(args['password'])
         db.session.add(user)
+
         try:
             db.session.commit()
+            user.check_register(args['name'])
+            db.session.commit()
+
             return {'data': user.serialize}, 201
         except Exception as error:
+            print(error)
             if "duplicate key value in error":
                 return {'data': {'message': 'User already exists'}}, 409
             else:
@@ -107,6 +112,7 @@ class ModifyUsersApi(Resource):
                 user.hash_password(value)
             elif value is not None:
                 setattr(user, key, value)
+        user.check_register(user.id)
         db.session.commit()
         return {'data': user.serialize}, 200
 
@@ -183,6 +189,68 @@ class ModifyOrganizationsApi(Resource):
         db.session.commit()
         return 204
 
+
+class FeedbackApi(Resource):
+    decorators = [auth.login_required]
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("transaction_id", type=int, location='json')
+        self.reqparse.add_argument("user", type=str, location='json')
+        self.reqparse.add_argument("user_evaluation", type=int, location='json')
+        self.reqparse.add_argument("time_evaluation", type=int, location='json')
+        self.reqparse.add_argument("book_evaluation", type=int, location='json')
+        self.reqparse.add_argument("interaction_evaluation", type=int, location='json')
+        self.reqparse.add_argument("comments", type=str, location='json')
+
+        super(FeedbackApi, self).__init__()
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        feedback = Feedback(**args)
+        db.session.add(feedback)
+        try:
+            loan = Book_loan.query.filter_by(id=feedback.transaction_id).first()
+            if feedback.user == "user":
+                user = User.query.filter_by(id=loan.owner_id).first()
+            else:
+                user = User.query.filter_by(id=loan.user_id).first()
+
+            if user.evaluation == 0:
+                user.evaluation = feedback.user_evaluation
+            else:
+                user.evaluation = ceil((user.evaluation +
+                                   feedback.user_evaluation) / 2)
+            if feedback.book_evaluation == 5:
+                user.points_update(8,user.id)
+                feedback.scored_update(8,user.id)
+            if feedback.time_evaluation == 5:
+                user.points_update(8,user.id)
+                feedback.scored_update(8,user.id)
+            db.session.commit()
+            return { 'data': feedback.serialize }, 200
+        except Exception as error:
+            print(error)
+            return { 'data': { 'message': 'Unexpected Error' } }, 500
+
+
+class ModifyFeedbackApi(Resource):
+    decorators = [auth.login_required]
+
+    def get(self, id):
+        feedback = Feedback.query.get_or_404(id)
+        return { 'data': feedback.serialize }, 200
+
+    def delete(self, id):
+        feedback = Feedback.query.get_or_404(id)
+        if feedback.user == "owner":
+            loan = Book_loan.query.filter_by(id=feedback.transaction_id).first()
+            user = User.query.filter_by(id=loan.owner_id).first()
+            user.points_update(-feedback.points)
+        db.session.delete(feedback)
+        db.session.commit()
+        return 204
+
 # for each resource we need to specify an URI and an endpoint
 # the endpoint is a "reference" to each resource
 api.add_resource(UsersApi, '/api/v1/users', endpoint='users')
@@ -192,6 +260,9 @@ api.add_resource(OrganizationsApi, '/api/v1/organizations',
                  endpoint='organizations')
 api.add_resource(ModifyOrganizationsApi, '/api/v1/organizations/<int:id>',
                  endpoint='modify_organizations')
+api.add_resource(FeedbackApi, '/api/v1/feedbacks', endpoint='feedback')
+api.add_resource(ModifyFeedbackApi, '/api/v1/feedbacks/<int:id>',
+                 endpoint='modify_feedback')
 
 # if you want to test any resource, try using CURL in the terminal, like:
 # $ curl -u USERAME:PASSWORD -H "Content-Type: application/json" -d '{"key": "value", "key": "value"}' -X GET/POST/PUT/DELETE -i http://localhost:5000/RESOURCE_URI
