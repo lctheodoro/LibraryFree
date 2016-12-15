@@ -1,10 +1,9 @@
-from flask import g, jsonify, json
+from flask import json
 from flask_restful import Resource, reqparse
-from app import app, db, auth, api
-from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, owned_books
+from app import db, auth, api
+from app.models.tables import Book, Book_loan, Book_return, User, Wishlist
 from app.models.decorators import is_user, is_manager
-
-from sqlalchemy.sql import and_, or_
+from sqlalchemy.sql import and_
 from isbnlib import *
 from isbnlib.registry import bibformatters
 from datetime import date, timedelta
@@ -193,16 +192,20 @@ class BooksAvailabilityApi(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("isbn", type=int, required=True,
                                    location='json')
-        self.reqparse.add_argument("user_id", type=int, required=True,
+        self.reqparse.add_argument("owner_id", type=int, required=True,
                                    location='json')
         super(BooksAvailabilityApi, self).__init__()
 
     def get(self):
         args = self.reqparse.parse_args()
         book = Book.query.filter_by(isbn=args['isbn']).first()
-
+        """
+        owned_book = Owned_books.query.filter_by(isbn=args['isbn'], owner_id=args['user_id']).first()
+        if(owned_book):
+            book = Book.query.filter_by(id=owned_book.id)
+        """
         if(book): # Book found
-            book_loans = Book_loan.query.filter_by(book_id=book.id, owner_id=args['user_id']).all()
+            book_loans = Book_loan.query.filter_by(book_id=book.id, owner_id=args['owner_id']).all()
             if(book_loans): # If any book loan
                 for loan in book_loans: # Search for all loans
                     book_return = Book_return.query.filter_by(book_loan_id=loan.id).first()
@@ -322,7 +325,7 @@ class ReturnApi(Resource):
         if not (return_record):
             return_record = Book_return(book_loan_id = loan_record.id,
                                         returned_date = datetime.now())
-            db.session.add(book_return)
+            db.session.add(return_record)
 
         if(args['confirmed_by']=='owner'):
             return_record.owner_confirmation=True
@@ -340,7 +343,7 @@ class ReturnApi(Resource):
                                                   owner_id=args['owner_id'],
                                                   user_id= args['user_id']).first()
         return_record_search = Book_return.query.filter_by(book_loan_id =
-                                                    loan_record.id).first()
+                                                    loan_record_search.id).first()
 
         return {'data': [return_record_search.serialize]}, 200
 
