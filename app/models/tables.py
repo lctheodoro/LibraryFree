@@ -36,9 +36,9 @@ class User(db.Model):
     complete = db.Column(db.Boolean, default=False)
 
     # User medals
-    medals = db.Column(db.Enum('Usuário Iniciante','Usuário Bronze','Usuário Prata',
-                                'Usuário Ouro','Usuário Diamante', name="users_medals"),
-                                    nullable=False,default='Usuário Iniciante')
+    medals = db.Column(db.Enum('Usuario Iniciante','Usuario Bronze','Usuario Prata',
+                                'Usuario Ouro','Usuario Diamante', name="users_medals"),
+                                    nullable=False,default='Usuario Iniciante')
 
     # Check if user's registration is complete
     def check_register(self):
@@ -55,15 +55,15 @@ class User(db.Model):
         self.points += points
         self.check_register();
         if self.points >= 0 and self.points <= 19:
-            self.medals = "Usuário Iniciante"
+            self.medals = 'Usuario Iniciante'
         elif self.points >= 20 and self.points <= 49:
-            self.medals = "Usuário Bronze"
+            self.medals = 'Usuario Bronze'
         elif self.points >=50 and self.points <= 89:
-            self.medals = "Usuário Prata"
+            self.medals = 'Usuario Prata'
         elif self.points >= 90 and self.points <= 139:
-            self.medals = "Usuário Ouro"
+            self.medals = 'Usuario Ouro'
         elif self.points >= 140:
-            self.medals = "Usuário Diamante"
+            self.medals = 'Usuario Diamante'
 
     # encrypts user's new password
     def hash_password(self, password):
@@ -202,7 +202,7 @@ class Book_loan(db.Model):
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    book = db.relationship('Book')
+    book = db.relationship('Book', foreign_keys=book_id)
     user = db.relationship('User', foreign_keys=user_id)
 
     # Transaction info
@@ -227,7 +227,13 @@ class Book_loan(db.Model):
             'loan_date': self.loan_date.strftime('%Y-%m-%d'),
             'return_date': self.return_date.strftime('%Y-%m-%d'),
             'loan_status': self.loan_status
+        } if self.loan_status == 'accepted' else {
+            'id': self.id,
+            'book': self.book.serialize,
+            'user': self.user.serialize,
+            'loan_status': self.loan_status
         }
+
 
     def __repr__(self):
         return "<Book %r to user %r>" % (self.book_id, self.user_id)

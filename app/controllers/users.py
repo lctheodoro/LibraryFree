@@ -1,7 +1,7 @@
 from flask import g, jsonify
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
-from app.models.tables import User, Organization, Feedback, Book_loan
+from app.models.tables import User, Organization, Feedback, Book_loan, Book
 from app.models.decorators import is_user, is_manager
 from math import ceil
 
@@ -248,9 +248,9 @@ class ModifyFeedbackApi(Resource):
     def delete(self, id):
         feedback = Feedback.query.get_or_404(id)
         if feedback.user == "owner":
-            
+
             loan = Book_loan.query.filter_by(id=feedback.transaction_id).first()
-            book = Boook.query.filter_by(id=loan.book_id).all()
+            book = Book.query.filter_by(id=loan.book_id).all()
 
             if book.is_organization:
                 user = User.query.filter_by(id=book.organization_id).first()

@@ -13,7 +13,7 @@ def Send(users,message,assunto,book=None,loan_date=None):
 				msg.html = render_template(message,user=i,book=book,loan_date=loan_date)
 				mail.send(msg)
 
-def ThreeDays():
+def threeDays():
 	users = []
 	day = date.today()+timedelta(days=3)
 	books = Book_loan.query.filter_by(return_date=day).all()
@@ -21,7 +21,7 @@ def ThreeDays():
 		users += [books.user]
 	return users,books,day
 
-def Tomorrow():
+def tomorrow():
 	users = []
 	day = date.today()+timedelta(days=1)
 	books = Book_loan.query.filter_by(return_date=day).all()
@@ -30,11 +30,11 @@ def Tomorrow():
 	return users,books,day
 
 # Daily Verification
-def Email():
+def email():
 	countdown = 86400
 	while(True):
-		u,b,d = Tomorrow()
+		u,b,d = tomorrow()
 		Send(b,"email.html","1 Day:",b,d)
-		u,b,d = ThreeDays()
+		u,b,d = threeDays()
 		Send(b,"email.html","3 Days:",b,d)
 		sleep(countdown)
