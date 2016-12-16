@@ -67,7 +67,7 @@ class UsersApi(Resource):
 
         try:
             db.session.commit()
-            user.check_register(args['name'])
+            user.check_register()
             db.session.commit()
 
             return {'data': user.serialize}, 201

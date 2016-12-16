@@ -43,4 +43,4 @@ from app.models import tables
 from app.controllers import users, books, notification
 
 notification = Thread(target=notification.Email)
-#notification.start()
+notification.start()

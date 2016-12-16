@@ -37,9 +37,9 @@ class User(db.Model):
     complete = db.Column(db.Boolean, default=False)
 
     # User medals
-    medals = db.Column(db.Enum("Usuário Iniciante","Usuário Bronze","Usuário Prata",
-                                "Usuário Ouro","Usuário Diamante", name="users_medals"),
-                                    nullable=False,default="Usuário Iniciante")
+    medals = db.Column(db.Enum('Usuário Iniciante','Usuário Bronze','Usuário Prata',
+                                'Usuário Ouro','Usuário Diamante', name="users_medals"),
+                                    nullable=False,default='Usuário Iniciante')
 
     # Check if user's registration is complete
     def check_register(self):
