@@ -1,7 +1,7 @@
 from flask import json
 from flask_restful import Resource, reqparse
 from app import db, auth, api
-from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, UserBooks, Delayed_return
+from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, Delayed_return
 from app.models.decorators import is_user
 from datetime import timedelta, date
 from sqlalchemy.sql import and_
@@ -25,6 +25,8 @@ class BooksApi(Resource):
         self.reqparse.add_argument("year", type=int)
         self.reqparse.add_argument("language", type=str, location='json')
         self.reqparse.add_argument("genre", type=str, location='json')
+        self.reqparse.add_argument("user_id", type=int, location='json')
+        self.reqparse.add_argument("organization_id", type=int, location='json')
         super(BooksApi, self).__init__()
 
     def get(self):
@@ -120,6 +122,12 @@ class BooksApi(Resource):
             book.year = aux['year']
         else:
             book.year = 0
+        if args['user_id'] and args['organization_id']:
+            return 300
+        elif args['user_id']:
+            book.is_organization = False
+        else:
+            book.is_organization = True
 
         db.session.add(book)
         db.session.commit()
@@ -192,18 +200,15 @@ class BooksAvailabilityApi(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("book_id", type=int, required=True,
                                    location='json')
-        self.reqparse.add_argument("owner_id", type=int, required=True,
-                                   location='json')
         super(BooksAvailabilityApi, self).__init__()
 
     def get(self):
         args = self.reqparse.parse_args()
 
-        owned_book = UserBooks.query.filter_by(book_id=args['book_id'], owner_id=args['owner_id']).first()
+        book = Book.query.filter_by(id=args['book_id']).first()
 
-        if(owned_book): # Book found
-            book = Book.query.filter_by(id=owned_book.book_id).first()
-            book_loans = Book_loan.query.filter_by(book_id=book.id, owner_id=args['owner_id']).all()
+        if(book): # Book found
+            book_loans = Book_loan.query.filter_by(book_id=book.id).all()
             if(book_loans): # If any book loan
                 for loan in book_loans: # Search for all loans
                     book_return = Book_return.query.filter_by(book_loan_id=loan.id).first()
@@ -226,8 +231,6 @@ class LoanRequestApi(Resource):
                                     location='json')
         self.reqparse.add_argument("user_id", type=int, required=True,
                                     location='json')
-        self.reqparse.add_argument("owner_id", type=int, required=True,
-                                    location='json')
         self.reqparse.add_argument("loan_status", type=str, default='requested',location='json')
         super(LoanRequestApi,self).__init__()
 
@@ -237,8 +240,13 @@ class LoanRequestApi(Resource):
         if args['loan_status'] == 'requested':
             try:
                 loan = Book_loan(**args)
-                owner = User.query.get_or_404(loan.owner_id)
                 book = Book.query.get_or_404(loan.book_id)
+
+                if book.is_organization:
+                    owner = Organization.get_or_404(book.organization_id)
+                else:
+                    owner = User.query.get_or_404(book.user_id)
+
                 notification.Send([owner],"loanrequest.html","Loan Request",book)
 
                 db.session.add(loan)
@@ -307,8 +315,6 @@ class ReturnApi(Resource):
                                    location='json')
         self.reqparse.add_argument("user_id", type=int, required=True,
                                    location='json')
-        self.reqparse.add_argument("owner_id", type=int, required=True,
-                                   location='json')
         self.reqparse.add_argument("confirmed_by", type=str,
                                    location='json')
         super(ReturnApi, self).__init__()
@@ -316,7 +322,6 @@ class ReturnApi(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         loan_record = Book_loan.query.filter_by(book_id=args['book_id'],
-                                                  owner_id=args['owner_id'],
                                                   user_id= args['user_id']).first()
         return_record = Book_return.query.filter_by(book_loan_id =
                                                     loan_record.id).first()
@@ -338,7 +343,6 @@ class ReturnApi(Resource):
     def get(self):
         args = self.reqparse.parse_args()
         loan_record_search = Book_loan.query.filter_by(book_id=args['book_id'],
-                                                  owner_id=args['owner_id'],
                                                   user_id= args['user_id']).first()
         return_record_search = Book_return.query.filter_by(book_loan_id =
                                                     loan_record_search.id).first()
@@ -352,8 +356,6 @@ class DelayApi(Resource):
                                    location='json')
         self.reqparse.add_argument("user_id", type=int, required=True,
                                    location='json')
-        self.reqparse.add_argument("owner_id", type=int, required=True,
-                                   location='json')
         self.reqparse.add_argument("status", type=Enum("waiting",
                                     "accepted", "refused",
                                    name="delayed_return_status"),
@@ -363,7 +365,6 @@ class DelayApi(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         loan_delay = Book_loan.query.filter_by(book_id=args['book_id'],
-                                                owner_id=args['owner_id'],
                                                 user_id=args['user_id']).first()
         delay_record= Delayed_return.query.filter_by(book_loan_id =
                                                     loan_delay.id).first()
@@ -397,7 +398,6 @@ class DelayApi(Resource):
     def get(self):
         args = self.reqparse.parse_args()
         loan_delay_search = Book_loan.query.filter_by(book_id=args['book_id'],
-                                                 owner_id=args['owner_id'],
                                                  user_id= args['user_id']).first()
         delay_record_search= Delayed_return.query.filter_by(book_loan_id =
                                                     loan_delay.id).first()

@@ -211,8 +211,12 @@ class FeedbackApi(Resource):
         db.session.add(feedback)
         try:
             loan = Book_loan.query.filter_by(id=feedback.transaction_id).first()
+            book = Book.query.filter_by(id=loan.book_id).first()
             if feedback.user == "user":
-                user = User.query.filter_by(id=loan.owner_id).first()
+                if book.is_organization:
+                    user = User.query.filter_by(id=book.organization_id).first()
+                else:
+                    user = User.query.filter_by(id=book.user_id).first()
             else:
                 user = User.query.filter_by(id=loan.user_id).first()
 
@@ -244,9 +248,17 @@ class ModifyFeedbackApi(Resource):
     def delete(self, id):
         feedback = Feedback.query.get_or_404(id)
         if feedback.user == "owner":
+            
             loan = Book_loan.query.filter_by(id=feedback.transaction_id).first()
-            user = User.query.filter_by(id=loan.owner_id).first()
+            book = Boook.query.filter_by(id=loan.book_id).all()
+
+            if book.is_organization:
+                user = User.query.filter_by(id=book.organization_id).first()
+            else:
+                user = User.query.filter_by(id=book.user_id).first()
+
             user.points_update(-feedback.points)
+
         db.session.delete(feedback)
         db.session.commit()
         return 204

@@ -27,7 +27,6 @@ class User(db.Model):
 
     # The lists of loans the user is participating
     my_loans = db.relationship('Book_loan', foreign_keys='Book_loan.user_id')
-    loaned = db.relationship('Book_loan', foreign_keys='Book_loan.owner_id')
 
     # User evaluation from feedback
     evaluation = db.Column(db.Integer, default=0)
@@ -165,6 +164,13 @@ class Book(db.Model):
     language = db.Column(db.String)
     genre = db.Column(db.String)
 
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
+    is_organization = db.Column(db.Boolean, default=False)
+
+    user = db.relationship('User', foreign_keys=user_id)
+    organization = db.relationship('Organization', foreign_keys=organization_id)
+
     @property
     def serialize(self):
         return {
@@ -194,11 +200,9 @@ class Book_loan(db.Model):
 
     # Relationships
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'))
-    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     book = db.relationship('Book')
-    owner = db.relationship('User', foreign_keys=owner_id)
     user = db.relationship('User', foreign_keys=user_id)
 
     # Transaction info
@@ -219,7 +223,6 @@ class Book_loan(db.Model):
         return {
             'id': self.id,
             'book': self.book.serialize,
-            'owner': self.owner.serialize,
             'user': self.user.serialize,
             'loan_date': self.loan_date.strftime('%Y-%m-%d'),
             'return_date': self.return_date.strftime('%Y-%m-%d'),
