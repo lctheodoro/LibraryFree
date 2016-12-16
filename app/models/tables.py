@@ -344,25 +344,3 @@ class Wishlist(db.Model):
 
     def __repr__(self):
         return "<Wishlist %r>" % self.isbn
-
-class UserBooks(db.Model):
-    id= db.Column(db.Integer, primary_key=True)
-
-    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
-    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
-    #Books = db.relationship('Book', backref='owner')
-    book = db.relationship(Book, foreign_keys=book_id)
-    owner= db.relationship(User, foreign_keys=owner_id)
-
-    @property
-    def serialize(self):
-        return {
-            'id': self.id,
-            #'Books': [b.serialize for b in self.book]
-            'book': self.book.serialize,
-            'owner': self.owner.serialize
-        }
-
-    def __repr__(self):
-        return "<UserBook %r>" % self.id
