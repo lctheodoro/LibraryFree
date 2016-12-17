@@ -9,6 +9,7 @@ from isbnlib.registry import bibformatters
 from app.controllers import notification
 from threading import Thread
 
+
 class BooksApi(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -95,9 +96,7 @@ class BooksApi(Resource):
             )
 
         filtering = and_(*filters_list)
-
         books = Book.query.filter(filtering).all()
-
         return {'data': [book.serialize for book in books]}, 200
 
     def post(self):
@@ -151,7 +150,9 @@ class BooksApi(Resource):
         except Exception:
             return { 'data': { 'message': 'Bad Request' } }, 400
 
+
 class ModifyBooksApi(Resource):
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("title", type=str, location='json')
@@ -217,17 +218,18 @@ class ModifyBooksApi(Resource):
         db.session.commit()
         return 204
 
+
 class BooksAvailabilityApi(Resource):
+
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("book_id", type=int, required=True,
-                                   location='json')
+        #self.reqparse = reqparse.RequestParser()
+        #self.reqparse.add_argument("book_id", type=int, required=True,
+        #                           location='json')
         super(BooksAvailabilityApi, self).__init__()
 
-    def get(self):
-        args = self.reqparse.parse_args()
-
-        book = Book.query.filter_by(id=args['book_id']).first()
+    def get(self, id):
+        #args = self.reqparse.parse_args()
+        book = Book.query.filter_by(id=id).first()
 
         if(book): # Book found
             book_loans = Book_loan.query.filter_by(book_id=book.id).all()
@@ -245,8 +247,10 @@ class BooksAvailabilityApi(Resource):
         else: # Book not found
             return {'data': 'Book not found'}, 404
 
+
 class LoanRequestApi(Resource):
     decorators = [auth.login_required]
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("book_id", type=int, required=True,
@@ -259,8 +263,8 @@ class LoanRequestApi(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         l = Book_loan.query.filter_by(book_id=args['book_id'],
-                                        user_id=args['user_id'],
-                                        loan_status=args['loan_status']).first()
+                                      user_id=args['user_id'],
+                                      loan_status=args['loan_status']).first()
         if args['loan_status'] == 'requested' and l==None:
             try:
                 loan = Book_loan(**args)
@@ -282,8 +286,10 @@ class LoanRequestApi(Resource):
                 return { 'data': { 'message': 'Unexpected Error' } }, 500
         return { 'data': { 'message': 'Request already made' } }, 500
 
+
 class LoanReplyApi(Resource):
     decorators = [auth.login_required]
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("loan_status", type=str, required=True,
@@ -335,7 +341,9 @@ class LoanReplyApi(Resource):
                 return { 'data': {'mesage': 'Unexpected Error'} }, 500
         return { 'data ' : {'mesage': 'Request already answered'}}, 409
 
+
 class ReturnApi(Resource):
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("book_id", type=int, required=True,
@@ -376,7 +384,9 @@ class ReturnApi(Resource):
 
         return {'data': [return_record_search.serialize]}, 200
 
+
 class DelayApi(Resource):
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("book_id", type=int, required=True,
@@ -394,16 +404,16 @@ class DelayApi(Resource):
         delay_record= Delayed_return.query.filter_by(book_loan_id =
                                                     loan_delay.id).first()
 
-        if not (delay_record):
+        if not delay_record:
             delay_record = Delayed_return(book_loan_id = loan_delay.id,
                                             requested_date = loan_delay.returned_date()+timedelta(days=7))
             db.session.add(Delayed_return)
 
-        if(args['status']=='waiting'):
+        if args['status']=='waiting':
             delay_record.status='waiting'
-        elif(args['status']=='accepted'):
+        elif args['status']=='accepted':
             delay_record.status='accepted'
-        elif(args['status']=='refused'):
+        elif args['status']=='refused':
             delay_record.status='refused'
         else:
             return 400
@@ -429,6 +439,7 @@ class DelayApi(Resource):
 
         return {'data': [delay_record_search.serialize]}, 200
 
+
 class WishlistApi(Resource):
     decorators = [auth.login_required]
 
@@ -447,7 +458,7 @@ class WishlistApi(Resource):
 
         wish = Wishlist.query.filter_by(isbn=args['isbn'], user=args['user_id']).first()
 
-        if(wish):
+        if wish:
             return {'data': wish.serialize}, 200
         else:
             return {'data': 'Wishlist not found'}, 404
@@ -456,18 +467,15 @@ class WishlistApi(Resource):
         self.reqparse.add_argument("isbn", type=str, required=True, location='json')
         self.reqparse.add_argument("title", type=str, required=True, location='json')
         self.reqparse.add_argument("user_id", type=int, required=True, location='json')
-
         args = self.reqparse.parse_args()
 
         user = User.query.filter_by(id=args['user_id']).first()
-
-        if(not user):
+        if not user:
             return {'data': 'User not found'}, 404
 
         wish = Wishlist.query.filter_by(isbn=args['isbn'], user=user.id).first()
-
         try:
-            if(wish):
+            if wish:
                 return {'data': wish.serialize}, 200
             else: # If wishlist doesn't exist
                 new_wish = Wishlist(isbn=args['isbn'], title=args['title'], user=user.id)
@@ -482,6 +490,6 @@ api.add_resource(BooksApi, '/api/v1/books', endpoint='books')
 api.add_resource(ModifyBooksApi, '/api/v1/books/<int:id>', endpoint='modify_books')
 api.add_resource(LoanRequestApi, '/api/v1/books/borrow', endpoint='loan_request')
 api.add_resource(LoanReplyApi, '/api/v1/books/borrow/<int:id>', endpoint='loan_reply')
-api.add_resource(BooksAvailabilityApi, '/api/v1/books/availability', endpoint='books_availability')
+api.add_resource(BooksAvailabilityApi, '/api/v1/books/availability/<int:id>', endpoint='books_availability')
 api.add_resource(ReturnApi, '/api/v1/books/return', endpoint='return')
 api.add_resource(WishlistApi, '/api/v1/wish', endpoint='wish')

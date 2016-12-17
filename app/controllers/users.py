@@ -212,29 +212,32 @@ class FeedbackApi(Resource):
         try:
             loan = Book_loan.query.filter_by(id=feedback.transaction_id).first()
             book = Book.query.filter_by(id=loan.book_id).first()
+            # Feedback from user to owner
             if feedback.user == "user":
-                if book.is_organization:
-                    user = User.query.filter_by(id=book.organization_id).first()
-                else:
-                    user = User.query.filter_by(id=book.user_id).first()
-            else:
                 user = User.query.filter_by(id=loan.user_id).first()
-
+            # Feedback from owner to user
+            else:
+                if book.is_organization: # Must be user-to-user
+                    return { 'message' : 'Organizations cannot be evaluated' }, 400
+                user = User.query.filter_by(id=book.user_id).first()
+            # Update user evaluation
             if user.evaluation == 0:
                 user.evaluation = feedback.user_evaluation
             else:
                 user.evaluation = ceil((user.evaluation +
                                    feedback.user_evaluation) / 2)
+            # Gamefication
             if feedback.book_evaluation == 5:
-                user.points_update(8,user.id)
-                feedback.scored_update(8,user.id)
+                user.points_update(8, user.id)
+                feedback.scored_update(8, user.id)
             if feedback.time_evaluation == 5:
-                user.points_update(8,user.id)
-                feedback.scored_update(8,user.id)
+                user.points_update(8, user.id)
+                feedback.scored_update(8, user.id)
+
             db.session.commit()
             return { 'data': feedback.serialize }, 200
         except Exception as error:
-            print(error)
+            print("ERROR: " + str(error))
             return { 'data': { 'message': 'Unexpected Error' } }, 500
 
 
@@ -247,23 +250,20 @@ class ModifyFeedbackApi(Resource):
 
     def delete(self, id):
         feedback = Feedback.query.get_or_404(id)
+        # Gamefication
         if feedback.user == "owner":
-
             loan = Book_loan.query.filter_by(id=feedback.transaction_id).first()
             book = Book.query.filter_by(id=loan.book_id).all()
-
-            if book.is_organization:
-                user = User.query.filter_by(id=book.organization_id).first()
-            else:
-                user = User.query.filter_by(id=book.user_id).first()
-
+            user = User.query.filter_by(id=book.user_id).first()
             user.points_update(-feedback.points)
 
         db.session.delete(feedback)
         db.session.commit()
-        return 204
+        return {}, 204
+
 
 class Ranking(Resource):
+
     def get(self):
         users = User.query.all()
         sorted_users = []
@@ -274,8 +274,6 @@ class Ranking(Resource):
         #Sorting first by the points, after by the alfabetic order of the names
         sorted_users = sorted(sorted_users, key = lambda t: (t['points']*-1, t['name']))
         return sorted_users
-
-
 
 # for each resource we need to specify an URI and an endpoint
 # the endpoint is a "reference" to each resource

@@ -143,7 +143,6 @@ class Organization(db.Model):
         return "<Organization %r>" % self.name
 
 
-# NEED TO FIX
 class Book(db.Model):
     __tablename__ = "books"
 
@@ -176,21 +175,9 @@ class Book(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'organization_id' : self.organization_id,
-            'title': self.title,
-            'isbn' : self.isbn,
-            'synopsis': self.synopsis,
-            'author': self.author,
-            'author2': self.author2,
-            'author3': self.author3,
-            'publisher': self.publisher,
-            'edition': self.edition,
-            'year': self.year,
-            'language': self.language,
-            'genre': self.genre
-        } if self.is_organization else {
-            'id': self.id,
             'user_id' : self.user_id,
+            'organization_id' : self.organization_id,
+            'is_organization' : self.is_organization,
             'title': self.title,
             'isbn' : self.isbn,
             'synopsis': self.synopsis,
@@ -332,7 +319,6 @@ class Feedback(db.Model):
 
     book_loan = db.relationship('Book_loan', foreign_keys=transaction_id)
 
-
     @property
     def serialize(self):
         return {
@@ -348,6 +334,7 @@ class Feedback(db.Model):
 
     def __repr__(self):
         return "<Feedback %r>" % self.id
+
 
 class Wishlist(db.Model):
     __tablename__ = "wishlists"
