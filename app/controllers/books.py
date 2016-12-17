@@ -40,10 +40,12 @@ class BooksApi(Resource):
         search_reqparse.add_argument("author3", type=str, location='json')
         search_reqparse.add_argument("publisher", type=str, location='json')
         search_reqparse.add_argument("genre", type=str, location='json')
+        # Also get books owned by a user or organization
+        search_reqparse.add_argument("user_id", type=int, location='json')
+        search_reqparse.add_argument("organization_id", type=int, location='json')
 
         # retrieving the values
         args = search_reqparse.parse_args()
-
         filters_list = []
 
         if args['title']:
@@ -82,6 +84,16 @@ class BooksApi(Resource):
                 Book.genre == args['genre']
             )
 
+        if args['user_id']:
+            filters_list.append(
+                Book.user_id == args['user_id']
+            )
+
+        if args['organization_id']:
+            filters_list.append(
+                Book.organization_id == args['organization_id']
+            )
+
         filtering = and_(*filters_list)
 
         books = Book.query.filter(filtering).all()
@@ -89,53 +101,55 @@ class BooksApi(Resource):
         return {'data': [book.serialize for book in books]}, 200
 
     def post(self):
-        args = self.reqparse.parse_args()
-        book = Book(**args)
+        try:
+            args = self.reqparse.parse_args()
+            book = Book(**args)
 
-        if (args['user_id'] and args['organization_id']) or ((not args['user_id'] and not args['organization_id'])):
-            return 300
-        elif args['user_id']:
-            book.is_organization = False
-            user = User.query.get_or_404(args['user_id'])
-            user.points_update(10)
-        else:
-            book.is_organization = True
+            if (args['user_id'] and args['organization_id']) or ((not args['user_id'] and not args['organization_id'])):
+                return { 'data': { 'message': 'Bad Request' } }, 400
+            elif args['user_id']:
+                book.is_organization = False
+                user = User.query.get_or_404(args['user_id'])
+                user.points_update(10)
+            else:
+                book.is_organization = True
 
-        #Generate the isbn code with title like a parameter
-        code_isbn = isbn_from_words(book.title)
-        book.isbn = code_isbn
+            #Generate the isbn code with title like a parameter
+            code_isbn = isbn_from_words(book.title)
+            book.isbn = code_isbn
 
-        #set the format to json
-        bibtex = bibformatters['json']
-        consult = meta(code_isbn)
+            #set the format to json
+            bibtex = bibformatters['json']
+            consult = meta(code_isbn)
 
-        if not consult:
-            return 300
+            if not consult:
+                return { 'data': { 'message': 'Bad Request' } }, 400
 
-        consult = bibtex(consult)
-        aux = json.loads(consult)
+            consult = bibtex(consult)
+            aux = json.loads(consult)
 
-        book.author = aux['author'][0]['name']
+            book.author = aux['author'][0]['name']
 
-        tam = 0
-        for i in aux['author']:
-            tam += 1
+            tam = 0
+            for i in aux['author']:
+                tam += 1
 
-        if tam >= 3:
-            book.author2 = aux['author'][1]['name']
-            book.author3 = aux['author'][2]['name']
-        elif tam == 2:
-            book.author2 = aux['author'][1]['name']
+            if tam >= 3:
+                book.author2 = aux['author'][1]['name']
+                book.author3 = aux['author'][2]['name']
+            elif tam == 2:
+                book.author2 = aux['author'][1]['name']
 
-        if aux['year']:
-            book.year = aux['year']
-        else:
-            book.year = 0
+            if aux['year']:
+                book.year = aux['year']
+            else:
+                book.year = 0
 
-        db.session.add(book)
-        db.session.commit()
-        return {'data': book.serialize}, 200
-
+            db.session.add(book)
+            db.session.commit()
+            return { 'data': book.serialize }, 200
+        except Exception:
+            return { 'data': { 'message': 'Bad Request' } }, 400
 
 class ModifyBooksApi(Resource):
     def __init__(self):

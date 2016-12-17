@@ -143,6 +143,7 @@ class Organization(db.Model):
         return "<Organization %r>" % self.name
 
 
+# NEED TO FIX
 class Book(db.Model):
     __tablename__ = "books"
 
@@ -175,6 +176,21 @@ class Book(db.Model):
     def serialize(self):
         return {
             'id': self.id,
+            'organization_id' : self.organization_id,
+            'title': self.title,
+            'isbn' : self.isbn,
+            'synopsis': self.synopsis,
+            'author': self.author,
+            'author2': self.author2,
+            'author3': self.author3,
+            'publisher': self.publisher,
+            'edition': self.edition,
+            'year': self.year,
+            'language': self.language,
+            'genre': self.genre
+        } if self.is_organization else {
+            'id': self.id,
+            'user_id' : self.user_id,
             'title': self.title,
             'isbn' : self.isbn,
             'synopsis': self.synopsis,
