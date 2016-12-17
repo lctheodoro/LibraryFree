@@ -263,6 +263,20 @@ class ModifyFeedbackApi(Resource):
         db.session.commit()
         return 204
 
+class Ranking(Resource):
+    def get(self):
+        users = User.query.all()
+        sorted_users = []
+
+        for u in users:
+            sorted_users.append(u.serialize)
+
+        #Sorting first by the points, after by the alfabetic order of the names
+        sorted_users = sorted(sorted_users, key = lambda t: (t['points']*-1, t['name']))
+        return sorted_users
+
+
+
 # for each resource we need to specify an URI and an endpoint
 # the endpoint is a "reference" to each resource
 api.add_resource(UsersApi, '/api/v1/users', endpoint='users')
@@ -275,6 +289,7 @@ api.add_resource(ModifyOrganizationsApi, '/api/v1/organizations/<int:id>',
 api.add_resource(FeedbackApi, '/api/v1/feedbacks', endpoint='feedback')
 api.add_resource(ModifyFeedbackApi, '/api/v1/feedbacks/<int:id>',
                  endpoint='modify_feedback')
+api.add_resource(Ranking, '/api/v1/ranking', endpoint='ranking')
 
 # if you want to test any resource, try using CURL in the terminal, like:
 # $ curl -u USERAME:PASSWORD -H "Content-Type: application/json" -d '{"key": "value", "key": "value"}' -X GET/POST/PUT/DELETE -i http://localhost:5000/RESOURCE_URI

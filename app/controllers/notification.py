@@ -6,7 +6,7 @@ from time import sleep
 from datetime import timedelta,date
 
 
-def Send(users,message,assunto,book=None,loan_date=None):
+def send(users,message,assunto,book=None,loan_date=None):
 	for i in users:
 			msg = Message(assunto, sender=app.config['MAIL_USERNAME'], recipients=[i.email])
 			with app.app_context():
@@ -34,7 +34,7 @@ def email():
 	countdown = 86400
 	while(True):
 		u,b,d = tomorrow()
-		Send(b,"email.html","1 Day:",b,d)
+		send(b,"email.html","1 Day:",b,d)
 		u,b,d = threeDays()
-		Send(b,"email.html","3 Days:",b,d)
+		send(b,"email.html","3 Days:",b,d)
 		sleep(countdown)

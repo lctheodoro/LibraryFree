@@ -7,6 +7,7 @@ from sqlalchemy.sql import and_
 from isbnlib import isbn_from_words,meta
 from isbnlib.registry import bibformatters
 from app.controllers import notification
+from threading import Thread
 
 class BooksApi(Resource):
     def __init__(self):
@@ -95,6 +96,8 @@ class BooksApi(Resource):
             return 300
         elif args['user_id']:
             book.is_organization = False
+            user = User.query.get_or_404(args['user_id'])
+            user.points_update(10)
         else:
             book.is_organization = True
 
@@ -191,6 +194,11 @@ class ModifyBooksApi(Resource):
 
     def delete(self, id):
         book = Book.query.get_or_404(id)
+        if book.is_organization:
+            user = User.query.get_or_404(book.organization_id)
+        else:
+            user = User.query.get_or_404(book.user_id)
+        user.points_update(-10)
         db.session.delete(book)
         db.session.commit()
         return 204
@@ -236,16 +244,20 @@ class LoanRequestApi(Resource):
 
     def post(self):
         args = self.reqparse.parse_args()
-        if args['loan_status'] == 'requested':
+        l = Book_loan.query.filter_by(book_id=args['book_id'],
+                                        user_id=args['user_id'],
+                                        loan_status=args['loan_status']).first()
+        if args['loan_status'] == 'requested' and l==None:
             try:
                 loan = Book_loan(**args)
+                loan.scored = False
                 book = Book.query.get_or_404(loan.book_id)
                 if book.is_organization:
                     owner = Organization.query.get_or_404(book.organization_id)
                 else:
                     owner = User.query.get_or_404(book.user_id)
 
-                notification.Send([owner],"loanrequest.html","Loan Request",book)
+                Thread(target=notification.send([owner],"loanrequest.html","Loan Request",book)).start()
 
                 db.session.add(loan)
                 db.session.commit()
@@ -254,7 +266,7 @@ class LoanRequestApi(Resource):
             except Exception as error:
                 print(error)
                 return { 'data': { 'message': 'Unexpected Error' } }, 500
-        return { 'data': { 'message': 'Unexpected Error' } }, 500
+        return { 'data': { 'message': 'Request already made' } }, 500
 
 class LoanReplyApi(Resource):
     decorators = [auth.login_required]
@@ -281,6 +293,7 @@ class LoanReplyApi(Resource):
             try:
                 user = User.query.get_or_404(loan.user_id)
                 book = Book.query.get_or_404(loan.book_id)
+
                 loan.loan_status = args['loan_status']
 
                 if loan.loan_status == 'accepted':
@@ -293,14 +306,14 @@ class LoanReplyApi(Resource):
                         return_day += timedelta(days=2)
                     loan.return_date = return_day
 
-                    user.points_update(5)
-
-                    notification.Send([user],"accepted.html","Loan Reply",book,loan.return_date)
+                    if not loan.scored:
+                        user.points_update(5)
+                        loan.scored = True
+                    Thread(target=notification.send([user],"accepted.html","Loan Reply",book,loan.return_date)).start()
                 elif loan.loan_status == 'refused':
-                    notification.Send([user],"refused.html","Loan Reply",book,loan.return_date)
+                    Thread(target=notification.send([user],"refused.html","Loan Reply",book,loan.return_date)).start()
                 elif loan.loan_status == 'queue':
-                    notification.Send([user],"queue.html","Loan Reply",book,loan.return_date)
-
+                    Thread(target=notification.send([user],"queue.html","Loan Reply",book,loan.return_date)).start()
                 db.session.commit()
                 return { 'data': loan.serialize }, 204
             except Exception as error:

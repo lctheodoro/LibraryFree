@@ -218,19 +218,18 @@ class Book_loan(db.Model):
                                     'refused', 'queue',
                                     name="loan_status"))
 
+    # Gamefication Info
+    scored = db.Column(db.Boolean, default=False)
+
     @property
     def serialize(self):
         return {
             'id': self.id,
-            'book': self.book.serialize,
-            'user': self.user.serialize,
             'loan_date': self.loan_date.strftime('%Y-%m-%d'),
             'return_date': self.return_date.strftime('%Y-%m-%d'),
             'loan_status': self.loan_status
         } if self.loan_status == 'accepted' else {
             'id': self.id,
-            'book': self.book.serialize,
-            'user': self.user.serialize,
             'loan_status': self.loan_status
         }
 
