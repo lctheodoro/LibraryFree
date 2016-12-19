@@ -1,7 +1,7 @@
 from flask import g, jsonify
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
-from app.models.tables import User, Organization, Feedback, Book_loan, Book
+from app.models.tables import User, Organization, Feedback, Book_loan, Book, Book_return
 from app.models.decorators import is_user, is_manager
 from math import ceil
 
@@ -205,7 +205,7 @@ class ModifyOrganizationsApi(Resource):
         org = Organization.query.get_or_404(id)
         db.session.delete(org)
         db.session.commit()
-        return {},204
+        return {}, 204
 
 
 class FeedbackApi(Resource):
@@ -228,16 +228,17 @@ class FeedbackApi(Resource):
         feedback = Feedback(**args)
         db.session.add(feedback)
         try:
-            loan = Book_loan.query.filter_by(id=feedback.transaction_id).first()
-            book = Book.query.filter_by(id=loan.book_id).first()
+            book_return = Book_return.query.get_or_404(feedback.transaction_id)
+            loan = Book_loan.query.get_or_404(book_return.book_loan_id)
+            book = Book.query.get_or_404(loan.book_id)
             # Feedback from user to owner
             if feedback.user == "user":
-                user = User.query.filter_by(id=loan.user_id).first()
+                user = User.query.get_or_404(loan.user_id)
             # Feedback from owner to user
             else:
                 if book.is_organization: # Must be user-to-user
                     return { 'message' : 'Organizations cannot be evaluated' }, 400
-                user = User.query.filter_by(id=book.user_id).first()
+                user = User.query.get_or_404(book.user_id)
             # Update user evaluation
             if user.evaluation == 0:
                 user.evaluation = feedback.user_evaluation
@@ -246,11 +247,11 @@ class FeedbackApi(Resource):
                                    feedback.user_evaluation) / 2)
             # Gamefication
             if feedback.book_evaluation == 5:
-                user.points_update(8, user.id)
-                feedback.scored_update(8, user.id)
+                user.points_update(8)
+                feedback.scored += 8
             if feedback.time_evaluation == 5:
-                user.points_update(8, user.id)
-                feedback.scored_update(8, user.id)
+                user.points_update(8)
+                feedback.scored += 8
 
             db.session.commit()
             return { 'data': feedback.serialize }, 200

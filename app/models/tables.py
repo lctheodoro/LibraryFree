@@ -310,7 +310,7 @@ class Feedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     # Feedback info
-    transaction_id = db.Column(db.Integer, db.ForeignKey('book_loans.id'), nullable=False)
+    transaction_id = db.Column(db.Integer, db.ForeignKey('book_returns.id'), nullable=False)
     user = db.Column(db.Enum("owner", "user", name="user_feedback"), nullable=False)
     user_evaluation = db.Column(db.Integer, nullable=False)
     time_evaluation = db.Column(db.Integer)
@@ -319,13 +319,13 @@ class Feedback(db.Model):
     comments = db.Column(db.Text)
     scored = db.Column(db.Integer, default=0)
 
-    book_loan = db.relationship('Book_loan', foreign_keys=transaction_id)
+    book_return = db.relationship('Book_return', foreign_keys=transaction_id)
 
     @property
     def serialize(self):
         return {
             'id': self.id,
-            'book_loan': self.book_loan.serialize,
+            'book_return': self.book_return.serialize,
             'user_type': self.user,
             'user_evaluation': self.user_evaluation,
             'time_evaluation': self.time_evaluation,

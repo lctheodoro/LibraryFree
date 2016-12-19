@@ -325,8 +325,8 @@ class LoanReplyApi(Resource):
                 return { 'data': loan.serialize }, 201
             except Exception as error:
                 print(error)
-                return { 'data': {'mesage': 'Unexpected Error'} }, 500
-        return { 'data ' : {'mesage': 'Request already answered'}}, 409
+                return { 'data': {'message': 'Unexpected Error'} }, 500
+        return { 'data ' : {'message': 'Request already answered'}}, 409
 
 
 class ReturnApi(Resource):
@@ -377,7 +377,7 @@ class ReturnApi(Resource):
             return { 'data': return_record.serialize }, 201
         except Exception as error:
             print(error)
-            return { 'data': {'mesage': 'Unexpected Error'} }, 500
+            return { 'data': {'message': 'Unexpected Error'} }, 500
 
 
 class DelayApi(Resource):
@@ -427,7 +427,7 @@ class DelayApi(Resource):
             return { 'data': delay_record.serialize }, 201
         except Exception as error:
             print(error)
-            return { 'data': {'mesage': 'Unexpected Error'} }, 500
+            return { 'data': {'message': 'Unexpected Error'} }, 500
 
 
 class WishlistApi(Resource):
@@ -475,14 +475,14 @@ class WishlistApi(Resource):
             wish = Wishlist.query.filter_by(isbn=isbn, user_id=user.id).first()
 
             if wish:
-                return {'data': wish.serialize}, 200
+                return { 'data': wish.serialize }, 201
             else: # If wishlist doesn't exist
                 new_wish = Wishlist(isbn=isbn, title=title, user_id=user.id)
                 db.session.add(new_wish)
                 db.session.commit()
                 return {}, 204
         except Exception:
-            return {'data': 'Unexpected error'}, 500
+            return {'data': 'Unexpected Error'}, 500
 
 api.add_resource(BooksApi, '/api/v1/books', endpoint='books')
 api.add_resource(ModifyBooksApi, '/api/v1/books/<int:id>', endpoint='modify_books')
