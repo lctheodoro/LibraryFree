@@ -100,21 +100,25 @@ class ModifyUsersApi(Resource):
     # if so, it can be edited, else the user is unauthorized
     @is_user
     def put(self, id):
-        user = User.query.get_or_404(id)
-        args = self.reqparse.parse_args()
-        # when we have an update to do, we can't simply update all information
-        # using the arguments from reqparse, because some may be empty
-        # then we have to keep the information
-        for key, value in args.items():
-            # this will filter only valid values
-            if key == 'password' and value is not None:
-                # we will ALWAYS encrypt a new password
-                user.hash_password(value)
-            elif value is not None:
-                setattr(user, key, value)
-        user.check_register(user.id)
-        db.session.commit()
-        return {'data': user.serialize}, 200
+        try:
+            user = User.query.get_or_404(id)
+            args = self.reqparse.parse_args()
+            # when we have an update to do, we can't simply update all information
+            # using the arguments from reqparse, because some may be empty
+            # then we have to keep the information
+            for key, value in args.items():
+                # this will filter only valid values
+                if key == 'password' and value is not None:
+                    # we will ALWAYS encrypt a new password
+                    user.hash_password(value)
+                elif value is not None:
+                    setattr(user, key, value)
+            user.check_register()
+            db.session.commit()
+            return {'data': user.serialize}, 200
+        except Exception as error:
+            print("ERROR: " + str(error))
+            return { 'data': { 'message': 'Unexpected Error' } }, 500
 
     @is_user
     def delete(self, id):
@@ -131,6 +135,8 @@ class OrganizationsApi(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("name", type=str, required=True,
                                    location='json')
+        self.reqparse.add_argument("email", type=str, required=True,
+                                   location='json')
         self.reqparse.add_argument("description", type=str, location='json')
         self.reqparse.add_argument("managers", type=list, required=True,
                                    location='json')
@@ -143,7 +149,8 @@ class OrganizationsApi(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         org = Organization(name=args['name'],
-                           description=args['description'])
+                           description=args['description'],
+                           email=args['email'])
         db.session.add(org)
 
         # we receive a list of IDs and select all users that have one of them
@@ -152,7 +159,7 @@ class OrganizationsApi(Resource):
 
         db.session.commit()
 
-        return {'data': org.serialize}, 200
+        return {'data': org.serialize}, 201
 
 
 class ModifyOrganizationsApi(Resource):
@@ -162,7 +169,7 @@ class ModifyOrganizationsApi(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("name", type=str, location='json')
         self.reqparse.add_argument("description", type=str, location='json')
-        self.reqparse.add_argument("managers", type=str, location='json')
+        self.reqparse.add_argument("managers", type=list, location='json')
 
         super(ModifyOrganizationsApi, self).__init__()
 
@@ -174,20 +181,31 @@ class ModifyOrganizationsApi(Resource):
     # if so, it can be edited, else the user is unauthorized
     @is_manager
     def put(self, id):
-        args = self.reqparse.parse_args()
-        org = Organization.query.get_or_404(id)
-        for key, value in args.items():
-            if value is not None:
-                setattr(org, key, value)
-        db.session.commit()
-        return {'data': org.serialize}, 200
+        try:
+            args = self.reqparse.parse_args()
+            org = Organization.query.get_or_404(id)
+            #for key, value in args.items():
+            if args['name'] is not None:
+                setattr(org, 'name', args['name'])
+            if args['description'] is not None:
+                setattr(org, 'description', args['description'])
+            if args['managers'] is not None:
+                for u in org.managers:
+                    u.organization_id = None
+                for m in User.query.filter(User.id.in_(args['managers'])).all():
+                    m.organization_id = org.id
+            db.session.commit()
+            return {'data': org.serialize}, 200
+        except Exception as error:
+            print("ERROR: " + str(error))
+            return { 'data': { 'message': 'Unexpected Error' } }, 500
 
     @is_manager
     def delete(self, id):
         org = Organization.query.get_or_404(id)
         db.session.delete(org)
         db.session.commit()
-        return 204
+        return {},204
 
 
 class FeedbackApi(Resource):

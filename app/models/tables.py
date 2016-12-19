@@ -43,8 +43,9 @@ class User(db.Model):
     # Check if user's registration is complete
     def check_register(self):
         if self.city != None and self.phone != None:
-            self.complete = True
-            self.points += 5
+            if self.complete is False:
+                self.complete = True
+                self.points += 5
         else:
             if self.complete == True:
                 self.points -= 5
@@ -124,6 +125,7 @@ class Organization(db.Model):
 
     # Description fields
     name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, unique=True, nullable=False)
     description = db.Column(db.Text)
     # insert image field
 
@@ -158,7 +160,7 @@ class Book(db.Model):
     author = db.Column(db.String, nullable=False)
     author2 = db.Column(db.String)
     author3 = db.Column(db.String)
-    publisher = db.Column(db.String, nullable=False)
+    publisher = db.Column(db.String)
     edition = db.Column(db.Integer)
     year = db.Column(db.Integer)
     language = db.Column(db.String)
@@ -217,8 +219,9 @@ class Book_loan(db.Model):
     # accepted - owner accepted user request
     # refused - owner refused user request
     # queue - user is in the queue
+    # done - loan finished
     loan_status = db.Column(db.Enum('requested', 'accepted',
-                                    'refused', 'queue',
+                                    'refused', 'queue','done',
                                     name="loan_status"))
 
     # Gamefication Info
@@ -260,7 +263,7 @@ class Book_return(db.Model):
         return {
             'id': self.id,
             'book_loan': self.book_loan.serialize,
-            'returned_date': self.returned_date,
+            'returned_date': str(self.returned_date),
             'user_confirmation': self.user_confirmation,
             'owner_confirmation': self.owner_confirmation
         }
@@ -292,8 +295,7 @@ class Delayed_return(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'book_loan': self.book_loan.serialize,
-            'requested_date': self.requested_date,
+            'requested_date': str(self.requested_date),
             'status': self.status
         }
 
@@ -342,7 +344,9 @@ class Wishlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     isbn = db.Column(db.String, nullable=False)
     title = db.Column(db.String, nullable=False)
-    user = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),nullable=False)
+
+    user = db.relationship('User', foreign_keys=user_id)
 
     @property
     def serialize(self):
@@ -350,7 +354,7 @@ class Wishlist(db.Model):
             'id': self.id,
             'isbn': self.isbn,
             'title': self.title,
-            'user': self.user
+            'user': self.user.serialize
         }
 
     def __repr__(self):

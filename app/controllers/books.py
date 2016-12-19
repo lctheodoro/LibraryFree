@@ -1,4 +1,4 @@
-from flask import json
+from flask import json, g
 from flask_restful import Resource, reqparse
 from app import db, auth, api
 from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, Delayed_return, Organization
@@ -17,11 +17,10 @@ class BooksApi(Resource):
                                    location='json')
         self.reqparse.add_argument("isbn", type=str, location = 'json')
         self.reqparse.add_argument("synopsis", type=str, location='json')
-        self.reqparse.add_argument("author", type=str, location='json')
+        self.reqparse.add_argument("author", type=str, location='json', required=True)
         self.reqparse.add_argument("author2", type=str, location='json')
         self.reqparse.add_argument("author3", type=str, location='json')
-        self.reqparse.add_argument("publisher", type=str, required=True,
-                                   location='json')
+        self.reqparse.add_argument("publisher", type=str, location='json')
         self.reqparse.add_argument("edition", type=int, location='json')
         self.reqparse.add_argument("year", type=int)
         self.reqparse.add_argument("language", type=str, location='json')
@@ -105,7 +104,11 @@ class BooksApi(Resource):
             book = Book(**args)
 
             if (args['user_id'] and args['organization_id']) or ((not args['user_id'] and not args['organization_id'])):
-                return { 'data': { 'message': 'Bad Request' } }, 400
+                return { 'data': { 'message': 'Bad Request1' } }, 400
+            if args['user_id'] and (not User.query.get(args['user_id'])):
+                return { 'data': { 'message': 'User not found' } }, 404
+            if args['organization_id'] and (not Organization.query.get(args['organization_id'])):
+                return { 'data': { 'message': 'Organization not found' } }, 404
             elif args['user_id']:
                 book.is_organization = False
                 user = User.query.get_or_404(args['user_id'])
@@ -121,33 +124,33 @@ class BooksApi(Resource):
             bibtex = bibformatters['json']
             consult = meta(code_isbn)
 
-            if not consult:
-                return { 'data': { 'message': 'Bad Request' } }, 400
+            if consult:
+                consult = bibtex(consult)
+                aux = json.loads(consult)
 
-            consult = bibtex(consult)
-            aux = json.loads(consult)
+                book.author = aux['author'][0]['name']
 
-            book.author = aux['author'][0]['name']
+                tam = 0
+                for i in aux['author']:
+                    tam += 1
 
-            tam = 0
-            for i in aux['author']:
-                tam += 1
+                if tam >= 3:
+                    book.author2 = aux['author'][1]['name']
+                    book.author3 = aux['author'][2]['name']
+                elif tam == 2:
+                    book.author2 = aux['author'][1]['name']
 
-            if tam >= 3:
-                book.author2 = aux['author'][1]['name']
-                book.author3 = aux['author'][2]['name']
-            elif tam == 2:
-                book.author2 = aux['author'][1]['name']
+                if aux['year']:
+                    book.year = aux['year']
 
-            if aux['year']:
-                book.year = aux['year']
-            else:
-                book.year = 0
+                if aux['publisher']:
+                    book.publisher = aux['publisher']
 
             db.session.add(book)
             db.session.commit()
-            return { 'data': book.serialize }, 200
-        except Exception:
+            return { 'data': book.serialize }, 201
+        except Exception as error:
+            print(error)
             return { 'data': { 'message': 'Bad Request' } }, 400
 
 
@@ -155,7 +158,6 @@ class ModifyBooksApi(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("title", type=str, location='json')
         self.reqparse.add_argument("synopsis", type=str, location='json')
         self.reqparse.add_argument("publisher", type=str, location='json')
         self.reqparse.add_argument("edition", type=int, location='json')
@@ -168,44 +170,19 @@ class ModifyBooksApi(Resource):
         return {'data': book.serialize}, 200
 
     def put(self, id):
-        book = Book.query.get_or_404(id)
-        args = self.reqparse.parse_args()
+        try:
+            book = Book.query.get_or_404(id)
+            args = self.reqparse.parse_args()
 
-        for key, value in args.items():
-            if value is not None:
-                setattr(book, key, value)
+            for key, value in args.items():
+                if value is not None:
+                    setattr(book, key, value)
 
-        code_isbn = isbn_from_words(book.title)
-        book.isbn = code_isbn
-
-        bibtex = bibformatters['json']
-        consult = meta(code_isbn)
-
-        if not consult:
-            return 300
-
-        consult = bibtex(consult)
-        aux = json.loads(consult)
-
-        book.author = aux['author'][0]['name']
-
-        tam = 0
-        for i in aux['author']:
-            tam += 1
-
-        if tam >= 3:
-            book.author2 = aux['author'][1]['name']
-            book.author3 = aux['author'][2]['name']
-        elif tam == 2:
-            book.author2 = aux['author'][1]['name']
-
-        if aux['year']:
-            book.year = aux['year']
-        else:
-            book.year = 0
-
-        db.session.commit()
-        return {'data': book.serialize}, 200
+            db.session.commit()
+            return {'data': book.serialize}, 200
+        except Exception as error:
+            print(error)
+            return { 'data': { 'message': 'Unexpected Error' } }, 500
 
     def delete(self, id):
         book = Book.query.get_or_404(id)
@@ -238,9 +215,9 @@ class BooksAvailabilityApi(Resource):
                     book_return = Book_return.query.filter_by(book_loan_id=loan.id).first()
                     if(book_return):
                         if(not book_return.user_confirmation or not book_return.owner_confirmation):
-                            return {'data': {'status': 'unavaiable'}}, 200
+                            return {'data': {'status': 'unavailable'}}, 200
                     else: # Book not returned yet
-                        return {'data': {'status': 'unavaiable'}}, 200
+                        return {'data': {'status': 'unavailable'}}, 200
                 return {'data': {'status': 'available'}}, 200 # All loans returned
             else: # Book not loaned yet
                 return {'data': {'status': 'available'}}, 200
@@ -280,7 +257,7 @@ class LoanRequestApi(Resource):
                 db.session.add(loan)
                 db.session.commit()
 
-                return { 'data': loan.serialize }, 200
+                return { 'data': loan.serialize }, 201
             except Exception as error:
                 print(error)
                 return { 'data': { 'message': 'Unexpected Error' } }, 500
@@ -298,21 +275,28 @@ class LoanReplyApi(Resource):
 
     def get(self,id):
         try:
-            loan = Book_loan.get_or_404(id)
+            loan =  Book_loan.query.get_or_404(id)
+            book = Book.query.get_or_404(loan.book_id)
+            if g.user.id != book.user_id and g.user.id!=loan.user_id:
+                return { 'data' :{'message': 'You are not authorized to access this area.'}},401
+            loan = Book_loan.query.get_or_404(id)
             return { 'data': loan.serialize }, 200
         except Exception as error:
             print(error)
-            return { 'data': {'mesage': 'Unexpected Error'} }, 500
+            return { 'data': {'message': 'Unexpected Error'} }, 500
 
-    def post(self,id):
-        args = self.reqparse.parse_args()
+    def put(self,id):
         loan =  Book_loan.query.get_or_404(id)
+        book = Book.query.get_or_404(loan.book_id)
+
+        if g.user.id != book.user_id:
+            return { 'data' :{'message': 'You are not authorized to access this area.'}},401
+        args = self.reqparse.parse_args()
         if args['loan_status'] == None:
-            return { 'data ' : {'mesage': 'Empty Status'}}, 500
+            return { 'data ' : {'message': 'Empty Status'}}, 500
         if loan.loan_status != args['loan_status']:
             try:
                 user = User.query.get_or_404(loan.user_id)
-                book = Book.query.get_or_404(loan.book_id)
 
                 loan.loan_status = args['loan_status']
 
@@ -329,13 +313,16 @@ class LoanReplyApi(Resource):
                     if not loan.scored:
                         user.points_update(5)
                         loan.scored = True
+                    db.session.commit()
                     Thread(target=notification.send([user],"accepted.html","Loan Reply",book,loan.return_date)).start()
                 elif loan.loan_status == 'refused':
+                    db.session.commit()
                     Thread(target=notification.send([user],"refused.html","Loan Reply",book,loan.return_date)).start()
                 elif loan.loan_status == 'queue':
+                    db.session.commit()
                     Thread(target=notification.send([user],"queue.html","Loan Reply",book,loan.return_date)).start()
-                db.session.commit()
-                return { 'data': loan.serialize }, 204
+
+                return { 'data': loan.serialize }, 201
             except Exception as error:
                 print(error)
                 return { 'data': {'mesage': 'Unexpected Error'} }, 500
@@ -346,7 +333,7 @@ class ReturnApi(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("book_id", type=int, required=True,
+        self.reqparse.add_argument("loan_id", type=int, required=True,
                                    location='json')
         self.reqparse.add_argument("user_id", type=int, required=True,
                                    location='json')
@@ -354,90 +341,93 @@ class ReturnApi(Resource):
                                    location='json')
         super(ReturnApi, self).__init__()
 
-    def post(self):
-        args = self.reqparse.parse_args()
-        loan_record = Book_loan.query.filter_by(book_id=args['book_id'],
-                                                  user_id= args['user_id']).first()
-        return_record = Book_return.query.filter_by(book_loan_id =
-                                                    loan_record.id).first()
-        if not (return_record):
-            return_record = Book_return(book_loan_id = loan_record.id,
-                                        returned_date = date.today())
-            db.session.add(return_record)
-
-        if(args['confirmed_by']=='owner'):
-            return_record.owner_confirmation=True
-        elif(args['confirmed_by']=='user'):
-            return_record.user_confirmation=True
-        else:
-            return 400
-        db.session.commit()
-
-        return 204
-
     def get(self):
         args = self.reqparse.parse_args()
-        loan_record_search = Book_loan.query.filter_by(book_id=args['book_id'],
-                                                  user_id= args['user_id']).first()
-        return_record_search = Book_return.query.filter_by(book_loan_id =
-                                                    loan_record_search.id).first()
+        loan_record_search = Book_loan.query.filter_by(id=args['loan_id']).first()
+        return_record_search = Book_return.query.get_or_404(loan_record_search.id)
+        print(return_record_search)
 
         return {'data': [return_record_search.serialize]}, 200
+
+    def post(self):
+        try:
+            args = self.reqparse.parse_args()
+            loan_record = Book_loan.query.filter_by(id=args['loan_id']).first()
+            if not loan_record.loan_status == 'accepted':
+                return { 'data': { 'message': 'Bad Request' } }, 400
+            return_record = Book_return.query.filter_by(book_loan_id =
+                                                        loan_record.id).first()
+            if not (return_record):
+                return_record = Book_return(book_loan_id = loan_record.id,
+                                            returned_date = date.today())
+                db.session.add(return_record)
+
+            if(args['confirmed_by']=='owner'):
+                return_record.owner_confirmation=True
+            elif(args['confirmed_by']=='user'):
+                return_record.user_confirmation=True
+            else:
+                return { 'data': { 'message': 'Bad Request' } }, 400
+            if return_record.owner_confirmation and return_record.user_confirmation:
+                loan_record.loan_status = 'done'
+            else:
+                loan_record.loan_status = 'accepted'
+            db.session.commit()
+
+            return { 'data': return_record.serialize }, 201
+        except Exception as error:
+            print(error)
+            return { 'data': {'mesage': 'Unexpected Error'} }, 500
 
 
 class DelayApi(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("book_id", type=int, required=True,
-                                   location='json')
-        self.reqparse.add_argument("user_id", type=int, required=True,
-                                   location='json')
+        self.reqparse.add_argument("loan_id",type=int,required=True,
+                                    location='json')
         self.reqparse.add_argument("status", type=str,
                                     required=True,location='json')
         super(DelayApi, self).__init__()
 
-    def post(self):
-        args = self.reqparse.parse_args()
-        loan_delay = Book_loan.query.filter_by(book_id=args['book_id'],
-                                                user_id=args['user_id']).first()
-        delay_record= Delayed_return.query.filter_by(book_loan_id =
-                                                    loan_delay.id).first()
-
-        if not delay_record:
-            delay_record = Delayed_return(book_loan_id = loan_delay.id,
-                                            requested_date = loan_delay.returned_date()+timedelta(days=7))
-            db.session.add(Delayed_return)
-
-        if args['status']=='waiting':
-            delay_record.status='waiting'
-        elif args['status']=='accepted':
-            delay_record.status='accepted'
-        elif args['status']=='refused':
-            delay_record.status='refused'
-        else:
-            return 400
-        db.session.commit()
-
-        users_mail = User.query.filter_by(user_id=args['user_id']).first()
-        book_mail = Book.query.filter_by(book_id=args['book_id']).first()
-
-        users_email = []
-        users_email += [users_mail.email]
-
-        notification.send(users_email, "email.html",delay_record.status,
-             book_mail.title,delay_record.requested_date)
-
-        return 204
-
     def get(self):
         args = self.reqparse.parse_args()
-        loan_delay = Book_loan.query.filter_by(book_id=args['book_id'],
-                                                 user_id= args['user_id']).first()
-        delay_record_search= Delayed_return.query.filter_by(book_loan_id =
-                                                    loan_delay.id).first()
+        loan_delay = Delayed_return.query.filter_by(book_loan_id=args['loan_id']).first()
 
-        return {'data': [delay_record_search.serialize]}, 200
+        return {'data': [loan_delay.serialize]}, 201
+
+    def post(self):
+        try:
+            args = self.reqparse.parse_args()
+            loan_delay = Book_loan.query.get_or_404(args['loan_id'])
+            delay_record= Delayed_return.query.filter_by(book_loan_id =
+                                                        loan_delay.id).first()
+
+            if not delay_record:
+                delay_record = Delayed_return(book_loan_id = loan_delay.id,
+                                                requested_date = loan_delay.return_date+timedelta(days=7))
+                db.session.add(delay_record)
+
+            if args['status']=='waiting':
+                delay_record.status='waiting'
+            elif args['status']=='accepted':
+                delay_record.status='accepted'
+            elif args['status']=='refused':
+                delay_record.status='refused'
+            else:
+                return { 'data': { 'message': 'Bad Request' } }, 400
+            db.session.commit()
+            users_mail = User.query.filter_by(id=loan_delay.user_id).first()
+            book_mail = Book.query.filter_by(id=loan_delay.book_id).first()
+
+            Thread(target=notification.send([users_mail], "email.html",
+                                            delay_record.status,
+                                            book_mail,delay_record.requested_date)).start()
+
+            return { 'data': delay_record.serialize }, 201
+        except Exception as error:
+            print(error)
+            return { 'data': {'mesage': 'Unexpected Error'} }, 500
 
 
 class WishlistApi(Resource):
@@ -445,26 +435,31 @@ class WishlistApi(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("isbn", type=int, location='json')
         self.reqparse.add_argument("title", type=str, location='json')
         self.reqparse.add_argument("user_id", type=int, location='json')
         super(WishlistApi, self).__init__()
 
     def get(self):
-        self.reqparse.add_argument("isbn", type=str, required=True, location='json')
+        self.reqparse.add_argument("title", type=str, required=True, location='json')
         self.reqparse.add_argument("user_id", type=int, required=True, location='json')
 
         args = self.reqparse.parse_args()
 
-        wish = Wishlist.query.filter_by(isbn=args['isbn'], user=args['user_id']).first()
+        try:
+            isbn = isbn_from_words(args['title'])
+            book_json = meta(isbn)
+            title = book_json['Title']
 
-        if wish:
-            return {'data': wish.serialize}, 200
-        else:
-            return {'data': 'Wishlist not found'}, 404
+            wish = Wishlist.query.filter_by(title=title, user_id=args['user_id']).first()
+
+            if wish:
+                return {'data': wish.serialize}, 200
+            else:
+                return {'data': 'Wishlist not found'}, 404
+        except Exception:
+            return {'data': 'Unexpected Error'}, 500
 
     def post(self):
-        self.reqparse.add_argument("isbn", type=str, required=True, location='json')
         self.reqparse.add_argument("title", type=str, required=True, location='json')
         self.reqparse.add_argument("user_id", type=int, required=True, location='json')
         args = self.reqparse.parse_args()
@@ -473,23 +468,27 @@ class WishlistApi(Resource):
         if not user:
             return {'data': 'User not found'}, 404
 
-        wish = Wishlist.query.filter_by(isbn=args['isbn'], user=user.id).first()
         try:
+            isbn = isbn_from_words(args['title'])
+            title = meta(isbn)['Title']
+
+            wish = Wishlist.query.filter_by(isbn=isbn, user_id=user.id).first()
+
             if wish:
                 return {'data': wish.serialize}, 200
             else: # If wishlist doesn't exist
-                new_wish = Wishlist(isbn=args['isbn'], title=args['title'], user=user.id)
+                new_wish = Wishlist(isbn=isbn, title=title, user_id=user.id)
                 db.session.add(new_wish)
                 db.session.commit()
-                return {'data': new_wish.serialize}, 200
+                return {}, 204
         except Exception:
             return {'data': 'Unexpected error'}, 500
 
-api.add_resource(DelayApi, '/api/v1/books/delay', endpoint='delay')
 api.add_resource(BooksApi, '/api/v1/books', endpoint='books')
 api.add_resource(ModifyBooksApi, '/api/v1/books/<int:id>', endpoint='modify_books')
 api.add_resource(LoanRequestApi, '/api/v1/books/borrow', endpoint='loan_request')
 api.add_resource(LoanReplyApi, '/api/v1/books/borrow/<int:id>', endpoint='loan_reply')
 api.add_resource(BooksAvailabilityApi, '/api/v1/books/availability/<int:id>', endpoint='books_availability')
 api.add_resource(ReturnApi, '/api/v1/books/return', endpoint='return')
+api.add_resource(DelayApi, '/api/v1/books/delay', endpoint='delay')
 api.add_resource(WishlistApi, '/api/v1/wish', endpoint='wish')
