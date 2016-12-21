@@ -67,6 +67,7 @@ class UsersApi(Resource):
 
         try:
             db.session.commit()
+            # Gamefication
             user.check_register()
             db.session.commit()
 
@@ -270,9 +271,10 @@ class ModifyFeedbackApi(Resource):
         feedback = Feedback.query.get_or_404(id)
         # Gamefication
         if feedback.user == "owner":
-            loan = Book_loan.query.filter_by(id=feedback.transaction_id).first()
-            book = Book.query.filter_by(id=loan.book_id).all()
-            user = User.query.filter_by(id=book.user_id).first()
+            book_return = Book_return.query.get_or_404(feedback.transaction_id)
+            loan = Book_loan.query.get_or_404(book_return.book_loan_id)
+            book = Book.query.get_or_404(loan.book_id)
+            user = User.query.get_or_404(book.user_id)
             user.points_update(-feedback.scored)
 
         db.session.delete(feedback)

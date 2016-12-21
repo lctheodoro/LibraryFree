@@ -210,7 +210,7 @@ class LoanRequestApi(Resource):
 
     def post(self):
         args = self.reqparse.parse_args()
-        #args.add_argument("loan_status", type=str,location='json')
+        # Checks if book_loan already exists
         l = Book_loan.query.filter_by(book_id=args['book_id'],
                                       user_id=args['user_id'],
                                       loan_status='requested').first()
@@ -220,6 +220,8 @@ class LoanRequestApi(Resource):
                 loan.loan_status = 'requested'
                 loan.scored = False
                 book = Book.query.get_or_404(loan.book_id)
+
+                # Get the book's owner whether it's an organization or a user
                 if book.is_organization:
                     owner = Organization.query.get_or_404(book.organization_id)
                 else:
@@ -250,8 +252,11 @@ class LoanReplyApi(Resource):
         try:
             loan =  Book_loan.query.get_or_404(id)
             book = Book.query.get_or_404(loan.book_id)
+
+            # Verify user logged in
             if g.user.id != book.user_id and g.user.id!=loan.user_id:
                 return {'message': 'You are not authorized to access this area'}, 401
+
             loan = Book_loan.query.get_or_404(id)
             return { 'data': loan.serialize }, 200
         except Exception as error:
@@ -265,8 +270,10 @@ class LoanReplyApi(Resource):
         loan =  Book_loan.query.get_or_404(id)
         book = Book.query.get_or_404(loan.book_id)
 
+        # Verify user logged in
         if g.user.id != book.user_id:
             return {'message': 'You are not authorized to access this area'}, 401
+
         if args['loan_status'] == None:
             return {'message': 'Empty Status'}, 500
         if loan.loan_status != args['loan_status']:
@@ -275,16 +282,21 @@ class LoanReplyApi(Resource):
 
                 loan.loan_status = args['loan_status']
 
+                # Create the date of return
                 if loan.loan_status == 'accepted':
                     loan.loan_date = date.today()
                     return_day = date.today() + timedelta(days=10)
 
+
+                    # If it falls on a weekend it updates the date
+                    # for the next Monday of this weekend
                     if return_day.strftime('%A') == 'Sunday':
                         return_day += timedelta(days=1)
                     elif return_day.strftime('%A') == 'Saturday':
                         return_day += timedelta(days=2)
                     loan.return_date = return_day
 
+                    # Gamefication
                     if not loan.scored:
                         user.points_update(5)
                         loan.scored = True
@@ -318,9 +330,9 @@ class ReturnApi(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
+
         loan_record_search = Book_loan.query.filter_by(id=args['loan_id']).first()
         return_record_search = Book_return.query.get_or_404(loan_record_search.id)
-        print(return_record_search)
 
         return {'data': [return_record_search.serialize]}, 200
 

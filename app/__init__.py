@@ -42,5 +42,7 @@ api = Api(app, errors=app_errors)
 from app.models import tables
 from app.controllers import users, books, notification
 
+# Starts a thread for daily notification about one-day
+# deadlines and three days for returning books
 notification = Thread(target=notification.email)
-#notification.start()
+notification.start()
