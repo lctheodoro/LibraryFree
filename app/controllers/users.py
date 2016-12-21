@@ -273,7 +273,7 @@ class ModifyFeedbackApi(Resource):
             loan = Book_loan.query.filter_by(id=feedback.transaction_id).first()
             book = Book.query.filter_by(id=loan.book_id).all()
             user = User.query.filter_by(id=book.user_id).first()
-            user.points_update(-feedback.points)
+            user.points_update(-feedback.scored)
 
         db.session.delete(feedback)
         db.session.commit()
