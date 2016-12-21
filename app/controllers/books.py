@@ -157,7 +157,6 @@ class BooksApi(Resource):
 
 
 class ModifyBooksApi(Resource):
-    decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -207,17 +206,18 @@ class LoanRequestApi(Resource):
                                     location='json')
         self.reqparse.add_argument("user_id", type=int, required=True,
                                     location='json')
-        self.reqparse.add_argument("loan_status", type=str, default='requested',location='json')
         super(LoanRequestApi,self).__init__()
 
     def post(self):
         args = self.reqparse.parse_args()
+        #args.add_argument("loan_status", type=str,location='json')
         l = Book_loan.query.filter_by(book_id=args['book_id'],
                                       user_id=args['user_id'],
-                                      loan_status=args['loan_status']).first()
-        if args['loan_status'] == 'requested' and l==None:
+                                      loan_status='requested').first()
+        if l==None:
             try:
                 loan = Book_loan(**args)
+                loan.loan_status = 'requested'
                 loan.scored = False
                 book = Book.query.get_or_404(loan.book_id)
                 if book.is_organization:
@@ -242,7 +242,7 @@ class LoanReplyApi(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("loan_status", type=str, required=True,
+        self.reqparse.add_argument("loan_status", type=str,
                                     location='json')
         super(LoanReplyApi,self).__init__()
 
@@ -259,12 +259,14 @@ class LoanReplyApi(Resource):
             return {'message': 'Unexpected Error'}, 500
 
     def put(self,id):
+        args = self.reqparse.parse_args()
+        if args['loan_status'] is None:
+            return {'message': 'Bad Request'}, 400
         loan =  Book_loan.query.get_or_404(id)
         book = Book.query.get_or_404(loan.book_id)
 
         if g.user.id != book.user_id:
             return {'message': 'You are not authorized to access this area'}, 401
-        args = self.reqparse.parse_args()
         if args['loan_status'] == None:
             return {'message': 'Empty Status'}, 500
         if loan.loan_status != args['loan_status']:
@@ -303,7 +305,6 @@ class LoanReplyApi(Resource):
 
 
 class ReturnApi(Resource):
-    decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -341,7 +342,7 @@ class ReturnApi(Resource):
             elif(args['confirmed_by']=='user'):
                 return_record.user_confirmation=True
             else:
-                return {'message': 'Bad Request'}, 400
+                return { 'data': { 'message': 'Bad Request' } }, 400
             if return_record.owner_confirmation and return_record.user_confirmation:
                 loan_record.loan_status = 'done'
             else:
@@ -355,7 +356,6 @@ class ReturnApi(Resource):
 
 
 class DelayApi(Resource):
-    decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -426,7 +426,7 @@ class BooksAvailabilityApi(Resource):
             else: # Book not loaned yet
                 return {'data': {'status': 'Available'}}, 200
         else: # Book not found
-            return {'message': 'Book not found'}, 404
+            return {'data': {'message': 'Book not found'}}, 404
 
 class WishlistApi(Resource):
     decorators = [auth.login_required]
@@ -446,7 +446,7 @@ class WishlistApi(Resource):
         user = User.query.filter_by(id=args['user_id']).first()
 
         if(not user):
-            return {'message': 'User not found'}, 404
+            return {'data': {'message': 'User not found'}}, 404
 
         try:
             wishlist = Wishlist.query.filter_by(user_id=args['user_id']).all()
