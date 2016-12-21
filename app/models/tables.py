@@ -354,8 +354,7 @@ class Wishlist(db.Model):
             'id': self.id,
             'isbn': self.isbn,
             'title': self.title,
-            'user': self.user.serialize
         }
 
     def __repr__(self):
-        return "<Wishlist %r>" % self.isbn
+        return "<Wishlist %r>" % self.id
