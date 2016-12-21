@@ -157,6 +157,7 @@ class BooksApi(Resource):
 
 
 class ModifyBooksApi(Resource):
+    decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -302,6 +303,7 @@ class LoanReplyApi(Resource):
 
 
 class ReturnApi(Resource):
+    decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -339,7 +341,7 @@ class ReturnApi(Resource):
             elif(args['confirmed_by']=='user'):
                 return_record.user_confirmation=True
             else:
-                return { 'data': { 'message': 'Bad Request' } }, 400
+                return {'message': 'Bad Request'}, 400
             if return_record.owner_confirmation and return_record.user_confirmation:
                 loan_record.loan_status = 'done'
             else:
@@ -353,6 +355,7 @@ class ReturnApi(Resource):
 
 
 class DelayApi(Resource):
+    decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -423,7 +426,7 @@ class BooksAvailabilityApi(Resource):
             else: # Book not loaned yet
                 return {'data': {'status': 'Available'}}, 200
         else: # Book not found
-            return {'data': {'message': 'Book not found'}}, 404
+            return {'message': 'Book not found'}, 404
 
 class WishlistApi(Resource):
     decorators = [auth.login_required]
@@ -443,7 +446,7 @@ class WishlistApi(Resource):
         user = User.query.filter_by(id=args['user_id']).first()
 
         if(not user):
-            return {'data': {'message': 'User not found'}}, 404
+            return {'message': 'User not found'}, 404
 
         try:
             wishlist = Wishlist.query.filter_by(user_id=args['user_id']).all()
