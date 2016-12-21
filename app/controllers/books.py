@@ -9,6 +9,7 @@ from isbnlib import isbn_from_words,meta
 from isbnlib.registry import bibformatters
 from app.controllers import notification
 from threading import Thread
+from app.models.decorators import is_user, is_manager
 
 
 class BooksApi(Resource):
@@ -100,6 +101,8 @@ class BooksApi(Resource):
         books = Book.query.filter(filtering).all()
         return {'data': [book.serialize for book in books]}, 200
 
+    @is_user
+    @is_manager
     def post(self):
         try:
             args = self.reqparse.parse_args()
@@ -157,6 +160,7 @@ class BooksApi(Resource):
 
 
 class ModifyBooksApi(Resource):
+    decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -302,6 +306,7 @@ class LoanReplyApi(Resource):
 
 
 class ReturnApi(Resource):
+    decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -353,6 +358,7 @@ class ReturnApi(Resource):
 
 
 class DelayApi(Resource):
+    decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -412,7 +418,7 @@ class BooksAvailabilityApi(Resource):
         if(book): # Book found
             book_loans = Book_loan.query.filter_by(book_id=book.id).all()
             if(book_loans): # If there's any book loan
-                for loan in book_loans: # Sweep all loans
+                for loan in book_loans: # Search in all loans
                     book_return = Book_return.query.filter_by(book_loan_id=loan.id).first()
                     if(book_return):
                         if(not book_return.user_confirmation or not book_return.owner_confirmation):
@@ -423,7 +429,7 @@ class BooksAvailabilityApi(Resource):
             else: # Book not loaned yet
                 return {'data': {'status': 'Available'}}, 200
         else: # Book not found
-            return {'data': {'message': 'Book not found'}}, 404
+            return {'message': 'Book not found'}, 404
 
 class WishlistApi(Resource):
     decorators = [auth.login_required]
@@ -443,7 +449,7 @@ class WishlistApi(Resource):
         user = User.query.filter_by(id=args['user_id']).first()
 
         if(not user):
-            return {'data': {'message': 'User not found'}}, 404
+            return {'message': 'User not found'}, 404
 
         try:
             wishlist = Wishlist.query.filter_by(user_id=args['user_id']).all()
@@ -464,6 +470,7 @@ class WishlistApi(Resource):
         user = User.query.filter_by(id=args['user_id']).first()
         if not user: # User not found
             return {'message': 'User not found'}, 404
+
         try:
             isbn = isbn_from_words(args['title'])
             title = meta(isbn)['Title']
