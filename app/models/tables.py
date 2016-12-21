@@ -325,8 +325,8 @@ class Feedback(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'book_return': self.book_return.serialize,
-            'user_type': self.user,
+            'transaction_id': self.book_return.serialize,
+            'user': self.user,
             'user_evaluation': self.user_evaluation,
             'time_evaluation': self.time_evaluation,
             'book_evaluation': self.book_evaluation,

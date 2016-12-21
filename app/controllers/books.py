@@ -1,7 +1,8 @@
 from flask import json, g
 from flask_restful import Resource, reqparse
 from app import db, auth, api
-from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, Delayed_return, Organization
+from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, \
+                            Delayed_return, Organization
 from datetime import timedelta, date
 from sqlalchemy.sql import and_
 from isbnlib import isbn_from_words,meta
@@ -11,6 +12,7 @@ from threading import Thread
 
 
 class BooksApi(Resource):
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("title", type=str, required=True,
@@ -104,11 +106,11 @@ class BooksApi(Resource):
             book = Book(**args)
 
             if (args['user_id'] and args['organization_id']) or ((not args['user_id'] and not args['organization_id'])):
-                return { 'data': { 'message': 'Bad Request1' } }, 400
+                return { 'message': 'Bad Request' }, 400
             if args['user_id'] and (not User.query.get(args['user_id'])):
-                return { 'data': { 'message': 'User not found' } }, 404
+                return { 'message': 'User not found' }, 404
             if args['organization_id'] and (not Organization.query.get(args['organization_id'])):
-                return { 'data': { 'message': 'Organization not found' } }, 404
+                return { 'message': 'Organization not found' }, 404
             elif args['user_id']:
                 book.is_organization = False
                 user = User.query.get_or_404(args['user_id'])
@@ -151,7 +153,7 @@ class BooksApi(Resource):
             return { 'data': book.serialize }, 201
         except Exception as error:
             print(error)
-            return { 'data': { 'message': 'Bad Request' } }, 400
+            return { 'message': 'Bad Request' }, 400
 
 
 class ModifyBooksApi(Resource):
@@ -182,7 +184,7 @@ class ModifyBooksApi(Resource):
             return {'data': book.serialize}, 200
         except Exception as error:
             print(error)
-            return { 'data': { 'message': 'Unexpected Error' } }, 500
+            return { 'message': 'Unexpected Error' }, 500
 
     def delete(self, id):
         book = Book.query.get_or_404(id)
@@ -260,8 +262,8 @@ class LoanRequestApi(Resource):
                 return { 'data': loan.serialize }, 201
             except Exception as error:
                 print(error)
-                return { 'data': { 'message': 'Unexpected Error' } }, 500
-        return { 'data': { 'message': 'Request already made' } }, 500
+                return { 'message': 'Unexpected Error' }, 500
+        return { 'message': 'Request already made' }, 500
 
 
 class LoanReplyApi(Resource):
@@ -278,22 +280,22 @@ class LoanReplyApi(Resource):
             loan =  Book_loan.query.get_or_404(id)
             book = Book.query.get_or_404(loan.book_id)
             if g.user.id != book.user_id and g.user.id!=loan.user_id:
-                return { 'data' :{'message': 'You are not authorized to access this area.'}},401
+                return {'message': 'You are not authorized to access this area'}, 401
             loan = Book_loan.query.get_or_404(id)
             return { 'data': loan.serialize }, 200
         except Exception as error:
             print(error)
-            return { 'data': {'message': 'Unexpected Error'} }, 500
+            return {'message': 'Unexpected Error'}, 500
 
     def put(self,id):
         loan =  Book_loan.query.get_or_404(id)
         book = Book.query.get_or_404(loan.book_id)
 
         if g.user.id != book.user_id:
-            return { 'data' :{'message': 'You are not authorized to access this area.'}},401
+            return {'message': 'You are not authorized to access this area'}, 401
         args = self.reqparse.parse_args()
         if args['loan_status'] == None:
-            return { 'data ' : {'message': 'Empty Status'}}, 500
+            return {'message': 'Empty Status'}, 500
         if loan.loan_status != args['loan_status']:
             try:
                 user = User.query.get_or_404(loan.user_id)
@@ -325,8 +327,8 @@ class LoanReplyApi(Resource):
                 return { 'data': loan.serialize }, 201
             except Exception as error:
                 print(error)
-                return { 'data': {'message': 'Unexpected Error'} }, 500
-        return { 'data ' : {'message': 'Request already answered'}}, 409
+                return {'message': 'Unexpected Error'}, 500
+        return {'message': 'Request already answered'}, 409
 
 
 class ReturnApi(Resource):
@@ -354,7 +356,7 @@ class ReturnApi(Resource):
             args = self.reqparse.parse_args()
             loan_record = Book_loan.query.filter_by(id=args['loan_id']).first()
             if not loan_record.loan_status == 'accepted':
-                return { 'data': { 'message': 'Bad Request' } }, 400
+                return { 'message': 'Bad Request' }, 400
             return_record = Book_return.query.filter_by(book_loan_id =
                                                         loan_record.id).first()
             if not (return_record):
@@ -377,7 +379,7 @@ class ReturnApi(Resource):
             return { 'data': return_record.serialize }, 201
         except Exception as error:
             print(error)
-            return { 'data': {'message': 'Unexpected Error'} }, 500
+            return {'message': 'Unexpected Error'}, 500
 
 
 class DelayApi(Resource):
@@ -392,7 +394,7 @@ class DelayApi(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        loan_delay = Delayed_return.query.filter_by(book_loan_id=args['loan_id']).first()
+        loan_delay = Delayed_return.query.get_or_404(args['loan_id'])
 
         return {'data': [loan_delay.serialize]}, 201
 
@@ -415,7 +417,7 @@ class DelayApi(Resource):
             elif args['status']=='refused':
                 delay_record.status='refused'
             else:
-                return { 'data': { 'message': 'Bad Request' } }, 400
+                return { 'message': 'Bad Request' }, 400
             db.session.commit()
             users_mail = User.query.filter_by(id=loan_delay.user_id).first()
             book_mail = Book.query.filter_by(id=loan_delay.book_id).first()
@@ -427,7 +429,7 @@ class DelayApi(Resource):
             return { 'data': delay_record.serialize }, 201
         except Exception as error:
             print(error)
-            return { 'data': {'message': 'Unexpected Error'} }, 500
+            return { 'message': 'Unexpected Error' }, 500
 
 
 class WishlistApi(Resource):
@@ -455,9 +457,9 @@ class WishlistApi(Resource):
             if wish:
                 return {'data': wish.serialize}, 200
             else:
-                return {'data': 'Wishlist not found'}, 404
+                return {'message': 'Wishlist not found'}, 404
         except Exception:
-            return {'data': 'Unexpected Error'}, 500
+            return {'message': 'Unexpected Error'}, 500
 
     def post(self):
         self.reqparse.add_argument("title", type=str, required=True, location='json')
@@ -466,7 +468,7 @@ class WishlistApi(Resource):
 
         user = User.query.filter_by(id=args['user_id']).first()
         if not user:
-            return {'data': 'User not found'}, 404
+            return {'message': 'User not found'}, 404
 
         try:
             isbn = isbn_from_words(args['title'])
@@ -482,7 +484,7 @@ class WishlistApi(Resource):
                 db.session.commit()
                 return {}, 204
         except Exception:
-            return {'data': 'Unexpected Error'}, 500
+            return {'message': 'Unexpected Error'}, 500
 
 api.add_resource(BooksApi, '/api/v1/books', endpoint='books')
 api.add_resource(ModifyBooksApi, '/api/v1/books/<int:id>', endpoint='modify_books')

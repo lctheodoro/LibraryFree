@@ -74,10 +74,9 @@ class UsersApi(Resource):
         except Exception as error:
             print(error)
             if "duplicate key value in error":
-                return {'data': {'message': 'User already exists'}}, 409
+                return { 'message': 'User already exists' }, 409
             else:
-                return {'data':
-                        {'message': 'Could\'nt complete the request'}}, 503
+                return { 'message': 'Could\'nt complete the request' }, 503
 
 
 class ModifyUsersApi(Resource):
@@ -118,7 +117,7 @@ class ModifyUsersApi(Resource):
             return {'data': user.serialize}, 200
         except Exception as error:
             print("ERROR: " + str(error))
-            return { 'data': { 'message': 'Unexpected Error' } }, 500
+            return { 'message': 'Unexpected Error' }, 500
 
     @is_user
     def delete(self, id):
@@ -198,7 +197,7 @@ class ModifyOrganizationsApi(Resource):
             return {'data': org.serialize}, 200
         except Exception as error:
             print("ERROR: " + str(error))
-            return { 'data': { 'message': 'Unexpected Error' } }, 500
+            return { 'message': 'Unexpected Error' }, 500
 
     @is_manager
     def delete(self, id):
@@ -257,7 +256,7 @@ class FeedbackApi(Resource):
             return { 'data': feedback.serialize }, 200
         except Exception as error:
             print("ERROR: " + str(error))
-            return { 'data': { 'message': 'Unexpected Error' } }, 500
+            return { 'message': 'Unexpected Error' }, 500
 
 
 class ModifyFeedbackApi(Resource):
@@ -290,8 +289,8 @@ class Ranking(Resource):
         for u in users:
             sorted_users.append(u.serialize)
 
-        #Sorting first by the points, after by the alfabetic order of the names
-        sorted_users = sorted(sorted_users, key = lambda t: (t['points']*-1, t['name']))
+        # Sorting first by the points, after by the alfabetic order of the names
+        sorted_users = sorted(sorted_users, key=lambda t:(t['points']*-1, t['name']))
         return sorted_users
 
 # for each resource we need to specify an URI and an endpoint
