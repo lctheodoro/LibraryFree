@@ -358,3 +358,20 @@ class Wishlist(db.Model):
 
     def __repr__(self):
         return "<Wishlist %r>" % self.id
+
+class Topsearches(db.Model):
+    __tablename__ = "topsearches"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String, nullable=False, unique=True)
+    times = db.Column(db.Integer, default=0)
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'times': self.times
+        }
+    def __repr__(self):
+        return "<Topsearches %r>" % self.id

@@ -2,12 +2,12 @@ from flask import json, g
 from flask_restful import Resource, reqparse
 from app import db, auth, api
 from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, \
-                            Delayed_return, Organization
+                            Delayed_return, Organization, Topsearches
 from datetime import timedelta, date
 from sqlalchemy.sql import and_
 from isbnlib import isbn_from_words,meta
 from isbnlib.registry import bibformatters
-from app.controllers import notification
+from app.controllers import notification,users
 from threading import Thread
 
 
@@ -51,6 +51,16 @@ class BooksApi(Resource):
         filters_list = []
 
         if args['title']:
+            most = Topsearches.query.filter_by(title=args['title'].lower()).first()
+            if most:
+                most.times += 1
+                db.session.commit()
+            else:
+                book = Book.query.filter_by(title=args['title']).first()
+                if book:
+                    most = Topsearches(title=args['title'].lower(),times=1)
+                    db.session.add(most)
+                    db.session.commit()
             filters_list.append(
                 Book.title.ilike("%{0}%".format(args['title']))
             )
@@ -496,7 +506,17 @@ class WishlistApi(Resource):
             print(error)
             return {'message': 'Unexpected Error'}, 500
 
+class TopsearchesAPI(Resource):
+
+    def get(self):
+        top = Topsearches.query.all()
+        # Sorting first by the times, after by the alfabetic order of the title
+        return users.sort(top,lambda t:(t['times']*-1, t['title']))
+
+
+
 api.add_resource(BooksApi, '/api/v1/books', endpoint='books')
+api.add_resource(TopsearchesAPI, '/api/v1/books/top', endpoint='top')
 api.add_resource(ModifyBooksApi, '/api/v1/books/<int:id>', endpoint='modify_books')
 api.add_resource(LoanRequestApi, '/api/v1/books/borrow', endpoint='loan_request')
 api.add_resource(LoanReplyApi, '/api/v1/books/borrow/<int:id>', endpoint='loan_reply')
