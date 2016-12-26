@@ -283,20 +283,12 @@ class ModifyFeedbackApi(Resource):
 
 
 class Ranking(Resource):
+
     def get(self):
-        users = User.query.all()
+        users = [u.serialize for u in User.query.all()]
         # Sorting first by the points, after by the alfabetic order of the names
-        return sort(users,lambda t:(t['points']*-1, t['name']))
+        return { 'data' : sorted(users, lambda t: (-t['points'], t['name'])) }, 200
 
-
-# Ordering method
-def sort(elem,func):
-    sorted_list = []
-    for u in elem:
-        sorted_list.append(u.serialize)
-
-    sorted_list = sorted(sorted_list, key=func)
-    return sorted_list
 
 # for each resource we need to specify an URI and an endpoint
 # the endpoint is a "reference" to each resource

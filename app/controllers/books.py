@@ -7,7 +7,7 @@ from datetime import timedelta, date
 from sqlalchemy.sql import and_
 from isbnlib import isbn_from_words,meta
 from isbnlib.registry import bibformatters
-from app.controllers import notification,users
+from app.controllers import notification
 from threading import Thread
 
 
@@ -51,15 +51,15 @@ class BooksApi(Resource):
         filters_list = []
 
         if args['title']:
-            most = Topsearches.query.filter_by(title=args['title'].lower()).first()
-            if most:
-                most.times += 1
+            book_searches = Topsearches.query.filter_by(title=args['title'].lower()).first()
+            if book_searches is not None:
+                book_searches.times += 1
                 db.session.commit()
             else:
-                book = Book.query.filter_by(title=args['title']).first()
-                if book:
-                    most = Topsearches(title=args['title'].lower(),times=1)
-                    db.session.add(most)
+                book_info = Book.query.filter_by(title=args['title']).first()
+                if book_info is not None:
+                    book_searches = Topsearches(title=args['title'].lower(), times=1)
+                    db.session.add(book_searches)
                     db.session.commit()
             filters_list.append(
                 Book.title.ilike("%{0}%".format(args['title']))
@@ -506,13 +506,14 @@ class WishlistApi(Resource):
             print(error)
             return {'message': 'Unexpected Error'}, 500
 
+
 class TopsearchesAPI(Resource):
 
     def get(self):
-        top = Topsearches.query.all()
+        top_searches = [t.serialize for t in Topsearches.query.all()]
         # Sorting first by the times, after by the alfabetic order of the title
-        return users.sort(top,lambda t:(t['times']*-1, t['title']))
-
+        return { 'data' :
+                sorted(top_searches, lambda t: (-t['times'], t['title'])) }, 200
 
 
 api.add_resource(BooksApi, '/api/v1/books', endpoint='books')
