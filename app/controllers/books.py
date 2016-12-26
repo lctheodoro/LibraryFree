@@ -51,22 +51,11 @@ class BooksApi(Resource):
         filters_list = []
 
         if args['title']:
-            book_searches = Topsearches.query.filter_by(title=args['title'].lower()).first()
-            if book_searches is not None:
-                book_searches.times += 1
-                db.session.commit()
-            else:
-                book_info = Book.query.filter_by(title=args['title']).first()
-                if book_info is not None:
-                    book_searches = Topsearches(title=args['title'].lower(), times=1)
-                    db.session.add(book_searches)
-                    db.session.commit()
             filters_list.append(
                 Book.title.ilike("%{0}%".format(args['title']))
             )
 
         if args['isbn'] :
-            print(args['isbn'])
             filters_list.append(
                 Book.isbn.ilike("%{0}%".format(args['isbn']))
             )
@@ -179,7 +168,18 @@ class ModifyBooksApi(Resource):
 
     def get(self, id):
         book = Book.query.get_or_404(id)
-        return {'data': book.serialize}, 200
+        book_topsearches = Topsearches.query.filter_by(isbn=book.isbn).first()
+        try:
+            if book_topsearches is not None:
+                book_topsearches.times += 1
+                db.session.commit()
+            else:
+                book_topsearches = Topsearches(isbn=book.isbn, title=book.title, times=1)
+                db.session.add(book_topsearches)
+                db.session.commit()
+            return {'data': book.serialize}, 200
+        except Exception:
+            return {'message': 'Unexpected error'}, 500
 
     def put(self, id):
         try:
@@ -513,7 +513,7 @@ class TopsearchesAPI(Resource):
         top_searches = [t.serialize for t in Topsearches.query.all()]
         # Sorting first by the times, after by the alfabetic order of the title
         return { 'data' :
-                sorted(top_searches, lambda t: (-t['times'], t['title'])) }, 200
+                sorted(top_searches, key=lambda t: (-t['times'], t['title'])) }, 200
 
 
 api.add_resource(BooksApi, '/api/v1/books', endpoint='books')

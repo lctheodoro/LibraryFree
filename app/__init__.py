@@ -25,15 +25,12 @@ auth = HTTPBasicAuth()
 app_errors = {
     'NotFound': {
         'message': 'The object you are looking for was not found.',
-        'status': 404,
     },
     'UnexpectedError': {
         'message': 'Something unexpected happened.',
-        'status': 500,
     },
     'Unauthorized': {
         'message': 'You are not authorized to access this area.',
-        'status': 401,
     }
 }
 
@@ -45,4 +42,4 @@ from app.controllers import users, books, notification
 # Starts a thread for daily notification about one-day
 # deadlines and three days for returning books
 notification = Thread(target=notification.email)
-notification.start()
+#notification.start()

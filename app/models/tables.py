@@ -363,15 +363,18 @@ class Topsearches(db.Model):
     __tablename__ = "topsearches"
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, nullable=False, unique=True)
+    title = db.Column(db.String, nullable=False)
+    isbn = db.Column(db.String, nullable=False)
     times = db.Column(db.Integer, default=0)
 
     @property
     def serialize(self):
         return {
             'id': self.id,
+            'isbn': self.isbn,
             'title': self.title,
             'times': self.times
         }
+
     def __repr__(self):
         return "<Topsearches %r>" % self.id

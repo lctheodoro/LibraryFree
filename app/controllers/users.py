@@ -287,7 +287,7 @@ class Ranking(Resource):
     def get(self):
         users = [u.serialize for u in User.query.all()]
         # Sorting first by the points, after by the alfabetic order of the names
-        return { 'data' : sorted(users, lambda t: (-t['points'], t['name'])) }, 200
+        return { 'data' : sorted(users, key=lambda t: (-t['points'], t['name'])) }, 200
 
 
 # for each resource we need to specify an URI and an endpoint
