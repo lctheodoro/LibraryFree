@@ -42,5 +42,6 @@ from app.controllers import users, books, notification
 # Starts a thread for daily notification about one-day
 # deadlines and three days for returning books
 notification = Thread(target=notification.email)
+
 # When it is necessary to make a migrate or an upgrade comment this line
 notification.start()
