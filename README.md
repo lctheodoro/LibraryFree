@@ -1,6 +1,6 @@
 # LibraryFree
-Aplicação web e mobile voltada para controle, doação e empréstimo de livros que permite: 
- 
+Aplicação web e mobile voltada para controle, doação e empréstimo de livros que permite:
+
 * Cadastrar todos os livros que o usuário possui ou que ele deseja adquirir  
 * Aos usuários Incluir organizações que permitirão o movimento de livros  
 * Solicitar os livros via sistema e aprovação/negação pelo dono  
@@ -16,7 +16,7 @@ Para instalar e executar, siga os seguintes passos:
 
 1. Clone o repositório  
         ```
-        $ git clone git@bitbucket.org:juliarizza/libraryfree.git
+        $ git clone https://github.com/lctheodoro/LibraryFree.git
         ```
 2. Entre no repositório  
         ```
@@ -70,7 +70,7 @@ A descrição da API encontra-se no [Google Drive](https://docs.google.com/docum
 
 ## Estudo
 Para compreender a forma como essa API funciona, por favor referir-se abaixo.  
-  
+
 1. Se você ainda não conhece Python, estude os seguintes materiais:  
         1.1 [Vídeo aulas - Python para Zumbis](http://pycursos.com/python-para-zumbis/)  
         1.2 [Vídeo aulas - Fundamentos da Programação com Python](https://br.udacity.com/course/programming-foundations-with-python--ud036/)  
