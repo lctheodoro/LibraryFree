@@ -27,3 +27,12 @@ def is_manager(func):
         else:
             return func(self, id)
     return func_wrapper
+
+def is_admin(func):
+    def func_wrapper(self, id):
+        user = User.query.filter_by(name='admin').first()
+        if not g.user.id == user.id:
+            abort(401)
+        else:
+            return func(self, id)
+    return func_wrapper

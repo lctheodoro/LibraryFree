@@ -39,9 +39,22 @@ api = Api(app, errors=app_errors)
 from app.models import tables
 from app.controllers import users, books, notification
 
-# Starts a thread for daily notification about one-day
-# deadlines and three days for returning books
-notification = Thread(target=notification.email)
+@manager.command
+def admin(mail):
+    adm = tables.User.query.filter_by(name='admin').first()
+    if adm is None:
+        adm = tables.User(name='admin',password='admin',email=mail)
+        db.session.add(adm)
+        db.session.commit()
+        print("Admin created!")
+    else:
+        print("Admin already exists!")
 
-# When it is necessary to make a migrate or an upgrade comment this line
-notification.start()
+@manager.command
+def notify():
+    # Starts a thread for daily notification about one-day
+    # deadlines and three days for returning books
+    notification_ = Thread(target=notification.email)
+
+    # When it is necessary to make a migrate or an upgrade comment this line
+    notification_.start()
