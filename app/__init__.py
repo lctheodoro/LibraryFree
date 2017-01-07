@@ -43,7 +43,8 @@ from app.controllers import users, books, notification
 def admin(mail):
     adm = tables.User.query.filter_by(name='admin').first()
     if adm is None:
-        adm = tables.User(name='admin',password='admin',email=mail)
+        adm = tables.User(name='admin',password='admin',email=mail,admin=2)
+        adm.hash_password('admin')
         db.session.add(adm)
         db.session.commit()
         print("Admin created!")

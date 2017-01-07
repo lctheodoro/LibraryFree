@@ -10,7 +10,7 @@ from app.models.tables import Organization
 # if it is, it calls the original function, else the user is unauthorized
 def is_user(func):
     def func_wrapper(self, id):
-        if not g.user.id == id:
+        if not (g.user.id == id or g.user.admin!=0):
             abort(401)
         else:
             return func(self, id)
@@ -22,17 +22,25 @@ def is_user(func):
 def is_manager(func):
     def func_wrapper(self, id):
         org = Organization.query.get_or_404(id)
-        if g.user not in org.managers:
+        if g.user not in org.managers and not g.user.admin!=0:
             abort(401)
         else:
             return func(self, id)
     return func_wrapper
 
 def is_admin(func):
-    def func_wrapper(self, id):
-        user = User.query.filter_by(name='admin').first()
-        if not g.user.id == user.id:
+    def func_wrapper(self):
+        if not g.user.admin!=0:
             abort(401)
         else:
-            return func(self, id)
+            return func(self)
+    return func_wrapper
+
+# overload
+def is_admin(func):
+    def func_wrapper(self,id):
+        if not g.user.admin!=0:
+            abort(401)
+        else:
+            return func(self,id)
     return func_wrapper

@@ -13,6 +13,7 @@ class User(db.Model):
     name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
+    admin = db.Column(db.Integer, default=0)
 
     # Complementary info
     city = db.Column(db.String)
@@ -104,6 +105,7 @@ class User(db.Model):
         return {
             'id': self.id,
             'name': self.name,
+            'admin': self.admin,
             'email': self.email,
             'city': self.city,
             'phone': self.phone,

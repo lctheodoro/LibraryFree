@@ -1,8 +1,8 @@
-from flask import g, jsonify
+from flask import g, jsonify,abort
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
 from app.models.tables import User, Organization, Feedback, Book_loan, Book, Book_return
-from app.models.decorators import is_user, is_manager
+from app.models.decorators import is_user, is_manager, is_admin
 from math import ceil
 
 @auth.verify_password
@@ -36,6 +36,7 @@ def get_auth_token():
 
 
 class UsersApi(Resource):
+    decorators = [auth.login_required]
     def __init__(self):
         # whenever we want to receive arguments from other parts
         # we need to use the RequestParser
@@ -50,6 +51,7 @@ class UsersApi(Resource):
         self.reqparse.add_argument("phone", type=str, location='json')
         super(UsersApi, self).__init__()
 
+    @is_admin
     def get(self):
         # Table.query makes a search (select) in the database
         users = User.query.all()
@@ -90,8 +92,10 @@ class ModifyUsersApi(Resource):
         self.reqparse.add_argument("password", type=str, location='json')
         self.reqparse.add_argument("city", type=str, location='json')
         self.reqparse.add_argument("phone", type=str, location='json')
+        self.reqparse.add_argument("admin",type=str,location='json')
         super(ModifyUsersApi, self).__init__()
 
+    @is_user
     def get(self, id):
         user = User.query.get_or_404(id)
         return {'data': user.serialize}, 200
@@ -106,13 +110,22 @@ class ModifyUsersApi(Resource):
             # when we have an update to do, we can't simply update all information
             # using the arguments from reqparse, because some may be empty
             # then we have to keep the information
+            if g.user.admin == 2:
+                administrator = True
+            else:
+                administrator = False
             for key, value in args.items():
+                if key == 'admin' and value is not None and not administrator:
+                    return {'message': 'You are not authorized to access this area.'},401
                 # this will filter only valid values
-                if key == 'password' and value is not None:
+                elif key == 'password' and value is not None:
                     # we will ALWAYS encrypt a new password
                     user.hash_password(value)
                 elif value is not None:
-                    setattr(user, key, value)
+                    if user.admin and not administrator and not user is g.user:
+                        return {'message': 'You are not authorized to access this area.'},401
+                    else:
+                        setattr(user, key, value)
             user.check_register()
             db.session.commit()
             return {'data': user.serialize}, 200
@@ -142,10 +155,12 @@ class OrganizationsApi(Resource):
                                    location='json')
         super(OrganizationsApi, self).__init__()
 
+    @is_admin
     def get(self):
         organizations = Organization.query.all()
         return {'data': [org.serialize for org in organizations]}, 200
 
+    @is_admin
     def post(self):
         args = self.reqparse.parse_args()
         org = Organization(name=args['name'],
@@ -173,6 +188,7 @@ class ModifyOrganizationsApi(Resource):
 
         super(ModifyOrganizationsApi, self).__init__()
 
+    @is_manager
     def get(self, id):
         org = Organization.query.get_or_404(id)
         return {'data': org.serialize}, 200
