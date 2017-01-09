@@ -36,7 +36,6 @@ def get_auth_token():
 
 
 class UsersApi(Resource):
-    decorators = [auth.login_required]
     def __init__(self):
         # whenever we want to receive arguments from other parts
         # we need to use the RequestParser
@@ -133,7 +132,7 @@ class ModifyUsersApi(Resource):
             print("ERROR: " + str(error))
             return { 'message': 'Unexpected Error' }, 500
 
-    @is_user
+    @is_admin
     def delete(self, id):
         user = User.query.get_or_404(id)
         db.session.delete(user)
@@ -216,7 +215,7 @@ class ModifyOrganizationsApi(Resource):
             print("ERROR: " + str(error))
             return { 'message': 'Unexpected Error' }, 500
 
-    @is_manager
+    @is_admin
     def delete(self, id):
         org = Organization.query.get_or_404(id)
         db.session.delete(org)

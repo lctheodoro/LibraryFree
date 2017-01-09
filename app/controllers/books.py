@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse
 from app import db, auth, api
 from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, \
                             Delayed_return, Organization, Topsearches
+from app.models.decorators import is_admin
 from datetime import timedelta, date
 from sqlalchemy.sql import and_
 from isbnlib import isbn_from_words,meta
@@ -156,6 +157,7 @@ class BooksApi(Resource):
 
 
 class ModifyBooksApi(Resource):
+    decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -195,7 +197,7 @@ class ModifyBooksApi(Resource):
         except Exception as error:
             print(error)
             return { 'message': 'Unexpected Error' }, 500
-
+    @is_admin
     def delete(self, id):
         book = Book.query.get_or_404(id)
         if book.is_organization:
@@ -214,19 +216,17 @@ class LoanRequestApi(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("book_id", type=int, required=True,
                                     location='json')
-        self.reqparse.add_argument("user_id", type=int, required=True,
-                                    location='json')
         super(LoanRequestApi,self).__init__()
 
     def post(self):
         args = self.reqparse.parse_args()
         # Checks if book_loan already exists
         l = Book_loan.query.filter_by(book_id=args['book_id'],
-                                      user_id=args['user_id'],
+                                      user_id=g.user.id,
                                       loan_status='requested').first()
         if l==None:
             try:
-                loan = Book_loan(**args)
+                loan = Book_loan(book_id=args['book_id'],user_id=g.user.id)
                 loan.loan_status = 'requested'
                 loan.scored = False
                 book = Book.query.get_or_404(loan.book_id)
@@ -327,6 +327,7 @@ class LoanReplyApi(Resource):
 
 
 class ReturnApi(Resource):
+    decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -378,6 +379,7 @@ class ReturnApi(Resource):
 
 
 class DelayApi(Resource):
+    decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -428,6 +430,8 @@ class DelayApi(Resource):
 
 
 class BooksAvailabilityApi(Resource):
+    decorators = [auth.login_required]
+
     def __init__(self):
         super(BooksAvailabilityApi, self).__init__()
 

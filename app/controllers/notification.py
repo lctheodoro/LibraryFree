@@ -9,8 +9,7 @@ from datetime import timedelta, date
 # and if necessary is taken a book and a date, passing all these variables
 # to the email, that is, you can create variables within the email
 def send(loans, message, assunto, book=None, loan_date=None):
-	for l in loans:
-		u = User.query.filter_by(id=l.user_id).first()
+	for u in loans:
 		msg = Message(assunto, sender=app.config['MAIL_USERNAME'], recipients=[u.email])
 		with app.app_context():
 			msg.html = render_template(message, user=u, book=book, loan_date=loan_date)
