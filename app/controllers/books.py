@@ -3,7 +3,7 @@ from flask_restful import Resource, reqparse
 from app import db, auth, api
 from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, \
                             Delayed_return, Organization, Topsearches
-from app.models.decorators import is_admin
+from app.models.decorators import is_admin, is_admin_id
 from datetime import timedelta, date
 from sqlalchemy.sql import and_
 from isbnlib import isbn_from_words,meta
@@ -13,7 +13,7 @@ from threading import Thread
 
 
 class BooksApi(Resource):
-
+    decorators = [auth.login_required]
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("title", type=str, required=True,
@@ -109,8 +109,12 @@ class BooksApi(Resource):
                 return { 'message': 'Bad Request' }, 400
             if args['user_id'] and (not User.query.get(args['user_id'])):
                 return { 'message': 'User not found' }, 404
-            if args['organization_id'] and (not Organization.query.get(args['organization_id'])):
-                return { 'message': 'Organization not found' }, 404
+            org = Organization.query.get(args['organization_id'])
+            if args['organization_id'] and ((org is None) or (g.user not in org.managers and g.user.admin == 0)):
+                if org is None:
+                    return { 'message': 'Organization not found' }, 404
+                if g.user not in org.managers and g.user.admin == 0:
+                    return {'message': 'You are not authorized to access this area.'},401
             elif args['user_id']:
                 book.is_organization = False
                 user = User.query.get_or_404(args['user_id'])
@@ -186,6 +190,14 @@ class ModifyBooksApi(Resource):
     def put(self, id):
         try:
             book = Book.query.get_or_404(id)
+            if book.is_organization:
+                org = Organization.query.get(book.organization_id)
+                if g.user not in org.managers and g.user.admin == 0:
+                    return {'message': 'You are not authorized to access this area.'},401
+            else:
+                if g.user.id != book.user_id and g.user.admin == 0:
+                    return {'message': 'You are not authorized to access this area.'},401
+
             args = self.reqparse.parse_args()
 
             for key, value in args.items():
@@ -197,7 +209,7 @@ class ModifyBooksApi(Resource):
         except Exception as error:
             print(error)
             return { 'message': 'Unexpected Error' }, 500
-    @is_admin
+    @is_admin_id
     def delete(self, id):
         book = Book.query.get_or_404(id)
         if book.is_organization:
@@ -281,7 +293,7 @@ class LoanReplyApi(Resource):
         book = Book.query.get_or_404(loan.book_id)
 
         # Verify user logged in
-        if g.user.id != book.user_id:
+        if g.user.id != book.user_id and g.user.admin == 0:
             return {'message': 'You are not authorized to access this area'}, 401
 
         if args['loan_status'] == None:
@@ -343,8 +355,17 @@ class ReturnApi(Resource):
         args = self.reqparse.parse_args()
 
         loan_record_search = Book_loan.query.filter_by(id=args['loan_id']).first()
-        return_record_search = Book_return.query.get_or_404(loan_record_search.id)
-
+        return_record_search = Book_return.query.filter_by(book_loan_id=loan_record_search.id).first()
+        book = Book.query.get(loan_record_search.book_id)
+        if ((g.user.id != return_record_search.user_id) and g.user.admin==0):
+            return {'message': 'You are not authorized to access this area'}, 401
+        if book.is_organization:
+            org = Organization.query.get(book.organization_id)
+            if g.user not in org.managers and g.user.admin == 0:
+                return {'message': 'You are not authorized to access this area'}, 401
+        else:
+            if g.user.id != book.user_id and g.user.admin == 0:
+                return {'message': 'You are not authorized to access this area'}, 401
         return {'data': [return_record_search.serialize]}, 200
 
     def post(self):

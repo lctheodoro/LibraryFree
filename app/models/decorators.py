@@ -37,7 +37,7 @@ def is_admin(func):
     return func_wrapper
 
 # overload
-def is_admin(func):
+def is_admin_id(func):
     def func_wrapper(self,id):
         if not g.user.admin!=0:
             abort(401)

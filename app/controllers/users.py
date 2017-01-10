@@ -2,7 +2,7 @@ from flask import g, jsonify,abort
 from flask_restful import Resource, reqparse
 from app import app, db, auth, api
 from app.models.tables import User, Organization, Feedback, Book_loan, Book, Book_return
-from app.models.decorators import is_user, is_manager, is_admin
+from app.models.decorators import is_user, is_manager, is_admin, is_admin_id
 from math import ceil
 
 @auth.verify_password
@@ -56,6 +56,7 @@ class UsersApi(Resource):
         users = User.query.all()
         # we should return serialized objects because they are ready to
         # be converted to JSON
+        print(users)
         # an HTTP status code is also important
         return {'data': [u.serialize for u in users]}, 200
 
@@ -132,9 +133,11 @@ class ModifyUsersApi(Resource):
             print("ERROR: " + str(error))
             return { 'message': 'Unexpected Error' }, 500
 
-    @is_admin
+    @is_admin_id
     def delete(self, id):
         user = User.query.get_or_404(id)
+        if user.admin == 2 and not g.user.admin == 2:
+            return {'message': 'You are not authorized to access this area.'},401
         db.session.delete(user)
         db.session.commit()
         return 204
@@ -215,7 +218,7 @@ class ModifyOrganizationsApi(Resource):
             print("ERROR: " + str(error))
             return { 'message': 'Unexpected Error' }, 500
 
-    @is_admin
+    @is_admin_id
     def delete(self, id):
         org = Organization.query.get_or_404(id)
         db.session.delete(org)
