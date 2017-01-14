@@ -109,7 +109,8 @@ class BooksApi(Resource):
                 return { 'message': 'Bad Request' }, 400
             if args['user_id'] and (not User.query.get(args['user_id'])):
                 return { 'message': 'User not found' }, 404
-            org = Organization.query.get(args['organization_id'])
+            if args['organization_id']:
+                org = Organization.query.get(args['organization_id'])
             if args['organization_id'] and ((org is None) or (g.user not in org.managers and g.user.admin == 0)):
                 if org is None:
                     return { 'message': 'Organization not found' }, 404
@@ -293,7 +294,11 @@ class LoanReplyApi(Resource):
         book = Book.query.get_or_404(loan.book_id)
 
         # Verify user logged in
-        if g.user.id != book.user_id and g.user.admin == 0:
+        if book.is_organization:
+            org = Organization.query.get(book.organization_id)
+            if g.user not in org.managers and g.user.admin==0:
+                return {'message': 'You are not authorized to access this area'}, 401
+        elif g.user.id != book.user_id and g.user.admin == 0:
             return {'message': 'You are not authorized to access this area'}, 401
 
         if args['loan_status'] == None:
@@ -345,10 +350,6 @@ class ReturnApi(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("loan_id", type=int, required=True,
                                    location='json')
-        self.reqparse.add_argument("user_id", type=int, required=True,
-                                   location='json')
-        self.reqparse.add_argument("confirmed_by", type=str,
-                                   location='json')
         super(ReturnApi, self).__init__()
 
     def get(self):
@@ -379,20 +380,27 @@ class ReturnApi(Resource):
             if not (return_record):
                 return_record = Book_return(book_loan_id = loan_record.id,
                                             returned_date = date.today())
-                db.session.add(return_record)
 
-            if(args['confirmed_by']=='owner'):
-                return_record.owner_confirmation=True
-            elif(args['confirmed_by']=='user'):
+            book = Book.query.get_or_404(loan_record.book_id)
+            if loan_record.user_id==g.user.id:
                 return_record.user_confirmation=True
+                db.session.add(return_record)
+            elif book.is_organization:
+                org = Organization.query.get(book.organization_id)
+                if g.user in org.managers:
+                    return_record.owner_confirmation=True
+                    db.session.add(return_record)
+            elif not book.is_organization and g.user.id == book.user_id:
+                return_record.owner_confirmation=True
+                db.session.add(return_record)
             else:
                 return { 'data': { 'message': 'Bad Request' } }, 400
             if return_record.owner_confirmation and return_record.user_confirmation:
                 loan_record.loan_status = 'done'
             else:
                 loan_record.loan_status = 'accepted'
-            db.session.commit()
 
+            db.session.commit()
             return { 'data': return_record.serialize }, 201
         except Exception as error:
             print(error)
@@ -404,17 +412,30 @@ class DelayApi(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("loan_id",type=int,required=True,
-                                    location='json')
-        self.reqparse.add_argument("status", type=str,
-                                    required=True,location='json')
+        self.reqparse.add_argument("loan_id",type=int, location='json')
+        self.reqparse.add_argument("status", type=str, location='json')
         super(DelayApi, self).__init__()
 
     def get(self):
         args = self.reqparse.parse_args()
-        loan_delay = Delayed_return.query.get_or_404(args['loan_id'])
+        loan_delay = Delayed_return.query.filter_by(book_loan_id=args['loan_id']).first()
 
-        return {'data': [loan_delay.serialize]}, 201
+        if loan_delay is None:
+            return {'message': 'The object you are looking for was not found.'}, 404
+
+        loan = Loan.query.get_or_404(args['loan_id'])
+        book = Book.query.get_or_404(loan.book_id)
+
+        if book.is_organization:
+            org = Organization.query.get_or_404(book.organization_id)
+        if book.is_organization and g.user in org.managers:
+            return {'data': [loan_delay.serialize]}, 201
+        elif g.user.id == book.user_id or g.user.admin!=0:
+            return {'data': [loan_delay.serialize]}, 201
+        elif g.user.id == loan.user_id or g.user.admin!=0:
+            return {'data': [loan_delay.serialize]}, 201
+
+        return {'message': 'You are not authorized to access this area'}, 401
 
     def post(self):
         try:
@@ -422,29 +443,48 @@ class DelayApi(Resource):
             loan_delay = Book_loan.query.get_or_404(args['loan_id'])
             delay_record= Delayed_return.query.filter_by(book_loan_id =
                                                         loan_delay.id).first()
+            if loan_delay.loan_status is not "done":
+                book = Book.query.get_or_404(loan_delay.book_id)
+                if g.user.id == loan_delay.user_id:
+                    if not delay_record:
+                        delay_record = Delayed_return(book_loan_id = loan_delay.id,
+                                                        requested_date = loan_delay.return_date+timedelta(days=7))
+                        db.session.add(delay_record)
+                    elif delay_record.status is not "waiting":
+                        return {'message': 'Request already answered'}, 409
 
-            if not delay_record:
-                delay_record = Delayed_return(book_loan_id = loan_delay.id,
-                                                requested_date = loan_delay.return_date+timedelta(days=7))
-                db.session.add(delay_record)
+                elif book.is_organization:
+                    org = Organization.query.get_or_404(book.organization_id)
+                    if g.user in org.managers:
+                        if args['status']=="accepted":
+                            delay_record.status='accepted'
+                            loan_delay.return_date = delay_record.requested_date
+                        elif args['status']=="refused":
+                            delay_record.status='refused'
+                        else:
+                            return { 'message': 'Bad Request' }, 400
+                    else:
+                        return {'message': 'You are not authorized to access this area'}, 401
+                elif g.user.id == book.user_id:
+                    if args['status']=="accepted":
+                        delay_record.status='accepted'
+                        loan_delay.return_date = delay_record.requested_date
+                    elif args['status']=="refused":
+                        delay_record.status='refused'
+                    else:
+                        return { 'message': 'Bad Request' }, 400
+                else:
+                    return {'message': 'You are not authorized to access this area'}, 401
+                db.session.commit()
+                users_mail = User.query.filter_by(id=loan_delay.user_id).first()
 
-            if args['status']=='waiting':
-                delay_record.status='waiting'
-            elif args['status']=='accepted':
-                delay_record.status='accepted'
-            elif args['status']=='refused':
-                delay_record.status='refused'
+                Thread(target=notification.send([users_mail], "email.html",
+                                                delay_record.status,
+                                                book,delay_record.requested_date)).start()
+
+                return { 'data': delay_record.serialize }, 201
             else:
-                return { 'message': 'Bad Request' }, 400
-            db.session.commit()
-            users_mail = User.query.filter_by(id=loan_delay.user_id).first()
-            book_mail = Book.query.filter_by(id=loan_delay.book_id).first()
-
-            Thread(target=notification.send([users_mail], "email.html",
-                                            delay_record.status,
-                                            book_mail,delay_record.requested_date)).start()
-
-            return { 'data': delay_record.serialize }, 201
+                return {'message': 'Book returned'},409
         except Exception as error:
             print(error)
             return { 'message': 'Unexpected Error' }, 500
@@ -506,12 +546,11 @@ class WishlistApi(Resource):
 
     def post(self):
         # Required arguments
-        self.reqparse.add_argument("user_id", type=int, required=True, location='json')
         self.reqparse.add_argument("title", type=str, required=True, location='json')
 
         args = self.reqparse.parse_args()
 
-        user = User.query.filter_by(id=args['user_id']).first()
+        user = g.user
         if not user: # User not found
             return {'message': 'User not found'}, 404
         try:

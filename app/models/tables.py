@@ -291,7 +291,7 @@ class Delayed_return(db.Model):
     # accepted - owner accepted to delay the return date
     # refused - owner refused to delay the return date
     status = db.Column(db.Enum("waiting", "accepted", "refused",
-                               name="delayed_return_status"))
+                               name="delayed_return_status"),default="waiting")
 
     @property
     def serialize(self):
@@ -313,7 +313,7 @@ class Feedback(db.Model):
 
     # Feedback info
     transaction_id = db.Column(db.Integer, db.ForeignKey('book_returns.id'), nullable=False)
-    user = db.Column(db.Enum("owner", "user", name="user_feedback"), nullable=False)
+    user = db.Column(db.Enum("owner", "user", name="user_feedback"))
     user_evaluation = db.Column(db.Integer, nullable=False)
     time_evaluation = db.Column(db.Integer)
     book_evaluation = db.Column(db.Integer)

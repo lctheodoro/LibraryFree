@@ -232,7 +232,6 @@ class FeedbackApi(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("transaction_id", type=int, location='json')
-        self.reqparse.add_argument("user", type=str, location='json')
         self.reqparse.add_argument("user_evaluation", type=int, location='json')
         self.reqparse.add_argument("time_evaluation", type=int, location='json')
         self.reqparse.add_argument("book_evaluation", type=int, location='json')
@@ -244,19 +243,24 @@ class FeedbackApi(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         feedback = Feedback(**args)
-        db.session.add(feedback)
         try:
             book_return = Book_return.query.get_or_404(feedback.transaction_id)
             loan = Book_loan.query.get_or_404(book_return.book_loan_id)
             book = Book.query.get_or_404(loan.book_id)
             # Feedback from user to owner
-            if feedback.user == "user":
-                user = User.query.get_or_404(loan.user_id)
+            if g.user.id == loan.user_id:
+                user = g.user
+                db.session.add(feedback)
+                feedback.user = "user"
             # Feedback from owner to user
-            else:
-                if book.is_organization: # Must be user-to-user
+            elif book.is_organization: # Must be user-to-user
                     return { 'message' : 'Organizations cannot be evaluated' }, 400
-                user = User.query.get_or_404(book.user_id)
+            elif book.user_id == g.user.id:
+                user = g.user
+                db.session.add(feedback)
+                feedback.user = "owner"
+            else:
+                return {'message': 'You are not authorized to access this area'}, 401
             # Update user evaluation
             if user.evaluation == 0:
                 user.evaluation = feedback.user_evaluation
