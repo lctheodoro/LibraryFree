@@ -1,6 +1,6 @@
-from flask import g, jsonify,abort
+from flask import g, jsonify,abort, request
 from flask_restful import Resource, reqparse
-from app import app, db, auth, api
+from app import app, db, auth, api, log__
 from app.models.tables import User, Organization, Feedback, Book_loan, Book, Book_return
 from app.models.decorators import is_user, is_manager, is_admin, is_admin_id
 from math import ceil
@@ -18,6 +18,7 @@ def verify_password(email_or_token, password):
         # tries to get the user by email and password
         user = User.query.filter_by(email=email_or_token).first()
         if not user or not user.verify_password(password):
+            log__(401)
             return False
     # saves the user in the global object 'user'
     g.user = user
@@ -50,15 +51,13 @@ class UsersApi(Resource):
         self.reqparse.add_argument("phone", type=str, location='json')
         super(UsersApi, self).__init__()
 
-    @is_admin
     def get(self):
         # Table.query makes a search (select) in the database
         users = User.query.all()
         # we should return serialized objects because they are ready to
         # be converted to JSON
-        print(users)
         # an HTTP status code is also important
-        return {'data': [u.serialize for u in users]}, 200
+        return {'data': [u.serialize for u in users]}, log__(200)
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -73,13 +72,13 @@ class UsersApi(Resource):
             user.check_register()
             db.session.commit()
 
-            return {'data': user.serialize}, 201
+            return {'data': user.serialize}, log__(201)
         except Exception as error:
             print(error)
             if "duplicate key value in error":
-                return { 'message': 'User already exists' }, 409
+                return { 'message': 'User already exists' }, log__(409)
             else:
-                return { 'message': 'Could\'nt complete the request' }, 503
+                return { 'message': 'Could\'nt complete the request' }, log__(503)
 
 
 class ModifyUsersApi(Resource):
@@ -98,7 +97,7 @@ class ModifyUsersApi(Resource):
     @is_user
     def get(self, id):
         user = User.query.get_or_404(id)
-        return {'data': user.serialize}, 200
+        return {'data': user.serialize}, log__(200,g.user)
 
     # this decorator verify if the object belongs to the user
     # if so, it can be edited, else the user is unauthorized
@@ -116,31 +115,31 @@ class ModifyUsersApi(Resource):
                 administrator = False
             for key, value in args.items():
                 if key == 'admin' and value is not None and not administrator:
-                    return {'message': 'You are not authorized to access this area.'},401
+                    return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
                 # this will filter only valid values
                 elif key == 'password' and value is not None:
                     # we will ALWAYS encrypt a new password
                     user.hash_password(value)
                 elif value is not None:
                     if user.admin and not administrator and not user is g.user:
-                        return {'message': 'You are not authorized to access this area.'},401
+                        return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
                     else:
                         setattr(user, key, value)
             user.check_register()
             db.session.commit()
-            return {'data': user.serialize}, 200
+            return {'data': user.serialize}, log__(200,g.user)
         except Exception as error:
             print("ERROR: " + str(error))
-            return { 'message': 'Unexpected Error' }, 500
+            return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
     @is_admin_id
     def delete(self, id):
         user = User.query.get_or_404(id)
         if user.admin == 2 and not g.user.admin == 2:
-            return {'message': 'You are not authorized to access this area.'},401
+            return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
         db.session.delete(user)
-        db.session.commit()
-        return 204
+        #db.session.commit()
+        return log__(204,g.user)
 
 
 class OrganizationsApi(Resource):
@@ -160,7 +159,7 @@ class OrganizationsApi(Resource):
     @is_admin
     def get(self):
         organizations = Organization.query.all()
-        return {'data': [org.serialize for org in organizations]}, 200
+        return {'data': [org.serialize for org in organizations]}, log__(200,g.user)
 
     @is_admin
     def post(self):
@@ -176,7 +175,7 @@ class OrganizationsApi(Resource):
 
         db.session.commit()
 
-        return {'data': org.serialize}, 201
+        return {'data': org.serialize}, log__(201,g.user)
 
 
 class ModifyOrganizationsApi(Resource):
@@ -193,7 +192,7 @@ class ModifyOrganizationsApi(Resource):
     @is_manager
     def get(self, id):
         org = Organization.query.get_or_404(id)
-        return {'data': org.serialize}, 200
+        return {'data': org.serialize}, log__(200,g.user)
 
     # this decorator verify if the user is one of the company managers
     # if so, it can be edited, else the user is unauthorized
@@ -213,17 +212,17 @@ class ModifyOrganizationsApi(Resource):
                 for m in User.query.filter(User.id.in_(args['managers'])).all():
                     m.organization_id = org.id
             db.session.commit()
-            return {'data': org.serialize}, 200
+            return {'data': org.serialize}, log__(200,g.user)
         except Exception as error:
             print("ERROR: " + str(error))
-            return { 'message': 'Unexpected Error' }, 500
+            return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
     @is_admin_id
     def delete(self, id):
         org = Organization.query.get_or_404(id)
         db.session.delete(org)
         db.session.commit()
-        return {}, 204
+        return {}, log__(204,g.user)
 
 
 class FeedbackApi(Resource):
@@ -254,13 +253,13 @@ class FeedbackApi(Resource):
                 feedback.user = "user"
             # Feedback from owner to user
             elif book.is_organization: # Must be user-to-user
-                    return { 'message' : 'Organizations cannot be evaluated' }, 400
+                    return { 'message' : 'Organizations cannot be evaluated' }, log__(400,g.user)
             elif book.user_id == g.user.id:
                 user = g.user
                 db.session.add(feedback)
                 feedback.user = "owner"
             else:
-                return {'message': 'You are not authorized to access this area'}, 401
+                return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
             # Update user evaluation
             if user.evaluation == 0:
                 user.evaluation = feedback.user_evaluation
@@ -276,10 +275,10 @@ class FeedbackApi(Resource):
                 feedback.scored += 8
 
             db.session.commit()
-            return { 'data': feedback.serialize }, 200
+            return { 'data': feedback.serialize }, log__(200,g.user)
         except Exception as error:
             print("ERROR: " + str(error))
-            return { 'message': 'Unexpected Error' }, 500
+            return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
 
 class ModifyFeedbackApi(Resource):
@@ -287,7 +286,7 @@ class ModifyFeedbackApi(Resource):
 
     def get(self, id):
         feedback = Feedback.query.get_or_404(id)
-        return { 'data': feedback.serialize }, 200
+        return { 'data': feedback.serialize }, log__(200,g.user)
 
     def delete(self, id):
         feedback = Feedback.query.get_or_404(id)
@@ -301,7 +300,7 @@ class ModifyFeedbackApi(Resource):
 
         db.session.delete(feedback)
         db.session.commit()
-        return {}, 204
+        return {}, log__(204,g.user)
 
 
 class Ranking(Resource):
@@ -309,7 +308,7 @@ class Ranking(Resource):
     def get(self):
         users = [u.serialize for u in User.query.all()]
         # Sorting first by the points, after by the alfabetic order of the names
-        return { 'data' : sorted(users, key=lambda t: (-t['points'], t['name'])) }, 200
+        return { 'data' : sorted(users, key=lambda t: (-t['points'], t['name'])) }, log__(200)
 
 
 # for each resource we need to specify an URI and an endpoint

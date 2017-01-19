@@ -1,13 +1,15 @@
 import os
 
-from flask import Flask, make_response, jsonify
+from flask import Flask, make_response, jsonify, request, g
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
-from flask_script import Manager
+from flask_script import Manager, prompt_pass, prompt, prompt_bool
 from flask_httpauth import HTTPBasicAuth
 from flask_restful import Api
 from flask_mail import Mail
 from threading import Thread
+from datetime import datetime
+import logging
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
@@ -34,17 +36,48 @@ app_errors = {
     }
 }
 
+def log__(http_code,user=None):
+    if user is None:
+        app.logger.info(request.environ.get("REMOTE_ADDR") + "\t| " + "Guest" + "\t| "+
+                        str(request.path) + " - " + str(request.method) + " - " + str(http_code))
+    else:
+        app.logger.info(request.environ.get("REMOTE_ADDR") + "\t| " + str(user.id) + " - " + user.name + "\t| "+
+                        str(request.path) + " - " + str(request.method) + " - " + str(http_code))
+    return http_code
+
 api = Api(app, errors=app_errors)
 
 from app.models import tables
 from app.controllers import users, books, notification
 
 @manager.command
-def admin(mail):
-    adm = tables.User.query.filter_by(name='admin').first()
+def admin():
+    adm = tables.User.query.filter_by(admin=2).first()
     if adm is None:
-        adm = tables.User(name='admin',password='admin',email=mail,admin=2)
-        adm.hash_password('admin')
+        while(True):
+            name = prompt("Please enter the administrator's name")
+            if name == None:
+                print("You must enter a name!!!")
+            else:
+                if prompt_bool("Correct name?",default=True):
+                    break
+        while(True):
+            email = prompt("Enter admin email")
+            if email == None:
+                print("You must enter an email!!!")
+            else:
+                if prompt_bool("Email Correct?",default=True):
+                    break
+        while(True):
+            password = prompt_pass("Enter the administrator password")
+            password_v = prompt_pass("Re-enter password")
+            if password == None or password_v==None or password != password_v:
+                print("You must enter a valid password!!!")
+            else:
+                if prompt_bool("Password correct?",default=True):
+                    break
+        adm = tables.User(name=name,password=password,email=email,admin=2)
+        adm.hash_password(password)
         db.session.add(adm)
         db.session.commit()
         print("Admin created!")

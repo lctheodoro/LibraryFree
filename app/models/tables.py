@@ -327,8 +327,8 @@ class Feedback(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'transaction_id': self.book_return.serialize,
-            'user': self.user,
+            'book_return': self.book_return.serialize,
+            'user_type': self.user,
             'user_evaluation': self.user_evaluation,
             'time_evaluation': self.time_evaluation,
             'book_evaluation': self.book_evaluation,
@@ -356,10 +356,11 @@ class Wishlist(db.Model):
             'id': self.id,
             'isbn': self.isbn,
             'title': self.title,
+            'user': self.user.serialize
         }
 
     def __repr__(self):
-        return "<Wishlist %r>" % self.id
+        return "<Wishlist %r>" % self.isbn
 
 class Topsearches(db.Model):
     __tablename__ = "topsearches"

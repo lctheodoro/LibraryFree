@@ -1,6 +1,6 @@
 from flask import json, g
 from flask_restful import Resource, reqparse
-from app import db, auth, api
+from app import db, auth, api, log__
 from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, \
                             Delayed_return, Organization, Topsearches
 from app.models.decorators import is_admin, is_admin_id
@@ -98,7 +98,7 @@ class BooksApi(Resource):
 
         filtering = and_(*filters_list)
         books = Book.query.filter(filtering).all()
-        return {'data': [book.serialize for book in books]}, 200
+        return {'data': [book.serialize for book in books]}, log__(200,g.user)
 
     def post(self):
         try:
@@ -106,16 +106,16 @@ class BooksApi(Resource):
             book = Book(**args)
 
             if (args['user_id'] and args['organization_id']) or ((not args['user_id'] and not args['organization_id'])):
-                return { 'message': 'Bad Request' }, 400
+                return { 'message': 'Bad Request' }, log__(400,g.user)
             if args['user_id'] and (not User.query.get(args['user_id'])):
-                return { 'message': 'User not found' }, 404
+                return { 'message': 'User not found' }, log__(404,g.user)
             if args['organization_id']:
                 org = Organization.query.get(args['organization_id'])
             if args['organization_id'] and ((org is None) or (g.user not in org.managers and g.user.admin == 0)):
                 if org is None:
-                    return { 'message': 'Organization not found' }, 404
+                    return { 'message': 'Organization not found' }, log__(404,g.user)
                 if g.user not in org.managers and g.user.admin == 0:
-                    return {'message': 'You are not authorized to access this area.'},401
+                    return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
             elif args['user_id']:
                 book.is_organization = False
                 user = User.query.get_or_404(args['user_id'])
@@ -155,10 +155,10 @@ class BooksApi(Resource):
 
             db.session.add(book)
             db.session.commit()
-            return { 'data': book.serialize }, 201
+            return { 'data': book.serialize }, log__(201,g.user)
         except Exception as error:
             print(error)
-            return { 'message': 'Bad Request' }, 400
+            return { 'message': 'Bad Request' }, log__(400,g.user)
 
 
 class ModifyBooksApi(Resource):
@@ -184,9 +184,9 @@ class ModifyBooksApi(Resource):
                 book_topsearches = Topsearches(isbn=book.isbn, title=book.title, times=1)
                 db.session.add(book_topsearches)
                 db.session.commit()
-            return {'data': book.serialize}, 200
+            return {'data': book.serialize}, log__(200,g.user)
         except Exception:
-            return {'message': 'Unexpected error'}, 500
+            return {'message': 'Unexpected error'}, log__(500,g.user)
 
     def put(self, id):
         try:
@@ -194,10 +194,10 @@ class ModifyBooksApi(Resource):
             if book.is_organization:
                 org = Organization.query.get(book.organization_id)
                 if g.user not in org.managers and g.user.admin == 0:
-                    return {'message': 'You are not authorized to access this area.'},401
+                    return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
             else:
                 if g.user.id != book.user_id and g.user.admin == 0:
-                    return {'message': 'You are not authorized to access this area.'},401
+                    return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
 
             args = self.reqparse.parse_args()
 
@@ -206,10 +206,10 @@ class ModifyBooksApi(Resource):
                     setattr(book, key, value)
 
             db.session.commit()
-            return {'data': book.serialize}, 200
+            return {'data': book.serialize}, log__(200,g.user)
         except Exception as error:
             print(error)
-            return { 'message': 'Unexpected Error' }, 500
+            return { 'message': 'Unexpected Error' }, log__(500,g.user)
     @is_admin_id
     def delete(self, id):
         book = Book.query.get_or_404(id)
@@ -220,7 +220,7 @@ class ModifyBooksApi(Resource):
         user.points_update(-10)
         db.session.delete(book)
         db.session.commit()
-        return 204
+        return log__(204,g.user)
 
 class LoanRequestApi(Resource):
     decorators = [auth.login_required]
@@ -255,11 +255,11 @@ class LoanRequestApi(Resource):
                 db.session.add(loan)
                 db.session.commit()
 
-                return { 'data': loan.serialize }, 201
+                return { 'data': loan.serialize }, log__(201,g.user)
             except Exception as error:
                 print(error)
-                return { 'message': 'Unexpected Error' }, 500
-        return { 'message': 'Request already made' }, 500
+                return { 'message': 'Unexpected Error' }, log__(500,g.user)
+        return { 'message': 'Request already made' }, log__(500,g.user)
 
 
 class LoanReplyApi(Resource):
@@ -278,18 +278,18 @@ class LoanReplyApi(Resource):
 
             # Verify user logged in
             if g.user.id != book.user_id and g.user.id!=loan.user_id:
-                return {'message': 'You are not authorized to access this area'}, 401
+                return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
 
             loan = Book_loan.query.get_or_404(id)
-            return { 'data': loan.serialize }, 200
+            return { 'data': loan.serialize }, log__(200,g.user)
         except Exception as error:
             print(error)
-            return {'message': 'Unexpected Error'}, 500
+            return {'message': 'Unexpected Error'}, log__(500,g.user)
 
     def put(self,id):
         args = self.reqparse.parse_args()
         if args['loan_status'] is None:
-            return {'message': 'Bad Request'}, 400
+            return {'message': 'Bad Request'}, log__(400,g.user)
         loan =  Book_loan.query.get_or_404(id)
         book = Book.query.get_or_404(loan.book_id)
 
@@ -297,12 +297,12 @@ class LoanReplyApi(Resource):
         if book.is_organization:
             org = Organization.query.get(book.organization_id)
             if g.user not in org.managers and g.user.admin==0:
-                return {'message': 'You are not authorized to access this area'}, 401
+                return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
         elif g.user.id != book.user_id and g.user.admin == 0:
-            return {'message': 'You are not authorized to access this area'}, 401
+            return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
 
         if args['loan_status'] == None:
-            return {'message': 'Empty Status'}, 500
+            return {'message': 'Empty Status'}, log__(500,g.user)
         if loan.loan_status != args['loan_status']:
             try:
                 user = User.query.get_or_404(loan.user_id)
@@ -336,11 +336,11 @@ class LoanReplyApi(Resource):
                     db.session.commit()
                     Thread(target=notification.send([user],"queue.html","Loan Reply",book,loan.return_date)).start()
 
-                return { 'data': loan.serialize }, 201
+                return { 'data': loan.serialize }, log__(201,g.user)
             except Exception as error:
                 print(error)
-                return {'message': 'Unexpected Error'}, 500
-        return {'message': 'Request already answered'}, 409
+                return {'message': 'Unexpected Error'}, log__(500,g.user)
+        return {'message': 'Request already answered'}, log__(409,g.user)
 
 
 class ReturnApi(Resource):
@@ -359,22 +359,22 @@ class ReturnApi(Resource):
         return_record_search = Book_return.query.filter_by(book_loan_id=loan_record_search.id).first()
         book = Book.query.get(loan_record_search.book_id)
         if ((g.user.id != return_record_search.user_id) and g.user.admin==0):
-            return {'message': 'You are not authorized to access this area'}, 401
+            return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
         if book.is_organization:
             org = Organization.query.get(book.organization_id)
             if g.user not in org.managers and g.user.admin == 0:
-                return {'message': 'You are not authorized to access this area'}, 401
+                return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
         else:
             if g.user.id != book.user_id and g.user.admin == 0:
-                return {'message': 'You are not authorized to access this area'}, 401
-        return {'data': [return_record_search.serialize]}, 200
+                return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
+        return {'data': [return_record_search.serialize]}, log__(200,g.user)
 
     def post(self):
         try:
             args = self.reqparse.parse_args()
             loan_record = Book_loan.query.filter_by(id=args['loan_id']).first()
             if not loan_record.loan_status == 'accepted':
-                return { 'message': 'Bad Request' }, 400
+                return { 'message': 'Bad Request' }, log__(400,g.user)
             return_record = Book_return.query.filter_by(book_loan_id =
                                                         loan_record.id).first()
             if not (return_record):
@@ -394,17 +394,17 @@ class ReturnApi(Resource):
                 return_record.owner_confirmation=True
                 db.session.add(return_record)
             else:
-                return { 'data': { 'message': 'Bad Request' } }, 400
+                return { 'data': { 'message': 'Bad Request' } }, log__(400,g.user)
             if return_record.owner_confirmation and return_record.user_confirmation:
                 loan_record.loan_status = 'done'
             else:
                 loan_record.loan_status = 'accepted'
 
             db.session.commit()
-            return { 'data': return_record.serialize }, 201
+            return { 'data': return_record.serialize }, log__(201,g.user)
         except Exception as error:
             print(error)
-            return {'message': 'Unexpected Error'}, 500
+            return {'message': 'Unexpected Error'}, log__(500,g.user)
 
 
 class DelayApi(Resource):
@@ -421,7 +421,7 @@ class DelayApi(Resource):
         loan_delay = Delayed_return.query.filter_by(book_loan_id=args['loan_id']).first()
 
         if loan_delay is None:
-            return {'message': 'The object you are looking for was not found.'}, 404
+            return {'message': 'The object you are looking for was not found.'}, log__(404,g.user)
 
         loan = Loan.query.get_or_404(args['loan_id'])
         book = Book.query.get_or_404(loan.book_id)
@@ -429,13 +429,13 @@ class DelayApi(Resource):
         if book.is_organization:
             org = Organization.query.get_or_404(book.organization_id)
         if book.is_organization and g.user in org.managers:
-            return {'data': [loan_delay.serialize]}, 201
+            return {'data': [loan_delay.serialize]}, log__(201,g.user)
         elif g.user.id == book.user_id or g.user.admin!=0:
-            return {'data': [loan_delay.serialize]}, 201
+            return {'data': [loan_delay.serialize]}, log__(201,g.user)
         elif g.user.id == loan.user_id or g.user.admin!=0:
-            return {'data': [loan_delay.serialize]}, 201
+            return {'data': [loan_delay.serialize]}, log__(201,g.user)
 
-        return {'message': 'You are not authorized to access this area'}, 401
+        return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
 
     def post(self):
         try:
@@ -451,7 +451,7 @@ class DelayApi(Resource):
                                                         requested_date = loan_delay.return_date+timedelta(days=7))
                         db.session.add(delay_record)
                     elif delay_record.status is not "waiting":
-                        return {'message': 'Request already answered'}, 409
+                        return {'message': 'Request already answered'}, log__(409,g.user)
 
                 elif book.is_organization:
                     org = Organization.query.get_or_404(book.organization_id)
@@ -462,9 +462,9 @@ class DelayApi(Resource):
                         elif args['status']=="refused":
                             delay_record.status='refused'
                         else:
-                            return { 'message': 'Bad Request' }, 400
+                            return { 'message': 'Bad Request' }, log__(400,g.user)
                     else:
-                        return {'message': 'You are not authorized to access this area'}, 401
+                        return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
                 elif g.user.id == book.user_id:
                     if args['status']=="accepted":
                         delay_record.status='accepted'
@@ -472,9 +472,9 @@ class DelayApi(Resource):
                     elif args['status']=="refused":
                         delay_record.status='refused'
                     else:
-                        return { 'message': 'Bad Request' }, 400
+                        return { 'message': 'Bad Request' }, log__(400,g.user)
                 else:
-                    return {'message': 'You are not authorized to access this area'}, 401
+                    return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
                 db.session.commit()
                 users_mail = User.query.filter_by(id=loan_delay.user_id).first()
 
@@ -482,12 +482,12 @@ class DelayApi(Resource):
                                                 delay_record.status,
                                                 book,delay_record.requested_date)).start()
 
-                return { 'data': delay_record.serialize }, 201
+                return { 'data': delay_record.serialize }, log__(201,g.user)
             else:
-                return {'message': 'Book returned'},409
+                return {'message': 'Book returned'},log__(409,g.user)
         except Exception as error:
             print(error)
-            return { 'message': 'Unexpected Error' }, 500
+            return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
 
 class BooksAvailabilityApi(Resource):
@@ -506,14 +506,14 @@ class BooksAvailabilityApi(Resource):
                     book_return = Book_return.query.filter_by(book_loan_id=loan.id).first()
                     if(book_return):
                         if(not book_return.user_confirmation or not book_return.owner_confirmation):
-                            return {'data': {'status': 'Unavailable'}}, 200
+                            return {'data': {'status': 'Unavailable'}}, log__(200,g.user)
                     else: # Book not returned yet
-                        return {'data': {'status': 'Unavailable'}}, 200
-                return {'data': {'status': 'Available'}}, 200 # All loans returned
+                        return {'data': {'status': 'Unavailable'}}, log__(200,g.user)
+                return {'data': {'status': 'Available'}}, log__(200,g.user) # All loans returned
             else: # Book not loaned yet
-                return {'data': {'status': 'Available'}}, 200
+                return {'data': {'status': 'Available'}}, log__(200,g.user)
         else: # Book not found
-            return {'data': {'message': 'Book not found'}}, 404
+            return {'data': {'message': 'Book not found'}}, log__(404,g.user)
 
 class WishlistApi(Resource):
     decorators = [auth.login_required]
@@ -533,16 +533,16 @@ class WishlistApi(Resource):
         user = User.query.filter_by(id=args['user_id']).first()
 
         if(not user):
-            return {'data': {'message': 'User not found'}}, 404
+            return {'data': {'message': 'User not found'}}, log__(404,g.user)
 
         try:
             wishlist = Wishlist.query.filter_by(user_id=args['user_id']).all()
             if wishlist:
-                return {'data': [wish.serialize for wish in wishlist]}, 200
+                return {'data': [wish.serialize for wish in wishlist]}, log__(200,g.user)
             else: # Wishlist is empty
-                return {'data': []}, 200
+                return {'data': []}, log__(200,g.user)
         except Exception:
-            return {'message': 'Unexpected Error'}, 500
+            return {'message': 'Unexpected Error'}, log__(500,g.user)
 
     def post(self):
         # Required arguments
@@ -552,7 +552,7 @@ class WishlistApi(Resource):
 
         user = g.user
         if not user: # User not found
-            return {'message': 'User not found'}, 404
+            return {'message': 'User not found'}, log__(404,g.user)
         try:
             isbn = isbn_from_words(args['title'])
             title = meta(isbn)['Title']
@@ -560,15 +560,15 @@ class WishlistApi(Resource):
             wish = Wishlist.query.filter_by(isbn=isbn, user_id=user.id).first()
 
             if wish: # Book already in the wishlist
-                return {'data': wish.serialize}, 200
+                return {'data': wish.serialize}, log__(200,g.user)
             else: # If book not in the wishlist
                 new_wish = Wishlist(isbn=isbn, title=title, user_id=user.id)
                 db.session.add(new_wish)
                 db.session.commit()
-                return {'data': new_wish.serialize}, 201
+                return {'data': new_wish.serialize}, log__(201,g.user)
         except Exception as error:
             print(error)
-            return {'message': 'Unexpected Error'}, 500
+            return {'message': 'Unexpected Error'}, log__(500,g.user)
 
 
 class TopsearchesAPI(Resource):
@@ -577,7 +577,7 @@ class TopsearchesAPI(Resource):
         top_searches = [t.serialize for t in Topsearches.query.all()]
         # Sorting first by the times, after by the alfabetic order of the title
         return { 'data' :
-                sorted(top_searches, key=lambda t: (-t['times'], t['title'])) }, 200
+                sorted(top_searches, key=lambda t: (-t['times'], t['title'])) }, log__(200)
 
 
 api.add_resource(BooksApi, '/api/v1/books', endpoint='books')
