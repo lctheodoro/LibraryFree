@@ -147,6 +147,45 @@ class Organization(db.Model):
         return "<Organization %r>" % self.name
 
 
+author_relationship = db.Table('author_relationship',
+                                db.Column('book_id',db.Integer,db.ForeignKey('books.id'),nullable=False),
+                                db.Column('author_id',db.Integer,db.ForeignKey('authors.id'),nullable=False),
+                                db.PrimaryKeyConstraint('book_id','author_id'))
+
+category_relationship = db.Table('category_relationship',
+                                db.Column('book_id',db.Integer,db.ForeignKey('books.id'),nullable=False),
+                                db.Column('category_id',db.Integer,db.ForeignKey('categories.id'),nullable=False),
+                                db.PrimaryKeyConstraint('book_id','category_id'))
+class Author(db.Model):
+    __tablename__ = "authors"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=True,unique=True)
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+    def __repr__(self):
+        return "<Author %r>" % self.name
+
+class Category(db.Model):
+    __tablename__ = "categories"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=True,unique=True)
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+    def __repr__(self):
+        return "<Category %r>" % self.name
+
 class Book(db.Model):
     __tablename__ = "books"
 
@@ -155,18 +194,25 @@ class Book(db.Model):
 
     # Description fields
     title = db.Column(db.String, nullable=False)
+    subtitle = db.Column(db.String)
 
-    isbn = db.Column(db.String)
+    isbn10 = db.Column(db.String)
+    isbn13 = db.Column(db.String)
+
+    avatarBase64 = db.Column(db.String)
+    avatarUrl = db.Column(db.String)
+
     synopsis = db.Column(db.Text)
-    # insert image field
-    author = db.Column(db.String, nullable=False)
-    author2 = db.Column(db.String)
-    author3 = db.Column(db.String)
     publisher = db.Column(db.String)
+    publisherDate = db.Column(db.String)
+    description = db.Column(db.String)
+
+    authors = db.relationship('Author',secondary=author_relationship, backref='books')
+    categories = db.relationship('Category',secondary=category_relationship, backref='books')
+
     edition = db.Column(db.Integer)
     year = db.Column(db.Integer)
     language = db.Column(db.String)
-    genre = db.Column(db.String)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
@@ -183,21 +229,25 @@ class Book(db.Model):
             'organization_id' : self.organization_id,
             'is_organization' : self.is_organization,
             'title': self.title,
-            'isbn' : self.isbn,
+            'subtitle': self.subtitle,
+            'isbn10' : self.isbn10,
+            'isbn13' : self.isbn13,
+            'avatarBase64': self.avatarBase64,
+            'avatarUrl': self.avatarUrl,
             'synopsis': self.synopsis,
-            'author': self.author,
-            'author2': self.author2,
-            'author3': self.author3,
+            'publisher': self.publisher,
+            'publisherDate': self.publisherDate,
+            'description': self.description,
+            'author': [a.serialize for a in self.authors],
+            'categories': [c.serialize for c in self.categories],
             'publisher': self.publisher,
             'edition': self.edition,
             'year': self.year,
             'language': self.language,
-            'genre': self.genre
         }
 
     def __repr__(self):
         return "<Book %r>" % self.title
-
 
 class Book_loan(db.Model):
     __tablename__ = "book_loans"
@@ -367,14 +417,16 @@ class Topsearches(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
-    isbn = db.Column(db.String, nullable=False)
+    isbn10 = db.Column(db.String, nullable=False)
+    isbn13 = db.Column(db.String, nullable=False)
     times = db.Column(db.Integer, default=0)
 
     @property
     def serialize(self):
         return {
             'id': self.id,
-            'isbn': self.isbn,
+            'isbn10': self.isbn10,
+            'isbn13': self.isbn13,
             'title': self.title,
             'times': self.times
         }

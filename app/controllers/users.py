@@ -50,15 +50,7 @@ class UsersApi(Resource):
         self.reqparse.add_argument("city", type=str, location='json')
         self.reqparse.add_argument("phone", type=str, location='json')
         super(UsersApi, self).__init__()
-
-    def get(self):
-        # Table.query makes a search (select) in the database
-        users = User.query.all()
-        # we should return serialized objects because they are ready to
-        # be converted to JSON
-        # an HTTP status code is also important
-        return {'data': [u.serialize for u in users]}, log__(200)
-
+        
     def post(self):
         args = self.reqparse.parse_args()
         user = User(**args)

@@ -2,7 +2,8 @@ from flask import json, g
 from flask_restful import Resource, reqparse
 from app import db, auth, api, log__
 from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, \
-                            Delayed_return, Organization, Topsearches
+                            Delayed_return, Organization, Topsearches, Author, \
+                            Category, author_relationship, category_relationship
 from app.models.decorators import is_admin, is_admin_id
 from datetime import timedelta, date
 from sqlalchemy.sql import and_
@@ -18,16 +19,20 @@ class BooksApi(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("title", type=str, required=True,
                                    location='json')
-        self.reqparse.add_argument("isbn", type=str, location = 'json')
+        self.reqparse.add_argument("subtitle", type=str, location='json')
+        self.reqparse.add_argument("isbn10", type=str, location = 'json')
+        self.reqparse.add_argument("isbn13", type=str, location = 'json')
+        self.reqparse.add_argument("avatarBase64", type=str, location = 'json')
+        self.reqparse.add_argument("avatarUrl", type=str, location = 'json')
         self.reqparse.add_argument("synopsis", type=str, location='json')
-        self.reqparse.add_argument("author", type=str, location='json', required=True)
-        self.reqparse.add_argument("author2", type=str, location='json')
-        self.reqparse.add_argument("author3", type=str, location='json')
         self.reqparse.add_argument("publisher", type=str, location='json')
+        self.reqparse.add_argument("publisherDate", type=str, location='json')
+        self.reqparse.add_argument("description", type=str, location='json')
+        self.reqparse.add_argument("authors", type=list, location='json')
+        self.reqparse.add_argument("categories", type=list, location='json')
         self.reqparse.add_argument("edition", type=int, location='json')
         self.reqparse.add_argument("year", type=int)
         self.reqparse.add_argument("language", type=str, location='json')
-        self.reqparse.add_argument("genre", type=str, location='json')
         self.reqparse.add_argument("user_id", type=int, location='json')
         self.reqparse.add_argument("organization_id", type=int, location='json')
         super(BooksApi, self).__init__()
@@ -37,12 +42,16 @@ class BooksApi(Resource):
         # because they are not mandatory
         search_reqparse = reqparse.RequestParser()
         search_reqparse.add_argument("title", type=str, location='json')
-        search_reqparse.add_argument("isbn", type=str, location='json')
-        search_reqparse.add_argument("author", type=str, location='json')
-        search_reqparse.add_argument("author2", type=str, location='json')
-        search_reqparse.add_argument("author3", type=str, location='json')
+        search_reqparse.add_argument("subtitle", type=str, location='json')
+        search_reqparse.add_argument("isbn10", type=str, location = 'json')
+        search_reqparse.add_argument("isbn13", type=str, location = 'json')
+        search_reqparse.add_argument("authors", type=list, location='json')
         search_reqparse.add_argument("publisher", type=str, location='json')
-        search_reqparse.add_argument("genre", type=str, location='json')
+        search_reqparse.add_argument("publisherDate", type=str, location='json')
+        search_reqparse.add_argument("categories", type=list, location='json')
+        search_reqparse.add_argument("edition", type=int, location='json')
+        search_reqparse.add_argument("year", type=int)
+        search_reqparse.add_argument("language", type=str, location='json')
         # Also get books owned by a user or organization
         search_reqparse.add_argument("user_id", type=int, location='json')
         search_reqparse.add_argument("organization_id", type=int, location='json')
@@ -56,24 +65,23 @@ class BooksApi(Resource):
                 Book.title.ilike("%{0}%".format(args['title']))
             )
 
-        if args['isbn'] :
+        if args['subtitle']:
             filters_list.append(
-                Book.isbn.ilike("%{0}%".format(args['isbn']))
+                Book.subtitle.ilike("%{0}%".format(args['subtitle']))
             )
 
-        if args['author']:
+        if args['isbn10'] :
             filters_list.append(
-                Book.author.ilike("%{0}%".format(args['author']))
+                Book.isbn10.ilike("%{0}%".format(args['isbn10']))
+            )
+        if args['isbn13'] :
+            filters_list.append(
+                Book.isbn13.ilike("%{0}%".format(args['isbn13']))
             )
 
-        if args['author2']:
+        if args['authors']:
             filters_list.append(
-                Book.author2.ilike("%{0}%".format(args['author2']))
-            )
-
-        if args['author3']:
-            filters_list.append(
-                Book.author3.ilike("%{0}%".format(args['author3']))
+                Book.authors.any(Author.name.in_(args['authors']))
             )
 
         if args['publisher']:
@@ -81,9 +89,29 @@ class BooksApi(Resource):
                 Book.publisher.ilike("%{0}%".format(args['publisher']))
             )
 
-        if args['genre']:
+        if args['publisherDate']:
             filters_list.append(
-                Book.genre == args['genre']
+                Book.publisherDate.ilike("%{0}%".format(args['publisherDate']))
+            )
+
+        if args['categories']:
+            filters_list.append(
+                Book.categories.any(Category.name.in_(args['categories']))
+            )
+
+        if args['edition']:
+            filters_list.append(
+                Book.edition == args['edition']
+            )
+
+        if args['year']:
+            filters_list.append(
+                Book.year == args['year']
+            )
+
+        if args['language']:
+            filters_list.append(
+                Book.language.ilike("%{0}%".format(args['language']))
             )
 
         if args['user_id']:
@@ -103,7 +131,30 @@ class BooksApi(Resource):
     def post(self):
         try:
             args = self.reqparse.parse_args()
+
+            category = args['categories']
+            author = args['authors']
+            del args['categories']
+            del args['authors']
+
             book = Book(**args)
+
+            if author:
+                for a in author:
+                    authors = Author.query.filter_by(name=a).first()
+                    if authors is None:
+                        authors = Author(name=a)
+                        db.session.add(authors)
+                        db.session.commit()
+                    book.authors.append(authors)
+            if category:
+                for c in category:
+                    categories = Category.query.filter_by(name=c).first()
+                    if categories is None:
+                        categories = Category(name=c)
+                        db.session.add(categories)
+                        db.session.commit()
+                    book.categories.append(categories)
 
             if (args['user_id'] and args['organization_id']) or ((not args['user_id'] and not args['organization_id'])):
                 return { 'message': 'Bad Request' }, log__(400,g.user)
@@ -123,36 +174,6 @@ class BooksApi(Resource):
             else:
                 book.is_organization = True
 
-            #Generate the isbn code with title like a parameter
-            code_isbn = isbn_from_words(book.title)
-            book.isbn = code_isbn
-
-            #set the format to json
-            bibtex = bibformatters['json']
-            consult = meta(code_isbn)
-
-            if consult:
-                consult = bibtex(consult)
-                aux = json.loads(consult)
-
-                book.author = aux['author'][0]['name']
-
-                tam = 0
-                for i in aux['author']:
-                    tam += 1
-
-                if tam >= 3:
-                    book.author2 = aux['author'][1]['name']
-                    book.author3 = aux['author'][2]['name']
-                elif tam == 2:
-                    book.author2 = aux['author'][1]['name']
-
-                if aux['year']:
-                    book.year = aux['year']
-
-                if aux['publisher']:
-                    book.publisher = aux['publisher']
-
             db.session.add(book)
             db.session.commit()
             return { 'data': book.serialize }, log__(201,g.user)
@@ -166,22 +187,34 @@ class ModifyBooksApi(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("subtitle", type=str, location='json')
+        self.reqparse.add_argument("isbn10", type=str, location = 'json')
+        self.reqparse.add_argument("isbn13", type=str, location = 'json')
+        self.reqparse.add_argument("avatarBase64", type=str, location = 'json')
+        self.reqparse.add_argument("avatarUrl", type=str, location = 'json')
         self.reqparse.add_argument("synopsis", type=str, location='json')
         self.reqparse.add_argument("publisher", type=str, location='json')
+        self.reqparse.add_argument("publisherDate", type=str, location='json')
+        self.reqparse.add_argument("description", type=str, location='json')
+        self.reqparse.add_argument("authors", type=list, location='json')
+        self.reqparse.add_argument("categories", type=list, location='json')
         self.reqparse.add_argument("edition", type=int, location='json')
+        self.reqparse.add_argument("year", type=int)
         self.reqparse.add_argument("language", type=str, location='json')
-        self.reqparse.add_argument("genre", type=str, location='json')
+        self.reqparse.add_argument("user_id", type=int, location='json')
+        self.reqparse.add_argument("organization_id", type=int, location='json')
         super(ModifyBooksApi, self).__init__()
 
     def get(self, id):
         book = Book.query.get_or_404(id)
-        book_topsearches = Topsearches.query.filter_by(isbn=book.isbn).first()
+        book_topsearches = Topsearches.query.filter_by(isbn10=book.isbn10).first()
+        book_topsearches += Topsearches.query.filter_by(isbn13=book.isbn13).first()
         try:
             if book_topsearches is not None:
                 book_topsearches.times += 1
                 db.session.commit()
             else:
-                book_topsearches = Topsearches(isbn=book.isbn, title=book.title, times=1)
+                book_topsearches = Topsearches(isbn10=book.isbn10,isbn13=book.isbn13, title=book.title, times=1)
                 db.session.add(book_topsearches)
                 db.session.commit()
             return {'data': book.serialize}, log__(200,g.user)
@@ -203,7 +236,28 @@ class ModifyBooksApi(Resource):
 
             for key, value in args.items():
                 if value is not None:
-                    setattr(book, key, value)
+                    if key is 'authors':
+                        for b in book.authors:
+                            book.authors.remove(b)
+                        for a in args['authors']:
+                            authors = Author.query.filter_by(name=a).first()
+                            if authors is None:
+                                authors = Author(name=a)
+                                db.session.add(authors)
+                                db.session.commit()
+                            book.authors.append(authors)
+                    elif key is 'categories':
+                        for b in book.categories:
+                            book.categories.remove(b)
+                        for c in args['categories']:
+                            categories = Category.query.filter_by(name=c).first()
+                            if categories is None:
+                                categories = Category(name=c)
+                                db.session.add(categories)
+                                db.session.commit()
+                            book.categories.append(categories)
+                    else:
+                        setattr(book, key, value)
 
             db.session.commit()
             return {'data': book.serialize}, log__(200,g.user)
