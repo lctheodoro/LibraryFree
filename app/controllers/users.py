@@ -50,7 +50,19 @@ class UsersApi(Resource):
         self.reqparse.add_argument("city", type=str, location='json')
         self.reqparse.add_argument("phone", type=str, location='json')
         super(UsersApi, self).__init__()
-        
+
+    @auth.login_required
+    def get(self):
+        if g.user.admin!=0:
+            # Table.query makes a search (select) in the database
+            user = User.query.all()
+            # we should return serialized objects because they are ready to
+            # be converted to JSON
+            # an HTTP status code is also important
+            return {'data': [u.serialize for u in user]},log__(200,g.user)
+        else:
+            return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
+
     def post(self):
         args = self.reqparse.parse_args()
         user = User(**args)
@@ -88,8 +100,14 @@ class ModifyUsersApi(Resource):
 
     @is_user
     def get(self, id):
-        user = User.query.get_or_404(id)
-        return {'data': user.serialize}, log__(200,g.user)
+        try:
+            user = User.query.get_or_404(id)
+            return {'data': user.serialize}, log__(200,g.user)
+        except Exception as error:
+            print("ERROR: " + str(error))
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
     # this decorator verify if the object belongs to the user
     # if so, it can be edited, else the user is unauthorized
@@ -121,17 +139,24 @@ class ModifyUsersApi(Resource):
             db.session.commit()
             return {'data': user.serialize}, log__(200,g.user)
         except Exception as error:
-            print("ERROR: " + str(error))
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
             return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
     @is_admin_id
     def delete(self, id):
-        user = User.query.get_or_404(id)
-        if user.admin == 2 and not g.user.admin == 2:
-            return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
-        db.session.delete(user)
-        #db.session.commit()
-        return log__(204,g.user)
+        try:
+            user = User.query.get_or_404(id)
+            if user.admin == 2 and not g.user.admin == 2:
+                return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
+            db.session.delete(user)
+            #db.session.commit()
+            return log__(204,g.user)
+        except Exception as error:
+            print("ERROR: " + str(error))
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
 
 class OrganizationsApi(Resource):
@@ -183,8 +208,14 @@ class ModifyOrganizationsApi(Resource):
 
     @is_manager
     def get(self, id):
-        org = Organization.query.get_or_404(id)
-        return {'data': org.serialize}, log__(200,g.user)
+        try:
+            org = Organization.query.get_or_404(id)
+            return {'data': org.serialize}, log__(200,g.user)
+        except Exception as error:
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
+                return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
     # this decorator verify if the user is one of the company managers
     # if so, it can be edited, else the user is unauthorized
@@ -206,15 +237,23 @@ class ModifyOrganizationsApi(Resource):
             db.session.commit()
             return {'data': org.serialize}, log__(200,g.user)
         except Exception as error:
-            print("ERROR: " + str(error))
-            return { 'message': 'Unexpected Error' }, log__(500,g.user)
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
+                return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
     @is_admin_id
     def delete(self, id):
-        org = Organization.query.get_or_404(id)
-        db.session.delete(org)
-        db.session.commit()
-        return {}, log__(204,g.user)
+        try:
+            org = Organization.query.get_or_404(id)
+            db.session.delete(org)
+            db.session.commit()
+            return {}, log__(204,g.user)
+        except Exception as error:
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
+                return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
 
 class FeedbackApi(Resource):
@@ -269,30 +308,45 @@ class FeedbackApi(Resource):
             db.session.commit()
             return { 'data': feedback.serialize }, log__(200,g.user)
         except Exception as error:
-            print("ERROR: " + str(error))
-            return { 'message': 'Unexpected Error' }, log__(500,g.user)
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
+                return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
 
 class ModifyFeedbackApi(Resource):
     decorators = [auth.login_required]
 
     def get(self, id):
-        feedback = Feedback.query.get_or_404(id)
-        return { 'data': feedback.serialize }, log__(200,g.user)
+        try:
+            feedback = Feedback.query.get_or_404(id)
+            return { 'data': feedback.serialize }, log__(200,g.user)
+        except Exception as error:
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
+                return { 'message': 'Unexpected Error' }, log__(500,g.user)
+
 
     def delete(self, id):
-        feedback = Feedback.query.get_or_404(id)
-        # Gamefication
-        if feedback.user == "owner":
-            book_return = Book_return.query.get_or_404(feedback.transaction_id)
-            loan = Book_loan.query.get_or_404(book_return.book_loan_id)
-            book = Book.query.get_or_404(loan.book_id)
-            user = User.query.get_or_404(book.user_id)
-            user.points_update(-feedback.scored)
+        try:
+            feedback = Feedback.query.get_or_404(id)
+            # Gamefication
+            if feedback.user == "owner":
+                book_return = Book_return.query.get_or_404(feedback.transaction_id)
+                loan = Book_loan.query.get_or_404(book_return.book_loan_id)
+                book = Book.query.get_or_404(loan.book_id)
+                user = User.query.get_or_404(book.user_id)
+                user.points_update(-feedback.scored)
 
-        db.session.delete(feedback)
-        db.session.commit()
-        return {}, log__(204,g.user)
+            db.session.delete(feedback)
+            db.session.commit()
+            return {}, log__(204,g.user)
+        except Exception as error:
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
+                return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
 
 class Ranking(Resource):

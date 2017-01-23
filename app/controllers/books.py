@@ -31,7 +31,7 @@ class BooksApi(Resource):
         self.reqparse.add_argument("authors", type=list, location='json')
         self.reqparse.add_argument("categories", type=list, location='json')
         self.reqparse.add_argument("edition", type=int, location='json')
-        self.reqparse.add_argument("year", type=int)
+        self.reqparse.add_argument("year", type=int, location='json')
         self.reqparse.add_argument("language", type=str, location='json')
         self.reqparse.add_argument("user_id", type=int, location='json')
         self.reqparse.add_argument("organization_id", type=int, location='json')
@@ -50,7 +50,7 @@ class BooksApi(Resource):
         search_reqparse.add_argument("publisherDate", type=str, location='json')
         search_reqparse.add_argument("categories", type=list, location='json')
         search_reqparse.add_argument("edition", type=int, location='json')
-        search_reqparse.add_argument("year", type=int)
+        search_reqparse.add_argument("year", type=int, location='json')
         search_reqparse.add_argument("language", type=str, location='json')
         # Also get books owned by a user or organization
         search_reqparse.add_argument("user_id", type=int, location='json')
@@ -131,7 +131,7 @@ class BooksApi(Resource):
     def post(self):
         try:
             args = self.reqparse.parse_args()
-
+            print("\n\nAQUI\n\n")
             category = args['categories']
             author = args['authors']
             del args['categories']
@@ -219,7 +219,10 @@ class ModifyBooksApi(Resource):
                 db.session.commit()
             return {'data': book.serialize}, log__(200,g.user)
         except Exception:
-            return {'message': 'Unexpected error'}, log__(500,g.user)
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
+                return {'message': 'Unexpected error'}, log__(500,g.user)
 
     def put(self, id):
         try:
@@ -262,19 +265,27 @@ class ModifyBooksApi(Resource):
             db.session.commit()
             return {'data': book.serialize}, log__(200,g.user)
         except Exception as error:
-            print(error)
-            return { 'message': 'Unexpected Error' }, log__(500,g.user)
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
+                return { 'message': 'Unexpected Error' }, log__(500,g.user)
     @is_admin_id
     def delete(self, id):
-        book = Book.query.get_or_404(id)
-        if book.is_organization:
-            user = User.query.get_or_404(book.organization_id)
-        else:
-            user = User.query.get_or_404(book.user_id)
-        user.points_update(-10)
-        db.session.delete(book)
-        db.session.commit()
-        return log__(204,g.user)
+        try:
+            book = Book.query.get_or_404(id)
+            if book.is_organization:
+                user = User.query.get_or_404(book.organization_id)
+            else:
+                user = User.query.get_or_404(book.user_id)
+            user.points_update(-10)
+            db.session.delete(book)
+            db.session.commit()
+            return log__(204,g.user)
+        except Exception as error:
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
+                return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
 class LoanRequestApi(Resource):
     decorators = [auth.login_required]
@@ -288,11 +299,11 @@ class LoanRequestApi(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         # Checks if book_loan already exists
-        l = Book_loan.query.filter_by(book_id=args['book_id'],
-                                      user_id=g.user.id,
-                                      loan_status='requested').first()
-        if l==None:
-            try:
+        try:
+            l = Book_loan.query.filter_by(book_id=args['book_id'],
+                                          user_id=g.user.id,
+                                          loan_status='requested').first()
+            if l==None:
                 loan = Book_loan(book_id=args['book_id'],user_id=g.user.id)
                 loan.loan_status = 'requested'
                 loan.scored = False
@@ -310,10 +321,12 @@ class LoanRequestApi(Resource):
                 db.session.commit()
 
                 return { 'data': loan.serialize }, log__(201,g.user)
-            except Exception as error:
-                print(error)
+            return { 'message': 'Request already made' }, log__(500,g.user)
+        except Exception as error:
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
                 return { 'message': 'Unexpected Error' }, log__(500,g.user)
-        return { 'message': 'Request already made' }, log__(500,g.user)
 
 
 class LoanReplyApi(Resource):
@@ -337,8 +350,10 @@ class LoanReplyApi(Resource):
             loan = Book_loan.query.get_or_404(id)
             return { 'data': loan.serialize }, log__(200,g.user)
         except Exception as error:
-            print(error)
-            return {'message': 'Unexpected Error'}, log__(500,g.user)
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
+                return {'message': 'Unexpected Error'}, log__(500,g.user)
 
     def put(self,id):
         args = self.reqparse.parse_args()
@@ -392,8 +407,10 @@ class LoanReplyApi(Resource):
 
                 return { 'data': loan.serialize }, log__(201,g.user)
             except Exception as error:
-                print(error)
-                return {'message': 'Unexpected Error'}, log__(500,g.user)
+                if str(error)=="404: Not Found":
+                    return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+                else:
+                    return {'message': 'Unexpected Error'}, log__(500,g.user)
         return {'message': 'Request already answered'}, log__(409,g.user)
 
 
@@ -457,8 +474,10 @@ class ReturnApi(Resource):
             db.session.commit()
             return { 'data': return_record.serialize }, log__(201,g.user)
         except Exception as error:
-            print(error)
-            return {'message': 'Unexpected Error'}, log__(500,g.user)
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
+                return {'message': 'Unexpected Error'}, log__(500,g.user)
 
 
 class DelayApi(Resource):
@@ -472,24 +491,30 @@ class DelayApi(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        loan_delay = Delayed_return.query.filter_by(book_loan_id=args['loan_id']).first()
+        try:
+            loan_delay = Delayed_return.query.filter_by(book_loan_id=args['loan_id']).first()
 
-        if loan_delay is None:
-            return {'message': 'The object you are looking for was not found.'}, log__(404,g.user)
+            if loan_delay is None:
+                return {'message': 'The object you are looking for was not found.'}, log__(404,g.user)
 
-        loan = Loan.query.get_or_404(args['loan_id'])
-        book = Book.query.get_or_404(loan.book_id)
+            loan = Loan.query.get_or_404(args['loan_id'])
+            book = Book.query.get_or_404(loan.book_id)
 
-        if book.is_organization:
-            org = Organization.query.get_or_404(book.organization_id)
-        if book.is_organization and g.user in org.managers:
-            return {'data': [loan_delay.serialize]}, log__(201,g.user)
-        elif g.user.id == book.user_id or g.user.admin!=0:
-            return {'data': [loan_delay.serialize]}, log__(201,g.user)
-        elif g.user.id == loan.user_id or g.user.admin!=0:
-            return {'data': [loan_delay.serialize]}, log__(201,g.user)
+            if book.is_organization:
+                org = Organization.query.get_or_404(book.organization_id)
+            if book.is_organization and g.user in org.managers:
+                return {'data': [loan_delay.serialize]}, log__(201,g.user)
+            elif g.user.id == book.user_id or g.user.admin!=0:
+                return {'data': [loan_delay.serialize]}, log__(201,g.user)
+            elif g.user.id == loan.user_id or g.user.admin!=0:
+                return {'data': [loan_delay.serialize]}, log__(201,g.user)
 
-        return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
+            return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
+        except Exception as error:
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
+                return {'message': 'Unexpected Error'}, log__(500,g.user)
 
     def post(self):
         try:
@@ -540,8 +565,10 @@ class DelayApi(Resource):
             else:
                 return {'message': 'Book returned'},log__(409,g.user)
         except Exception as error:
-            print(error)
-            return { 'message': 'Unexpected Error' }, log__(500,g.user)
+            if str(error)=="404: Not Found":
+                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+            else:
+                return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
 
 class BooksAvailabilityApi(Resource):

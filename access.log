@@ -117,3 +117,68 @@ INFO 2017-01-21 19:21:02,603 127.0.0.1	| 1 - ronitone	| /api/v1/books/2 - PUT - 
 INFO 2017-01-21 19:21:20,637 127.0.0.1	| 1 - ronitone	| /api/v1/books/2 - PUT - 200
 INFO 2017-01-21 19:21:26,076 127.0.0.1	| 1 - ronitone	| /api/v1/books/2 - PUT - 200
 INFO 2017-01-21 19:24:00,397 127.0.0.1	| 1 - ronitone	| /api/v1/books/2 - PUT - 200
+INFO 2017-01-21 20:04:38,104 127.0.0.1	| Guest	| /api/v1/users/1000 - PUT - 401
+INFO 2017-01-21 20:04:49,983 127.0.0.1	| 1 - ronitone	| /api/v1/users/1000 - PUT - 500
+INFO 2017-01-21 20:05:00,585 127.0.0.1	| 1 - ronitone	| /api/v1/users/1000 - PUT - 500
+INFO 2017-01-21 20:05:42,179 127.0.0.1	| 1 - ronitone	| /api/v1/users/1 - PUT - 500
+INFO 2017-01-21 20:07:30,267 127.0.0.1	| 1 - ronitone	| /api/v1/users/1 - PUT - 404
+INFO 2017-01-21 20:08:08,807 127.0.0.1	| 1 - ronitone	| /api/v1/users/1 - PUT - 500
+INFO 2017-01-21 20:08:25,022 127.0.0.1	| 1 - ronitone	| /api/v1/users/1 - PUT - 500
+INFO 2017-01-21 20:08:36,601 127.0.0.1	| 1 - ronitone	| /api/v1/users/100 - PUT - 500
+INFO 2017-01-21 20:08:59,926 127.0.0.1	| 1 - ronitone	| /api/v1/users/100 - PUT - 404
+INFO 2017-01-21 20:12:13,309 127.0.0.1	| 1 - ronitone	| /api/v1/users/100 - DELETE - 404
+INFO 2017-01-21 20:14:40,667 127.0.0.1	| 1 - ronitone	| /api/v1/users/100 - GET - 404
+INFO 2017-01-23 09:53:24,280 127.0.0.1	| 1 - ronitone	| /api/v1/users/1 - GET - 200
+INFO 2017-01-23 09:53:49,959 127.0.0.1	| Guest	| /api/v1/users/1 - GET - 401
+INFO 2017-01-23 09:53:59,719 127.0.0.1	| 1 - ronitone	| /api/v1/users/1 - GET - 200
+INFO 2017-01-23 09:54:04,094 127.0.0.1	| 1 - ronitone	| /api/v1/users/1 - GET - 200
+INFO 2017-01-23 09:54:06,635 127.0.0.1	| 1 - ronitone	| /api/v1/users/1 - GET - 200
+INFO 2017-01-23 09:58:20,968 127.0.0.1	| 1 - ronitone	| /api/v1/users - GET - 200
+INFO 2017-01-23 09:58:33,428 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-23 09:59:58,877 127.0.0.1	| Guest	| /api/v1/users - POST - 201
+INFO 2017-01-23 10:00:11,709 127.0.0.1	| 2 - Roni	| /api/v1/users - GET - 401
+INFO 2017-01-23 10:00:19,679 127.0.0.1	| 1 - ronitone	| /api/v1/users - GET - 200
+INFO 2017-01-23 10:50:52,522 127.0.0.1	| 1 - ronitone	| /api/v1/users - GET - 200
+INFO 2017-01-23 11:28:41,265 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-23 11:29:17,876 127.0.0.1	| 1 - ronitone	| /api/v1/users - GET - 200
+INFO 2017-01-23 11:42:57,170 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 11:43:30,411 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 11:45:18,706 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 11:45:30,043 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 11:45:39,403 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 11:46:07,558 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 11:47:12,145 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 11:48:38,897 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 201
+INFO 2017-01-23 11:51:25,147 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 11:51:40,237 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 11:51:49,079 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 11:53:45,765 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 201
+INFO 2017-01-23 11:54:23,499 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 11:55:00,838 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 11:56:03,124 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 11:57:18,570 127.0.0.1	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-23 11:57:38,510 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 201
+INFO 2017-01-23 11:58:21,638 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 201
+INFO 2017-01-23 11:59:26,243 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 201
+INFO 2017-01-23 12:02:29,553 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:02:34,495 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:05:30,672 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:05:38,725 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:05:52,921 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:06:03,918 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:06:51,303 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:06:58,860 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:07:08,118 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:07:16,600 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:08:36,203 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:10:47,139 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:11:05,750 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:12:16,076 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 201
+INFO 2017-01-23 12:12:20,745 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 201
+INFO 2017-01-23 12:19:50,888 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:19:59,394 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:20:05,980 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:20:31,966 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 201
+INFO 2017-01-23 12:20:47,849 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
+INFO 2017-01-23 12:24:09,871 127.0.0.1	| Guest	| /api/v1/tokens - GET - 401
+INFO 2017-01-23 12:24:52,852 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 201
