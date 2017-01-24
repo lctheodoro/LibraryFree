@@ -33,7 +33,11 @@ def get_auth_token():
         It guarantees the security of user's information.
     """
     token = g.user.generate_auth_token()
-    return jsonify({'token': token.decode('ascii')})
+    token = token.decode('ascii')
+    user = g.user
+    user.token = token
+    print({'user': user.serialize})
+    return jsonify({'user': user.serialize, 'token': token})
 
 
 class UsersApi(Resource):

@@ -269,7 +269,7 @@ class ModifyBooksApi(Resource):
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
             else:
                 return { 'message': 'Unexpected Error' }, log__(500,g.user)
-    @is_admin_id
+    # @is_admin_id
     def delete(self, id):
         try:
             book = Book.query.get_or_404(id)
@@ -280,7 +280,8 @@ class ModifyBooksApi(Resource):
             user.points_update(-10)
             db.session.delete(book)
             db.session.commit()
-            return log__(204,g.user)
+            print('aqui')
+            return {'message': 'sucesso'}, log__(200,g.user)
         except Exception as error:
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)

@@ -182,3 +182,163 @@ INFO 2017-01-23 12:20:31,966 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 2
 INFO 2017-01-23 12:20:47,849 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 400
 INFO 2017-01-23 12:24:09,871 127.0.0.1	| Guest	| /api/v1/tokens - GET - 401
 INFO 2017-01-23 12:24:52,852 127.0.0.1	| 1 - ronitone	| /api/v1/books - POST - 201
+INFO 2017-01-23 12:58:08,938 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-23 17:40:56,245 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-23 17:42:12,386 127.0.0.1	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-23 17:43:14,510 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-23 17:50:16,240 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-23 19:25:29,410 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-23 19:25:52,678 127.0.0.1	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-23 19:26:13,830 127.0.0.1	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-23 19:31:20,827 127.0.0.1	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-23 19:33:41,542 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-23 19:34:03,774 127.0.0.1	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-23 19:34:58,994 127.0.0.1	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-23 19:36:20,818 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-23 19:36:59,658 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-23 19:37:06,474 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-23 19:37:09,946 127.0.0.1	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-23 19:42:49,528 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-23 19:46:54,016 127.0.0.1	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-23 19:49:11,836 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-23 22:01:49,896 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-23 22:07:29,815 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-23 22:14:32,535 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/users - GET - 401
+INFO 2017-01-23 22:16:08,736 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/users/2 - GET - 200
+INFO 2017-01-23 22:16:12,290 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/users/2 - GET - 200
+INFO 2017-01-23 22:18:07,114 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/users/2 - GET - 200
+INFO 2017-01-23 22:18:28,754 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-23 22:20:37,683 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-23 22:22:08,731 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-23 23:28:36,612 127.0.0.1	| Guest	| /api/v1/users/2 - GET - 401
+INFO 2017-01-23 23:29:00,181 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/users/2 - GET - 200
+INFO 2017-01-23 23:29:30,558 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-23 23:31:36,323 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-23 23:32:34,369 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-23 23:39:08,787 127.0.0.1	| Guest	| /api/v1/users - POST - 201
+INFO 2017-01-23 23:39:24,895 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/users/2 - GET - 200
+INFO 2017-01-23 23:39:26,476 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/users/2 - GET - 200
+INFO 2017-01-23 23:41:20,950 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/users/2 - GET - 200
+INFO 2017-01-23 23:43:32,887 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-23 23:45:35,954 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 00:31:15,503 127.0.0.1	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-24 00:31:41,996 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 00:33:59,959 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 00:34:17,011 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 00:34:24,615 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 400
+INFO 2017-01-24 00:34:43,691 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 400
+INFO 2017-01-24 00:37:09,042 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/users/2 - GET - 200
+INFO 2017-01-24 00:37:56,277 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 00:38:24,590 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 00:42:56,855 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 00:43:00,087 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 00:44:13,828 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 00:47:26,145 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 00:52:39,377 127.0.0.1	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-24 01:06:13,195 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 01:07:32,877 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 01:09:27,923 127.0.0.1	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-24 01:10:19,167 127.0.0.1	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-24 01:12:18,577 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 01:15:27,444 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:18:30,607 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:21:36,739 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:24:58,451 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 01:25:02,442 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:39:00,139 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 01:40:35,074 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 01:41:05,019 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 01:41:22,365 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:42:13,361 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:42:25,430 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:42:28,178 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:43:47,135 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 01:44:19,243 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 01:44:20,404 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 01:44:31,832 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 01:44:49,292 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:46:31,014 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 01:46:54,625 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:48:02,395 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:49:49,683 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 01:49:53,029 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:50:59,503 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 01:51:10,527 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:58:15,609 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 01:59:15,374 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:02:47,263 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/1 - DELETE - 204
+INFO 2017-01-24 02:03:14,894 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:03:27,611 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/2 - DELETE - 204
+INFO 2017-01-24 02:03:30,495 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/3 - DELETE - 204
+INFO 2017-01-24 02:03:34,645 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:03:48,435 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/5 - DELETE - 204
+INFO 2017-01-24 02:03:51,369 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:03:58,687 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/6 - DELETE - 204
+INFO 2017-01-24 02:04:01,648 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:04:05,564 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/7 - DELETE - 204
+INFO 2017-01-24 02:04:08,305 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/8 - DELETE - 204
+INFO 2017-01-24 02:04:10,768 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/9 - DELETE - 204
+INFO 2017-01-24 02:04:13,132 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/10 - DELETE - 204
+INFO 2017-01-24 02:04:51,895 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/11 - DELETE - 204
+INFO 2017-01-24 02:04:54,430 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:05:37,260 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/16 - DELETE - 204
+INFO 2017-01-24 02:05:44,203 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:06:06,031 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:13:59,565 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:14:03,283 127.0.0.1	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-24 02:14:18,290 127.0.0.1	| Guest	| /api/v1/books/16 - DELETE - 401
+INFO 2017-01-24 02:17:12,404 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:17:13,467 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:17:14,194 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:17:37,676 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:18:44,177 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:22:33,767 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:23:37,215 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:27:45,400 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:28:24,165 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:28:29,303 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/4 - DELETE - 204
+INFO 2017-01-24 02:29:02,019 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:32:11,560 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:32:15,021 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/12 - DELETE - 204
+INFO 2017-01-24 02:32:30,046 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:33:30,141 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/13 - DELETE - 204
+INFO 2017-01-24 02:33:39,874 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:36:17,990 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/14 - DELETE - 204
+INFO 2017-01-24 02:36:23,383 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:37:27,785 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/15 - DELETE - 204
+INFO 2017-01-24 02:38:00,109 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:38:00,989 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:38:03,337 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:38:58,464 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:39:18,933 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 02:39:21,771 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:41:54,554 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:41:56,120 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:42:00,110 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/17 - DELETE - 204
+INFO 2017-01-24 02:42:07,321 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:43:06,983 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 02:43:09,818 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:43:16,755 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 02:43:22,421 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:43:30,130 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/18 - DELETE - 500
+INFO 2017-01-24 02:44:51,493 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:44:53,905 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/19 - DELETE - 500
+INFO 2017-01-24 02:45:27,435 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:45:33,896 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 02:45:36,511 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:45:43,608 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/20 - DELETE - 200
+INFO 2017-01-24 02:46:24,012 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:46:32,928 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 02:46:34,883 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:50:06,695 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:50:17,313 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 02:50:21,290 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:50:32,509 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/21 - DELETE - 200
+INFO 2017-01-24 02:51:08,755 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:51:35,903 127.0.0.1	| Guest	| /api/v1/users - GET - 401
+INFO 2017-01-24 02:51:39,167 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:51:48,377 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - POST - 201
+INFO 2017-01-24 02:51:52,714 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:51:58,791 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/22 - DELETE - 200
+INFO 2017-01-24 02:52:02,731 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-24 02:52:13,267 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
