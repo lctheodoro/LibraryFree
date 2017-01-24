@@ -13,16 +13,20 @@ def verify_password(email_or_token, password):
     decorator will pass.
     """
     # tries to get the user by token
-    user = User.verify_auth_token(email_or_token)
-    if not user:
-        # tries to get the user by email and password
-        user = User.query.filter_by(email=email_or_token).first()
-        if not user or not user.verify_password(password):
-            log__(401)
-            return False
-    # saves the user in the global object 'user'
-    g.user = user
-    return True
+    if email_or_token is not None:
+        user = User.verify_auth_token(email_or_token)
+        if not user:
+            # tries to get the user by email and password
+            user = User.query.filter_by(email=email_or_token).first()
+            if not user or not user.verify_password(password):
+                log__(401)
+                return False
+        # saves the user in the global object 'user'
+        g.user = user
+        return True
+    else:
+        log__(401)
+        return False
 
 
 @app.route('/api/v1/tokens', methods=['GET'])

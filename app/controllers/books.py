@@ -131,7 +131,6 @@ class BooksApi(Resource):
     def post(self):
         try:
             args = self.reqparse.parse_args()
-            print("\n\nAQUI\n\n")
             category = args['categories']
             author = args['authors']
             del args['categories']
@@ -357,8 +356,7 @@ class LoanReplyApi(Resource):
 
     def put(self,id):
         args = self.reqparse.parse_args()
-        if args['loan_status'] is None:
-            return {'message': 'Bad Request'}, log__(400,g.user)
+
         loan =  Book_loan.query.get_or_404(id)
         book = Book.query.get_or_404(loan.book_id)
 
@@ -370,19 +368,20 @@ class LoanReplyApi(Resource):
         elif g.user.id != book.user_id and g.user.admin == 0:
             return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
 
-        if args['loan_status'] == None:
-            return {'message': 'Empty Status'}, log__(500,g.user)
+        if args['loan_status'] == "requested" or loan.loan_status == "done" or \
+                args['loan_status'] == None or loan.loan_status=="accepted":
+            return {'message': 'Bad Request'}, log__(400,g.user)
         if loan.loan_status != args['loan_status']:
             try:
                 user = User.query.get_or_404(loan.user_id)
-
+                print(user,"\n",user.name)
                 loan.loan_status = args['loan_status']
 
                 # Create the date of return
-                if loan.loan_status == 'accepted':
+                if loan.loan_status == 'accepted' and book.available:
                     loan.loan_date = date.today()
                     return_day = date.today() + timedelta(days=10)
-
+                    book.available = False
 
                     # If it falls on a weekend it updates the date
                     # for the next Monday of this weekend
@@ -396,20 +395,23 @@ class LoanReplyApi(Resource):
                     if not loan.scored:
                         user.points_update(5)
                         loan.scored = True
-                    db.session.commit()
-                    Thread(target=notification.send([user],"accepted.html","Loan Reply",book,loan.return_date)).start()
-                elif loan.loan_status == 'refused':
-                    db.session.commit()
-                    Thread(target=notification.send([user],"refused.html","Loan Reply",book,loan.return_date)).start()
-                elif loan.loan_status == 'queue':
-                    db.session.commit()
-                    Thread(target=notification.send([user],"queue.html","Loan Reply",book,loan.return_date)).start()
 
+                    Thread(target=notification.send([user],"accepted.html","Loan Reply",book,loan.return_date)).start()
+                    db.session.commit()
+                elif loan.loan_status == 'refused':
+                    Thread(target=notification.send([user],"refused.html","Loan Reply",book,loan.return_date)).start()
+                    db.session.commit()
+                elif loan.loan_status == 'queue':
+                    Thread(target=notification.send([user],"queue.html","Loan Reply",book,loan.return_date)).start()
+                    db.session.commit()
+                else:
+                    return {'data':'Bad Request'}, log__(400,g.user)
                 return { 'data': loan.serialize }, log__(201,g.user)
             except Exception as error:
                 if str(error)=="404: Not Found":
                     return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
                 else:
+                    print(error)
                     return {'message': 'Unexpected Error'}, log__(500,g.user)
         return {'message': 'Request already answered'}, log__(409,g.user)
 
@@ -468,6 +470,7 @@ class ReturnApi(Resource):
                 return { 'data': { 'message': 'Bad Request' } }, log__(400,g.user)
             if return_record.owner_confirmation and return_record.user_confirmation:
                 loan_record.loan_status = 'done'
+                book.available = True
             else:
                 loan_record.loan_status = 'accepted'
 
