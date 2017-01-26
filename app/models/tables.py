@@ -217,9 +217,11 @@ class Book(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
     is_organization = db.Column(db.Boolean, default=False)
+    available = db.Column(db.Boolean,default=True)
 
     user = db.relationship('User', foreign_keys=user_id)
     organization = db.relationship('Organization', foreign_keys=organization_id)
+
 
     @property
     def serialize(self):

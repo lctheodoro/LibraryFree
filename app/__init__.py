@@ -5,10 +5,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, prompt_pass, prompt, prompt_bool
 from flask_httpauth import HTTPBasicAuth
-from flask_restful import Api
+from flask_restful import Api, output_json
 from flask_mail import Mail
 from threading import Thread
-from datetime import datetime
 import logging
 
 app = Flask(__name__)
@@ -37,18 +36,32 @@ app_errors = {
 }
 
 def log__(http_code,user=None):
-    if user is None:
-        app.logger.info(request.environ.get("REMOTE_ADDR") + "\t| " + "Guest" + "\t| "+
-                        str(request.path) + " - " + str(request.method) + " - " + str(http_code))
-    else:
-        app.logger.info(request.environ.get("REMOTE_ADDR") + "\t| " + str(user.id) + " - " + user.name + "\t| "+
-                        str(request.path) + " - " + str(request.method) + " - " + str(http_code))
-    return http_code
+    try:
+        if user is None:
+            app.logger.info(request.environ.get("REMOTE_ADDR") + "\t| " + "Guest" + "\t| "+
+                            str(request.path) + " - " + str(request.method) + " - " + str(http_code))
+        else:
+            app.logger.info(request.environ.get("REMOTE_ADDR") + "\t| " + str(user.id) + " - " + user.name + "\t| "+
+                            str(request.path) + " - " + str(request.method) + " - " + str(http_code))
+        return http_code
+    except Exception as error:
+        print(error)
+        return http_code
 
-api = Api(app, errors=app_errors)
+class UnicodeApi(Api):
+    def __init__(self, *args, **kwargs):
+        super(UnicodeApi, self).__init__(*args, **kwargs)
+        self.app.config['RESTFUL_JSON'] = {
+        'ensure_ascii': False
+        }
+        self.representations = {
+        'application/json; charset=utf-8': output_json,
+        }
+api = UnicodeApi(app, errors=app_errors)
 
 from app.models import tables
 from app.controllers import users, books, notification
+
 
 @manager.command
 def admin():
