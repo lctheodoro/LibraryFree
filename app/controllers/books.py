@@ -217,7 +217,7 @@ class ModifyBooksApi(Resource):
                 db.session.add(book_topsearches)
                 db.session.commit()
             return {'data': book.serialize}, log__(200,g.user)
-        except Exception:
+        except Exception as error:
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
             else:
@@ -399,10 +399,10 @@ class LoanReplyApi(Resource):
                     Thread(target=notification.send([user],"accepted.html","Loan Reply",book,loan.return_date)).start()
                     db.session.commit()
                 elif loan.loan_status == 'refused':
-                    Thread(target=notification.send([user],"refused.html","Loan Reply",book,loan.return_date)).start()
+                    Thread(target=notification.send([user],"refused.html","Loan Reply",book)).start()
                     db.session.commit()
                 elif loan.loan_status == 'queue':
-                    Thread(target=notification.send([user],"queue.html","Loan Reply",book,loan.return_date)).start()
+                    Thread(target=notification.send([user],"queue.html","Loan Reply",book)).start()
                     db.session.commit()
                 else:
                     return {'data':'Bad Request'}, log__(400,g.user)
@@ -500,7 +500,7 @@ class DelayApi(Resource):
             if loan_delay is None:
                 return {'message': 'The object you are looking for was not found.'}, log__(404,g.user)
 
-            loan = Loan.query.get_or_404(args['loan_id'])
+            loan = Book_loan.query.get_or_404(args['loan_id'])
             book = Book.query.get_or_404(loan.book_id)
 
             if book.is_organization:
