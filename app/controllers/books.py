@@ -123,9 +123,11 @@ class BooksApi(Resource):
             filters_list.append(
                 Book.organization_id == args['organization_id']
             )
-
-        filtering = and_(*filters_list)
-        books = Book.query.filter(filtering).all()
+        if filters_list == []:
+            books = []
+        else:
+            filtering = and_(*filters_list)
+            books = Book.query.filter(filtering).all()
         return {'data': [book.serialize for book in books]}, log__(200,g.user)
 
     def post(self):
