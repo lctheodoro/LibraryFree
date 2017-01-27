@@ -1,0 +1,30 @@
+--------------------------------------------------------------------------------
+INFO in __init__ [/home/admin/biblioteca/LibraryFree/app/__init__.py:43]:
+191.54.153.207	| Guest	| /api/v1/tokens - GET - 401
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+INFO in __init__ [/home/admin/biblioteca/LibraryFree/app/__init__.py:43]:
+191.54.153.207	| Guest	| /api/v1/tokens - GET - 401
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+INFO in __init__ [/home/admin/biblioteca/LibraryFree/app/__init__.py:43]:
+191.54.153.207	| Guest	| /api/v1/tokens - GET - 401
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+INFO in __init__ [/home/admin/biblioteca/LibraryFree/app/__init__.py:42]:
+191.54.153.207	| Guest	| /api/v1/users - POST - 201
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+ERROR in app [/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py:1587]:
+Exception on /api/v1/users [POST]
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error

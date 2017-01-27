@@ -61,7 +61,7 @@ class UsersApi(Resource):
 
     @auth.login_required
     def get(self):
-        if g.user.admin!=0:
+        if True:
             # Table.query makes a search (select) in the database
             user = User.query.all()
             # we should return serialized objects because they are ready to
