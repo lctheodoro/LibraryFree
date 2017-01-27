@@ -23,6 +23,7 @@ def verify_password(email_or_token, password):
                 return False
         # saves the user in the global object 'user'
         g.user = user
+        log__(200,g.user)
         return True
     else:
         log__(401)
@@ -53,6 +54,8 @@ class UsersApi(Resource):
                                    location='json')
         self.reqparse.add_argument("city", type=str, location='json')
         self.reqparse.add_argument("phone", type=str, location='json')
+        self.reqparse.add_argument("avatarUri", type=str, location='json')
+        self.reqparse.add_argument("oneSignalUserId", type=str, location='json')
         super(UsersApi, self).__init__()
 
     @auth.login_required
@@ -100,6 +103,8 @@ class ModifyUsersApi(Resource):
         self.reqparse.add_argument("city", type=str, location='json')
         self.reqparse.add_argument("phone", type=str, location='json')
         self.reqparse.add_argument("admin",type=str,location='json')
+        self.reqparse.add_argument("avatarUri", type=str,location='json')
+        self.reqparse.add_argument("oneSignalUserId", type=str, location='json')
         super(ModifyUsersApi, self).__init__()
 
     @is_user

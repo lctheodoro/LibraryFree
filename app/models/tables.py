@@ -18,7 +18,11 @@ class User(db.Model):
     # Complementary info
     city = db.Column(db.String)
     phone = db.Column(db.String)
+
     # insert avatar field
+    avatarUri = db.Column(db.String)
+
+    oneSignalUserId = db.Column(db.String)
 
     # If the user is the manager of a organization, this field is user_id
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
@@ -112,7 +116,9 @@ class User(db.Model):
             'evaluation': self.evaluation,
             'points': self.points,
             'medal': self.medals,
-            'organization_id': org
+            'organization_id': org,
+            'avatarUri': self.avatarUri,
+            'oneSignalUserId': self.oneSignalUserId
         }
 
     def __repr__(self):
@@ -227,9 +233,10 @@ class Book(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'user_id' : self.user_id,
+            'user' : self.user.serialize,
             'organization_id' : self.organization_id,
             'is_organization' : self.is_organization,
+            'available': self.available,
             'title': self.title,
             'subtitle': self.subtitle,
             'isbn10' : self.isbn10,
@@ -242,7 +249,6 @@ class Book(db.Model):
             'description': self.description,
             'author': [a.serialize for a in self.authors],
             'categories': [c.serialize for c in self.categories],
-            'publisher': self.publisher,
             'edition': self.edition,
             'year': self.year,
             'language': self.language,
