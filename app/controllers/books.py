@@ -282,7 +282,8 @@ class ModifyBooksApi(Resource):
             db.session.delete(book)
             db.session.commit()
             print('aqui')
-            return {'message': 'sucesso'}, log__(200,g.user)
+            # return {'message': 'sucesso'}, log__(200,g.user)
+            return jsonify({ 'message': 'sucesso' })
         except Exception as error:
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
