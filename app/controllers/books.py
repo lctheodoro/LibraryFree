@@ -176,7 +176,8 @@ class BooksApi(Resource):
 
             db.session.add(book)
             db.session.commit()
-            return { 'data': book.serialize }, log__(201,g.user)
+            # return { 'data': book.serialize }, log__(201,g.user)
+            return jsonify({ 'data': book.serialize })
         except Exception as error:
             print(error)
             return { 'message': 'Bad Request' }, log__(400,g.user)
