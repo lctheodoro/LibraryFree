@@ -84,7 +84,8 @@ class UsersApi(Resource):
             user.check_register()
             db.session.commit()
 
-            return {'data': user.serialize}, log__(201)
+            # return {'data': user.serialize}, log__(201)
+            return jsonify({'data': user.serialize})
         except Exception as error:
             print(error)
             if "duplicate key value in error":
