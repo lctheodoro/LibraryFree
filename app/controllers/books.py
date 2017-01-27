@@ -124,9 +124,12 @@ class BooksApi(Resource):
                 Book.organization_id == args['organization_id']
             )
 
-        filtering = and_(*filters_list)
-        books = Book.query.filter(filtering).all()
-#        return {'data': [book.serialize for book in books]}, log__(200,g.user)
+        if filters_list == []:
+            books = []
+        else:
+            filtering = and_(*filters_list)
+            books = Book.query.filter(filtering).all()
+        # return {'data': [book.serialize for book in books]}, log__(200,g.user)
         return jsonify({'data': [book.serialize for book in books]})
 
     def post(self):
