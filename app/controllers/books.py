@@ -100,9 +100,10 @@ class BooksApi(Resource):
             )
 
         if args['authors']:
-            filters_list.append(
-                Book.authors.any(Author.name.in_(args['authors']))
-            )
+            for a in args['authors']:
+                filters_list.append(
+                    Book.authors.any(Author.name.ilike("%{0}%".format(a)))  #args['authors']))
+                )
 
         if args['publisher']:
             filters_list.append(
@@ -115,9 +116,10 @@ class BooksApi(Resource):
             )
 
         if args['categories']:
-            filters_list.append(
-                Book.categories.any(Category.name.in_(args['categories']))
-            )
+            for a in args['categories']:
+                filters_list.append(
+                    Book.categories.any(Category.name.ilike("%{0}%".format(a)))  #args['categories']))
+                )
 
         if args['edition']:
             filters_list.append(
