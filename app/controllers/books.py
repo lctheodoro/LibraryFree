@@ -37,7 +37,7 @@ class BooksApi(Resource):
         self.reqparse.add_argument("organization_id", type=int, location='json')
         super(BooksApi, self).__init__()
 
-    def get(self):
+    def put(self):
         # This parameters are specific to the GET method
         # because they are not mandatory
         search_reqparse = reqparse.RequestParser()
