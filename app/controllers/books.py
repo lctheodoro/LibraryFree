@@ -1,4 +1,4 @@
-from flask import json, g
+from flask import json, g,request
 from flask_restful import Resource, reqparse
 from app import db, auth, api, log__
 from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, \
@@ -40,24 +40,44 @@ class BooksApi(Resource):
     def get(self):
         # This parameters are specific to the GET method
         # because they are not mandatory
-        search_reqparse = reqparse.RequestParser()
-        search_reqparse.add_argument("title", type=str, location='json')
-        search_reqparse.add_argument("subtitle", type=str, location='json')
-        search_reqparse.add_argument("isbn10", type=str, location = 'json')
-        search_reqparse.add_argument("isbn13", type=str, location = 'json')
-        search_reqparse.add_argument("authors", type=list, location='json')
-        search_reqparse.add_argument("publisher", type=str, location='json')
-        search_reqparse.add_argument("publisherDate", type=str, location='json')
-        search_reqparse.add_argument("categories", type=list, location='json')
-        search_reqparse.add_argument("edition", type=int, location='json')
-        search_reqparse.add_argument("year", type=int, location='json')
-        search_reqparse.add_argument("language", type=str, location='json')
+        args = {}
+        args['title'] = request.args.get("title")
+        args['subtitle'] = request.args.get("subtitle")
+        args['isbn10'] = request.args.get("isbn10")
+        args['isbn13'] = request.args.get("isbn13")
+        args['authors'] = request.args.get("authors")
+        args['publisher'] = request.args.get("publisher")
+        args['publisherDate'] = request.args.get("publisherDate")
+        args['categories'] = request.args.get("categories")
+        args['edition'] = request.args.get("edition")
+        args['year'] = request.args.get("year")
+        args['language'] = request.args.get("language")
+        args['user_id'] = request.args.get("user_id")
+        args['organization_id'] = request.args.get("organization_id")
+
+        if(args['authors']):
+            args['authors'] = args['authors'].split(',')
+        if(args['categories']):
+            args['categories'] = args['categories'].split(',')
+
+        #search_reqparse = reqparse.RequestParser()
+        #search_reqparse.add_argument("title", type=str, location='json')
+        #search_reqparse.add_argument("subtitle", type=str, location='json')
+        #search_reqparse.add_argument("isbn10", type=str, location = 'json')
+        #search_reqparse.add_argument("isbn13", type=str, location = 'json')
+        #search_reqparse.add_argument("authors", type=list, location='json')
+        #search_reqparse.add_argument("publisher", type=str, location='json')
+        #search_reqparse.add_argument("publisherDate", type=str, location='json')
+        #search_reqparse.add_argument("categories", type=list, location='json')
+        #search_reqparse.add_argument("edition", type=int, location='json')
+        #search_reqparse.add_argument("year", type=int, location='json')
+        #search_reqparse.add_argument("language", type=str, location='json')
         # Also get books owned by a user or organization
-        search_reqparse.add_argument("user_id", type=int, location='json')
-        search_reqparse.add_argument("organization_id", type=int, location='json')
+        #search_reqparse.add_argument("user_id", type=int, location='json')
+        #search_reqparse.add_argument("organization_id", type=int, location='json')
 
         # retrieving the values
-        args = search_reqparse.parse_args()
+        #args = search_reqparse.parse_args()
         filters_list = []
 
         if args['title']:
@@ -428,21 +448,25 @@ class ReturnApi(Resource):
         super(ReturnApi, self).__init__()
 
     def get(self):
-        args = self.reqparse.parse_args()
-
-        loan_record_search = Book_loan.query.filter_by(id=args['loan_id']).first()
-        return_record_search = Book_return.query.filter_by(book_loan_id=loan_record_search.id).first()
-        book = Book.query.get(loan_record_search.book_id)
-        if ((g.user.id != return_record_search.user_id) and g.user.admin==0):
-            return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
-        if book.is_organization:
-            org = Organization.query.get(book.organization_id)
-            if g.user not in org.managers and g.user.admin == 0:
-                return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
-        else:
-            if g.user.id != book.user_id and g.user.admin == 0:
-                return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
-        return {'data': [return_record_search.serialize]}, log__(200,g.user)
+        args = {}
+        args['loan_id'] = request.args.get("loan_id")
+        if args['loan_id']:
+            loan_record_search = Book_loan.query.filter_by(id=args['loan_id']).first()
+            if loan_record_search:
+                return_record_search = Book_return.query.filter_by(book_loan_id=loan_record_search.id).first()
+                if return_record_search:
+                    book = Book.query.get(loan_record_search.book_id)
+                    if ((g.user.id != return_record_search.user_id) and g.user.admin==0):
+                        return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
+                    if book.is_organization:
+                        org = Organization.query.get(book.organization_id)
+                        if g.user not in org.managers and g.user.admin == 0:
+                            return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
+                    else:
+                        if g.user.id != book.user_id and g.user.admin == 0:
+                            return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
+                    return {'data': [return_record_search.serialize]}, log__(200,g.user)
+        return {'message': 'Bad Request'}, log__(400,g.user)
 
     def post(self):
         try:
@@ -495,7 +519,10 @@ class DelayApi(Resource):
         super(DelayApi, self).__init__()
 
     def get(self):
-        args = self.reqparse.parse_args()
+        #args = self.reqparse.parse_args()
+        args = {}
+        args['loan_id'] = request.args.get("loan_id")
+
         try:
             loan_delay = Delayed_return.query.filter_by(book_loan_id=args['loan_id']).first()
 
@@ -612,9 +639,11 @@ class WishlistApi(Resource):
 
     def get(self):
         # Required arguments
-        self.reqparse.add_argument("user_id", type=int, required=True, location='json')
+        #self.reqparse.add_argument("user_id", type=int, required=True, location='json')
 
-        args = self.reqparse.parse_args()
+        #args = self.reqparse.parse_args()
+        args = {}
+        args['user_id'] = request.args.get("user_id")
 
         user = User.query.filter_by(id=args['user_id']).first()
 
