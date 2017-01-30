@@ -126,7 +126,7 @@ class ModifyUsersApi(Resource):
     # this decorator verify if the object belongs to the user
     # if so, it can be edited, else the user is unauthorized
     @is_user
-    def put(self, id):
+    def post(self, id):
         try:
             user = User.query.get_or_404(id)
             args = self.reqparse.parse_args()
