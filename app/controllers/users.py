@@ -151,7 +151,8 @@ class ModifyUsersApi(Resource):
                         setattr(user, key, value)
             user.check_register()
             db.session.commit()
-            return {'data': user.serialize}, log__(200,g.user)
+            # return {'data': user.serialize}, log__(200,g.user)
+            return jsonify({'user': user.serialize})
         except Exception as error:
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
