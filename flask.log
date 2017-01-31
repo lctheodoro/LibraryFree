@@ -1,0 +1,7 @@
+179.104.21.69 - - [29/Jan/2017 18:49:33] code 400, message Bad request syntax ('GET /api/v1/books?title=Harry Potter e a Pedra Filosofal&isbn10=1781103682&isbn13=9781781103685&subtitle= HTTP/1.1')
+179.104.21.69 - - [29/Jan/2017 18:50:25] code 400, message Bad request syntax ('GET /api/v1/books?title=Harry Potter e a Pedra Filosofal&isbn10=1781103682&isbn13=9781781103685&subtitle= HTTP/1.1')
+179.104.21.69 - - [29/Jan/2017 18:51:24] code 400, message Bad request syntax ('GET /api/v1/books?title=Harry Potter e a Pedra Filosofal&isbn10=1781103682&isbn13=9781781103685&subtitle= HTTP/1.1')
+179.104.21.69 - - [29/Jan/2017 18:52:19] code 400, message Bad request syntax ('GET /api/v1/books?title=Harry Potter e a Pedra Filosofal&isbn10=1781103682&isbn13=9781781103685&subtitle= HTTP/1.1')
+179.104.21.69 - - [29/Jan/2017 18:53:30] code 400, message Bad request syntax ('GET /api/v1/books?title=Harry Potter e a Pedra Filosofal&isbn10=1781103682&isbn13=9781781103685&subtitle= HTTP/1.1')
+179.104.21.69 - - [29/Jan/2017 18:58:19] code 400, message Bad request syntax ('GET /api/v1/books?title=Harry Potter e a Pedra Filosofal&isbn10=1781103682&isbn13=9781781103685&subtitle= HTTP/1.1')
+179.104.21.69 - - [29/Jan/2017 19:50:17] code 400, message Bad request syntax ("GET /api/v1/books?title=Harry Potter and the Philosopher's Stone&isbn10=0747542988&isbn13=9780747542988&subtitle= HTTP/1.1")

@@ -80,14 +80,14 @@ class UsersApi(Resource):
         # we will ALWAYS encrypt a new password
         user.hash_password(args['password'])
         db.session.add(user)
-
+        print(user.city)
         try:
             db.session.commit()
             # Gamefication
             user.check_register()
             db.session.commit()
 
-            # return {'data': user.serialize}, log__(201)
+         #   return {'data': user.serialize}, log__(201)
             return jsonify({'data': user.serialize})
         except Exception as error:
             print(error)

@@ -342,3 +342,826 @@ INFO 2017-01-24 02:51:52,714 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GE
 INFO 2017-01-24 02:51:58,791 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books/22 - DELETE - 200
 INFO 2017-01-24 02:52:02,731 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
 INFO 2017-01-24 02:52:13,267 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-26 20:29:38,695 189.15.251.200	| 3 - Gustavo	| /api/v1/books - POST - 201
+ERROR 2017-01-26 20:29:38,696 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-26 21:50:24,553 189.15.251.200	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-26 21:53:57,325 189.15.251.200	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-26 22:00:06,268 189.15.251.200	| 3 - Gustavo	| /api/v1/books/1 - DELETE - 200
+ERROR 2017-01-26 22:00:06,276 Exception on /api/v1/books/1 [DELETE]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-26 22:16:29,440 189.15.251.200	| Guest	| /api/v1/users - POST - 409
+ERROR 2017-01-26 22:16:29,443 Exception on /api/v1/users [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-26 22:18:12,123 189.15.251.200	| Guest	| /api/v1/users - POST - 409
+ERROR 2017-01-26 22:18:12,124 Exception on /api/v1/users [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-26 22:21:40,672 189.15.251.200	| 9 - Biblioteca de Talentos	| /api/v1/books/0 - DELETE - 404
+ERROR 2017-01-26 22:21:40,673 Exception on /api/v1/books/0 [DELETE]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-26 22:22:07,149 189.15.251.200	| 9 - Biblioteca de Talentos	| /api/v1/books/0 - DELETE - 404
+ERROR 2017-01-26 22:22:07,149 Exception on /api/v1/books/0 [DELETE]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-26 22:31:11,112 189.15.251.200	| 9 - Biblioteca de Talentos	| /api/v1/books - POST - 400
+ERROR 2017-01-26 22:31:11,112 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-26 22:31:39,684 189.15.251.200	| 9 - Biblioteca de Talentos	| /api/v1/books - POST - 400
+ERROR 2017-01-26 22:31:39,685 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+ERROR 2017-01-26 22:35:20,444 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+ERROR 2017-01-26 22:37:20,966 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+ERROR 2017-01-26 22:37:29,022 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+ERROR 2017-01-26 22:41:25,882 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+ERROR 2017-01-26 23:00:10,713 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-26 23:32:21,519 189.15.251.200	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-27 01:00:21,358 189.15.251.200	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-27 01:00:25,074 189.15.251.200	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-27 13:04:17,178 191.54.153.207	| Guest	| /api/v1/tokens - GET - 401
+INFO 2017-01-27 13:04:46,921 179.155.80.21	| Guest	| /api/v1/users - POST - 409
+ERROR 2017-01-27 13:04:46,936 Exception on /api/v1/users [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-27 13:05:32,843 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-27 13:05:37,881 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:06:07,602 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-27 13:06:07,618 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-27 13:06:13,975 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-27 13:06:19,212 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:06:33,356 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:06:46,366 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-27 13:06:46,372 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-27 13:06:51,804 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:08:33,035 191.54.153.207	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-27 13:08:55,558 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-27 13:08:55,602 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:09:33,302 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-27 13:09:37,945 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:09:45,411 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:13:20,466 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:13:55,656 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:14:18,951 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-27 13:14:18,956 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-27 13:14:30,583 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-27 13:14:30,588 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-27 13:14:58,372 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-27 13:15:02,503 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:15:14,424 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:19:27,476 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-27 13:19:27,492 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-27 13:19:38,261 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:22:39,809 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-27 13:22:39,823 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-27 13:36:19,305 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:36:35,815 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-27 13:36:35,825 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-27 13:39:26,342 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-27 13:39:32,290 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 13:39:48,785 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-27 13:39:48,791 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-27 13:40:02,101 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-27 13:40:02,105 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - POST - 400
+ERROR 2017-01-27 13:40:02,106 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-27 13:40:31,024 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-27 13:40:31,049 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-27 14:17:42,513 191.54.153.207	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-27 14:18:17,572 179.155.80.21	| Guest	| /api/v1/books - POST - 401
+INFO 2017-01-27 14:20:12,974 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-27 14:20:21,302 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-27 14:20:43,756 179.155.80.21	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-27 14:20:43,766 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-27 14:37:22,421 191.54.153.207	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-27 14:37:22,431 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-27 14:40:52,521 179.155.80.21	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-27 15:02:03,624 179.155.80.21	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-27 15:02:18,801 179.155.80.21	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-27 15:03:25,788 179.155.80.21	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-28 15:22:53,383 191.55.125.172	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-28 15:23:55,922 191.55.125.172	| Guest	| /api/v1/tokens - GET - 401
+INFO 2017-01-28 15:24:03,588 191.55.125.172	| Guest	| /api/v1/tokens - GET - 401
+INFO 2017-01-28 15:24:35,622 191.55.125.172	| Guest	| /api/v1/users - POST - 409
+ERROR 2017-01-28 15:24:35,623 Exception on /api/v1/users [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-28 15:24:36,695 191.55.125.172	| Guest	| /api/v1/users - POST - 409
+ERROR 2017-01-28 15:24:36,699 Exception on /api/v1/users [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-28 15:32:12,454 191.55.125.172	| Guest	| /api/v1/users - POST - 409
+ERROR 2017-01-28 15:32:12,455 Exception on /api/v1/users [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-28 15:37:20,178 191.55.125.172	| Guest	| /api/v1/users - POST - 409
+ERROR 2017-01-28 15:37:20,179 Exception on /api/v1/users [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-28 15:37:21,238 191.55.125.172	| Guest	| /api/v1/users - POST - 409
+ERROR 2017-01-28 15:37:21,239 Exception on /api/v1/users [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-28 15:37:39,564 191.55.125.172	| Guest	| /api/v1/users - POST - 409
+ERROR 2017-01-28 15:37:39,565 Exception on /api/v1/users [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-28 15:51:27,169 191.55.125.172	| Guest	| /api/v1/users - POST - 409
+ERROR 2017-01-28 15:51:27,170 Exception on /api/v1/users [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-28 17:16:47,287 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-28 17:16:52,844 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:17:01,647 191.55.125.172	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-28 17:19:12,963 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-28 17:19:19,690 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:20:03,799 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-28 17:20:12,830 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:21:46,779 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-28 17:21:46,787 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - POST - 400
+INFO 2017-01-28 17:25:52,114 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:32:39,844 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:32:56,297 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:35:08,684 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:35:39,290 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:37:02,199 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:41:02,698 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:41:50,178 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-28 17:41:50,179 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - POST - 400
+INFO 2017-01-28 17:48:34,731 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:53:04,500 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:53:35,117 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:55:38,070 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:55:44,275 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:56:47,473 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 17:58:46,886 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 18:02:53,622 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 18:05:31,640 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 18:05:45,722 191.44.58.42	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-28 18:07:24,175 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 18:07:32,654 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 18:10:07,061 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 18:12:01,850 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 18:12:17,285 191.44.58.42	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-28 18:12:26,337 191.44.58.42	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-28 18:12:59,010 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 18:13:13,356 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 18:18:59,362 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - PUT - 200
+INFO 2017-01-28 18:19:32,823 191.55.125.172	| Guest	| /api/v1/books - PUT - 401
+INFO 2017-01-28 18:19:41,011 191.44.58.42	| Guest	| /api/v1/tokens - GET - 401
+INFO 2017-01-28 18:19:46,126 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - PUT - 200
+INFO 2017-01-28 18:19:56,305 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - PUT - 200
+INFO 2017-01-28 18:21:38,648 191.55.125.172	| Guest	| /api/v1/books - PUT - 401
+INFO 2017-01-28 18:22:40,778 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-28 18:44:02,296 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-28 18:46:24,809 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-28 18:46:24,810 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - POST - 400
+ERROR 2017-01-28 18:46:24,811 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-28 18:46:52,646 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-28 18:46:52,647 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - POST - 400
+ERROR 2017-01-28 18:46:52,648 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-28 18:47:01,872 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-28 18:47:01,873 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - POST - 400
+ERROR 2017-01-28 18:47:01,875 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-28 18:47:23,135 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - PUT - 200
+INFO 2017-01-28 18:51:25,617 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - PUT - 200
+INFO 2017-01-28 20:46:14,930 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 20:52:03,889 191.55.125.172	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-28 20:53:12,387 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-28 21:00:26,494 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-28 21:03:45,324 191.55.125.172	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 18:35:36,657 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-29 18:36:19,867 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-29 18:47:46,546 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+ERROR 2017-01-29 18:49:33,440 179.104.21.69 - - [29/Jan/2017 18:49:33] code 400, message Bad request syntax ('GET /api/v1/books?title=Harry Potter e a Pedra Filosofal&isbn10=1781103682&isbn13=9781781103685&subtitle= HTTP/1.1')
+ERROR 2017-01-29 18:50:25,240 179.104.21.69 - - [29/Jan/2017 18:50:25] code 400, message Bad request syntax ('GET /api/v1/books?title=Harry Potter e a Pedra Filosofal&isbn10=1781103682&isbn13=9781781103685&subtitle= HTTP/1.1')
+INFO 2017-01-29 18:51:08,137 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+ERROR 2017-01-29 18:51:24,676 179.104.21.69 - - [29/Jan/2017 18:51:24] code 400, message Bad request syntax ('GET /api/v1/books?title=Harry Potter e a Pedra Filosofal&isbn10=1781103682&isbn13=9781781103685&subtitle= HTTP/1.1')
+ERROR 2017-01-29 18:52:19,585 179.104.21.69 - - [29/Jan/2017 18:52:19] code 400, message Bad request syntax ('GET /api/v1/books?title=Harry Potter e a Pedra Filosofal&isbn10=1781103682&isbn13=9781781103685&subtitle= HTTP/1.1')
+ERROR 2017-01-29 18:53:30,209 179.104.21.69 - - [29/Jan/2017 18:53:30] code 400, message Bad request syntax ('GET /api/v1/books?title=Harry Potter e a Pedra Filosofal&isbn10=1781103682&isbn13=9781781103685&subtitle= HTTP/1.1')
+ERROR 2017-01-29 18:58:19,592 179.104.21.69 - - [29/Jan/2017 18:58:19] code 400, message Bad request syntax ('GET /api/v1/books?title=Harry Potter e a Pedra Filosofal&isbn10=1781103682&isbn13=9781781103685&subtitle= HTTP/1.1')
+INFO 2017-01-29 18:59:12,505 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 18:59:23,585 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 19:01:43,949 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-29 19:01:44,143 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-29 19:02:13,512 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 19:08:07,625 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 19:08:20,021 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-29 19:08:20,030 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-29 19:09:18,514 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+ERROR 2017-01-29 19:09:18,525 Exception on /api/v1/books [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-29 19:11:07,107 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-29 19:11:12,104 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 19:16:12,127 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 19:17:39,093 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - POST - 200
+INFO 2017-01-29 19:17:42,994 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 19:18:45,807 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 19:19:48,549 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 19:22:07,993 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 19:24:49,806 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 19:48:51,509 179.104.21.69	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-29 19:50:06,253 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+ERROR 2017-01-29 19:50:17,486 179.104.21.69 - - [29/Jan/2017 19:50:17] code 400, message Bad request syntax ("GET /api/v1/books?title=Harry Potter and the Philosopher's Stone&isbn10=0747542988&isbn13=9780747542988&subtitle= HTTP/1.1")
+INFO 2017-01-29 19:56:23,986 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 20:09:53,567 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 20:15:31,443 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 20:16:38,431 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 20:21:30,964 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 20:22:02,775 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 21:43:18,345 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-29 21:43:23,607 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 21:43:37,871 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 21:51:36,076 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 21:54:06,775 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 21:56:14,851 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 21:56:44,070 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 22:08:52,845 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/0 - PUT - 200
+INFO 2017-01-29 22:14:52,530 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - PUT - 200
+INFO 2017-01-29 22:14:52,650 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - PUT - 200
+ERROR 2017-01-29 22:14:52,662 Exception on /api/v1/users/2 [PUT]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-29 22:15:40,771 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - PUT - 200
+INFO 2017-01-29 22:15:40,774 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - PUT - 200
+ERROR 2017-01-29 22:15:40,774 Exception on /api/v1/users/2 [PUT]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-29 22:16:15,689 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - PUT - 200
+INFO 2017-01-29 22:16:15,693 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - PUT - 200
+ERROR 2017-01-29 22:16:15,693 Exception on /api/v1/users/2 [PUT]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-29 22:19:54,509 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - PUT - 200
+INFO 2017-01-29 22:19:54,513 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - PUT - 200
+ERROR 2017-01-29 22:19:54,513 Exception on /api/v1/users/2 [PUT]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-29 23:15:10,496 179.104.21.69	| Guest	| /api/v1/users/2 - PUT - 401
+INFO 2017-01-29 23:16:13,157 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-29 23:16:24,259 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 23:17:42,883 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - PUT - 200
+INFO 2017-01-29 23:17:42,898 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - PUT - 200
+ERROR 2017-01-29 23:17:42,899 Exception on /api/v1/users/2 [PUT]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-29 23:23:31,882 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - PUT - 200
+INFO 2017-01-29 23:27:03,157 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-29 23:27:58,840 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-29 23:31:45,207 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-29 23:32:31,778 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users - GET - 200
+INFO 2017-01-29 23:32:31,794 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users - GET - 200
+INFO 2017-01-29 23:36:28,286 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-29 23:42:03,925 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-29 23:44:41,389 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-29 23:45:50,828 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-29 23:46:07,993 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 23:49:36,601 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-29 23:49:48,151 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 23:50:24,255 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-29 23:59:37,533 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:00:47,437 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:04:43,544 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:05:25,257 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-30 00:05:30,348 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-30 00:14:27,492 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:14:41,726 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-30 00:20:40,992 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 00:22:47,975 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 00:23:14,735 179.104.21.69	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-30 00:24:14,410 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-30 00:24:25,286 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-30 00:24:34,760 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:24:53,058 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-30 00:25:19,485 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:26:06,532 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:28:16,649 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:29:50,054 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:30:33,464 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:31:51,366 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:33:49,971 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:35:05,835 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:36:18,640 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:36:46,529 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:43:21,546 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:44:39,990 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:47:45,776 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:48:46,180 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:50:29,260 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:56:19,825 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:56:43,340 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-30 00:57:58,576 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 00:58:27,462 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-30 01:17:35,043 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 01:22:36,956 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 01:24:48,244 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 01:25:50,701 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 01:31:47,339 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 01:37:23,659 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 01:41:21,501 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 01:43:11,908 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 01:44:05,522 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 01:48:33,660 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 01:50:07,783 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 01:51:58,357 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 01:52:32,064 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 01:54:26,911 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 01:59:11,655 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 02:01:43,318 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 02:02:05,124 179.104.21.69	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-30 02:06:08,901 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 02:08:23,765 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 02:17:18,227 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 02:18:20,471 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 02:23:26,341 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 02:27:04,317 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 02:27:38,889 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 02:30:22,886 179.104.21.69	| Guest	| /api/v1/users/2 - POST - 401
+INFO 2017-01-30 02:58:18,629 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-30 02:59:51,416 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/tokens - GET - 200
+INFO 2017-01-30 03:04:44,763 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 03:06:06,101 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 03:07:50,983 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 03:10:19,966 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 03:13:20,712 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 03:15:32,202 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 03:17:17,278 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 03:22:36,606 179.104.21.69	| 2 - Gustavo Garcia	| /api/v1/users/2 - POST - 200
+INFO 2017-01-30 03:28:19,520 179.104.21.69	| Guest	| /api/v1/users/0 - POST - 401
+INFO 2017-01-30 03:32:16,486 179.104.21.69	| Guest	| /api/v1/users/0 - POST - 401
+INFO 2017-01-30 03:42:37,311 179.104.21.69	| Guest	| /api/v1/users/0 - POST - 401
+INFO 2017-01-30 03:48:38,946 179.104.21.69	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-30 04:08:54,556 179.104.21.69	| Guest	| /api/v1/users/0 - POST - 401
+INFO 2017-01-30 04:09:04,248 179.104.21.69	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-30 04:09:38,486 179.104.21.69	| Guest	| /api/v1/users/0 - POST - 401
+INFO 2017-01-30 04:14:44,451 179.104.21.69	| Guest	| /api/v1/users/0 - POST - 401
+INFO 2017-01-30 04:16:45,477 179.104.21.69	| Guest	| /api/v1/users/0 - POST - 401
+INFO 2017-01-30 04:22:10,681 179.104.21.69	| Guest	| /api/v1/users/0 - POST - 401
+INFO 2017-01-30 04:28:06,255 179.104.21.69	| Guest	| /api/v1/books - GET - 401
+INFO 2017-01-30 04:29:01,325 179.104.21.69	| Guest	| /api/v1/users/0 - POST - 401
+INFO 2017-01-30 04:29:50,957 179.104.21.69	| Guest	| /api/v1/users/0 - POST - 401
+INFO 2017-01-30 04:31:46,289 179.104.21.69	| Guest	| /api/v1/ranking - GET - 200
+INFO 2017-01-30 04:52:45,769 179.104.21.69	| Guest	| /api/v1/users/0 - POST - 401
+INFO 2017-01-30 04:53:36,169 179.104.21.69	| Guest	| /api/v1/ranking - GET - 200
+ERROR 2017-01-30 04:53:36,195 Exception on /api/v1/ranking [GET]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-30 04:54:16,313 179.104.21.69	| Guest	| /api/v1/ranking - GET - 200
+INFO 2017-01-30 11:02:08,507 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 11:03:01,664 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 11:06:00,004 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 11:06:09,943 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 11:10:11,428 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 11:12:04,990 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 11:13:45,267 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 11:18:18,885 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 11:49:26,609 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 12:42:00,115 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-30 12:42:09,254 127.0.0.1	| 2 - Gustavo Garcia	| /api/v1/books - GET - 200
+INFO 2017-01-30 12:43:23,400 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 12:44:24,042 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 12:44:35,550 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 12:45:50,436 127.0.0.1	| Guest	| /api/v1/users - POST - 201
+INFO 2017-01-30 13:14:16,206 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 13:14:55,662 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 13:15:01,709 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 13:18:00,136 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 13:20:54,477 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 13:21:56,954 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 13:23:20,693 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 13:29:42,525 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 14:23:47,898 127.0.0.1	| Guest	| /api/v1/users - POST - 409
+INFO 2017-01-30 15:34:53,948 127.0.0.1	| Guest	| /api/v1/users - POST - 201
+INFO 2017-01-31 01:26:09,935 191.55.234.184	| Guest	| /api/v1/users - POST - 201
+ERROR 2017-01-31 01:26:09,959 Exception on /api/v1/users [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
+INFO 2017-01-31 01:26:24,167 191.55.234.184	| Guest	| /api/v1/users - POST - 409
+ERROR 2017-01-31 01:26:24,168 Exception on /api/v1/users [POST]
+Traceback (most recent call last):
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1639, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask/app.py", line 1625, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 481, in wrapper
+    return self.make_response(data, code, headers=headers)
+  File "/home/admin/biblioteca/LibraryFree/flask/lib/python3.4/site-packages/flask_restful/__init__.py", line 518, in make_response
+    raise InternalServerError()
+werkzeug.exceptions.InternalServerError: 500: Internal Server Error
