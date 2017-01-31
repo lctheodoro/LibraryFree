@@ -11,7 +11,7 @@ from isbnlib import isbn_from_words,meta
 from isbnlib.registry import bibformatters
 from app.controllers import notification
 from threading import Thread
-
+from sqlalchemy import desc
 
 class BooksApi(Resource):
     decorators = [auth.login_required]
@@ -169,6 +169,7 @@ class BooksApi(Resource):
                         authors = Author(name=a)
                         db.session.add(authors)
                         db.session.commit()
+                    authors.qtd += 1
                     book.authors.append(authors)
             if category:
                 for c in category:
@@ -177,6 +178,7 @@ class BooksApi(Resource):
                         categories = Category(name=c)
                         db.session.add(categories)
                         db.session.commit()
+                    categories.qtd += 1
                     book.categories.append(categories)
 
             if (args['user_id'] and args['organization_id']) or ((not args['user_id'] and not args['organization_id'])):
@@ -204,6 +206,12 @@ class BooksApi(Resource):
             print(error)
             return { 'message': 'Bad Request' }, log__(400,g.user)
 
+class CategoriesAPI(Resource):
+    decorators = [auth.login_required]
+
+    def get(self):
+        categories = Category.query.order_by(desc(Category.qtd)).limit(10).all()
+        return {'data': [c.serialize for c in categories]}, log__(200,g.user)
 
 class ModifyBooksApi(Resource):
     decorators = [auth.login_required]
@@ -706,3 +714,4 @@ api.add_resource(ReturnApi, '/api/v1/books/return', endpoint='return')
 api.add_resource(DelayApi, '/api/v1/books/delay', endpoint='delay')
 api.add_resource(BooksAvailabilityApi, '/api/v1/books/availability/<int:id>', endpoint='books_availability')
 api.add_resource(WishlistApi, '/api/v1/wish', endpoint='wish')
+api.add_resource(CategoriesAPI,'/api/v1/books/categories',endpoint='categories')
