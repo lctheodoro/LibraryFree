@@ -272,6 +272,7 @@ class ModifyBooksApi(Resource):
                 if value is not None:
                     if key is 'authors':
                         for b in book.authors:
+                            b.qtd -= 1
                             book.authors.remove(b)
                         for a in args['authors']:
                             authors = Author.query.filter_by(name=a).first()
@@ -279,9 +280,11 @@ class ModifyBooksApi(Resource):
                                 authors = Author(name=a)
                                 db.session.add(authors)
                                 db.session.commit()
+                            authors.qtd += 1
                             book.authors.append(authors)
                     elif key is 'categories':
                         for b in book.categories:
+                            b.qtd -= 1
                             book.categories.remove(b)
                         for c in args['categories']:
                             categories = Category.query.filter_by(name=c).first()
@@ -289,6 +292,7 @@ class ModifyBooksApi(Resource):
                                 categories = Category(name=c)
                                 db.session.add(categories)
                                 db.session.commit()
+                            categories.qtd += 1
                             book.categories.append(categories)
                     else:
                         setattr(book, key, value)
@@ -308,6 +312,10 @@ class ModifyBooksApi(Resource):
                 user = User.query.get_or_404(book.organization_id)
             else:
                 user = User.query.get_or_404(book.user_id)
+            for b in book.authors:
+                b.qtd -= 1
+            for b in book.categories:
+                b.qtd -= 1
             user.points_update(-10)
             db.session.delete(book)
             db.session.commit()
