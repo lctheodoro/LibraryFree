@@ -11,7 +11,7 @@ from isbnlib import isbn_from_words,meta
 from isbnlib.registry import bibformatters
 from app.controllers import notification
 from threading import Thread
-
+from sqlalchemy import desc
 
 class BooksApi(Resource):
     decorators = [auth.login_required]
@@ -100,9 +100,10 @@ class BooksApi(Resource):
             )
 
         if args['authors']:
-            filters_list.append(
-                Book.authors.any(Author.name.in_(args['authors']))
-            )
+            for a in args['authors']:
+                filters_list.append(
+                    Book.authors.any(Author.name.ilike("%{0}%".format(a)))  #args['authors']))
+                )
 
         if args['publisher']:
             filters_list.append(
@@ -115,9 +116,10 @@ class BooksApi(Resource):
             )
 
         if args['categories']:
-            filters_list.append(
-                Book.categories.any(Category.name.in_(args['categories']))
-            )
+            for a in args['categories']:
+                filters_list.append(
+                    Book.categories.any(Category.name.ilike("%{0}%".format(a)))  #args['categories']))
+                )
 
         if args['edition']:
             filters_list.append(
@@ -169,6 +171,7 @@ class BooksApi(Resource):
                         authors = Author(name=a)
                         db.session.add(authors)
                         db.session.commit()
+                    authors.qtd += 1
                     book.authors.append(authors)
             if category:
                 for c in category:
@@ -177,6 +180,7 @@ class BooksApi(Resource):
                         categories = Category(name=c)
                         db.session.add(categories)
                         db.session.commit()
+                    categories.qtd += 1
                     book.categories.append(categories)
 
             if (args['user_id'] and args['organization_id']) or ((not args['user_id'] and not args['organization_id'])):
@@ -205,6 +209,12 @@ class BooksApi(Resource):
             print(error)
             return { 'message': 'Bad Request' }, log__(400,g.user)
 
+class CategoriesAPI(Resource):
+    decorators = [auth.login_required]
+
+    def get(self):
+        categories = Category.query.order_by(desc(Category.qtd)).limit(10).all()
+        return {'data': [c.serialize for c in categories]}, log__(200,g.user)
 
 class ModifyBooksApi(Resource):
     decorators = [auth.login_required]
@@ -265,6 +275,7 @@ class ModifyBooksApi(Resource):
                 if value is not None:
                     if key is 'authors':
                         for b in book.authors:
+                            b.qtd -= 1
                             book.authors.remove(b)
                         for a in args['authors']:
                             authors = Author.query.filter_by(name=a).first()
@@ -272,9 +283,11 @@ class ModifyBooksApi(Resource):
                                 authors = Author(name=a)
                                 db.session.add(authors)
                                 db.session.commit()
+                            authors.qtd += 1
                             book.authors.append(authors)
                     elif key is 'categories':
                         for b in book.categories:
+                            b.qtd -= 1
                             book.categories.remove(b)
                         for c in args['categories']:
                             categories = Category.query.filter_by(name=c).first()
@@ -282,6 +295,7 @@ class ModifyBooksApi(Resource):
                                 categories = Category(name=c)
                                 db.session.add(categories)
                                 db.session.commit()
+                            categories.qtd += 1
                             book.categories.append(categories)
                     else:
                         setattr(book, key, value)
@@ -301,6 +315,10 @@ class ModifyBooksApi(Resource):
                 user = User.query.get_or_404(book.organization_id)
             else:
                 user = User.query.get_or_404(book.user_id)
+            for b in book.authors:
+                b.qtd -= 1
+            for b in book.categories:
+                b.qtd -= 1
             user.points_update(-10)
             db.session.delete(book)
             db.session.commit()
@@ -713,3 +731,4 @@ api.add_resource(ReturnApi, '/api/v1/books/return', endpoint='return')
 api.add_resource(DelayApi, '/api/v1/books/delay', endpoint='delay')
 api.add_resource(BooksAvailabilityApi, '/api/v1/books/availability/<int:id>', endpoint='books_availability')
 api.add_resource(WishlistApi, '/api/v1/wish', endpoint='wish')
+api.add_resource(CategoriesAPI,'/api/v1/books/categories',endpoint='categories')

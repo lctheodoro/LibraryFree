@@ -166,13 +166,15 @@ class Author(db.Model):
     __tablename__ = "authors"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=True,unique=True)
+    name = db.Column(db.String, nullable=False,unique=True)
+    qtd = db.Column(db.Integer, nullable=False,default=0)
 
     @property
     def serialize(self):
         return {
             'id': self.id,
-            'name': self.name
+            'name': self.name,
+            'qtd': self.qtd
         }
     def __repr__(self):
         return "<Author %r>" % self.name
@@ -181,13 +183,15 @@ class Category(db.Model):
     __tablename__ = "categories"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=True,unique=True)
+    name = db.Column(db.String, nullable=False,unique=True)
+    qtd = db.Column(db.Integer, nullable=False,default=0)
 
     @property
     def serialize(self):
         return {
             'id': self.id,
-            'name': self.name
+            'name': self.name,
+            'qtd': self.qtd
         }
     def __repr__(self):
         return "<Category %r>" % self.name
