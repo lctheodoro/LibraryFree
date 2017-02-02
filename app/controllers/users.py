@@ -41,7 +41,7 @@ def get_auth_token():
     token = token.decode('ascii')
     user = g.user
     user.token = token
-    print({'user': user.serialize})
+    # print({'user': user.serialize})
     return jsonify({'user': user.serialize, 'token': token})
 
 

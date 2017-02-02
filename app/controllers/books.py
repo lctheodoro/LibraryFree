@@ -364,7 +364,8 @@ class LoanRequestApi(Resource):
                 db.session.add(loan)
                 db.session.commit()
 
-                return { 'data': loan.serialize }, log__(201,g.user)
+                # return { 'data': loan.serialize }, log__(201,g.user)
+                return jsonify({ 'data': loan.serialize })
             return { 'message': 'Request already made' }, log__(500,g.user)
         except Exception as error:
             if str(error)=="404: Not Found":
@@ -392,7 +393,8 @@ class LoanReplyApi(Resource):
                 return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
 
             loan = Book_loan.query.get_or_404(id)
-            return { 'data': loan.serialize }, log__(200,g.user)
+            # return { 'data': loan.serialize }, log__(200,g.user)
+            return jsonify({ 'data': loan.serialize })
         except Exception as error:
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
@@ -451,7 +453,8 @@ class LoanReplyApi(Resource):
                     db.session.commit()
                 else:
                     return {'data':'Bad Request'}, log__(400,g.user)
-                return { 'data': loan.serialize }, log__(201,g.user)
+                # return { 'data': loan.serialize }, log__(201,g.user)
+                return jsonify({ 'data': loan.serialize })
             except Exception as error:
                 if str(error)=="404: Not Found":
                     return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
