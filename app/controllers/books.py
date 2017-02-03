@@ -682,6 +682,7 @@ class WishlistApi(Resource):
     def post(self):
         # Required arguments
         self.reqparse.add_argument("title", type=str, required=True, location='json')
+        self.reqparse.add_argument("isbn", type=str, required=True, location='json')
 
         args = self.reqparse.parse_args()
 
@@ -689,15 +690,12 @@ class WishlistApi(Resource):
         if not user: # User not found
             return {'message': 'User not found'}, log__(404,g.user)
         try:
-            isbn = isbn_from_words(args['title'])
-            title = meta(isbn)['Title']
-
-            wish = Wishlist.query.filter_by(isbn=isbn, user_id=user.id).first()
+            wish = Wishlist.query.filter_by(isbn=args['isbn'], user_id=user.id).first()
 
             if wish: # Book already in the wishlist
                 return {'data': wish.serialize}, log__(200,g.user)
             else: # If book not in the wishlist
-                new_wish = Wishlist(isbn=isbn, title=title, user_id=user.id)
+                new_wish = Wishlist(isbn=args['isbn'], title=args['title'], user_id=user.id)
                 db.session.add(new_wish)
                 db.session.commit()
                 return {'data': new_wish.serialize}, log__(201,g.user)
