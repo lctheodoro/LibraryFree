@@ -165,7 +165,7 @@ class ModifyUsersApi(Resource):
             if user.admin == 2 and not g.user.admin == 2:
                 return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
             db.session.delete(user)
-            #db.session.commit()
+            db.session.commit()
             return log__(204,g.user)
         except Exception as error:
             print("ERROR: " + str(error))

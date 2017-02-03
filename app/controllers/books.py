@@ -3,12 +3,12 @@ from flask_restful import Resource, reqparse
 from app import db, auth, api, log__
 from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, \
                             Delayed_return, Organization, Topsearches, Author, \
-                            Category, author_relationship, category_relationship
-from app.models.decorators import is_admin, is_admin_id
+                            Category
+from app.models.decorators import is_admin_id
 from datetime import timedelta, date
 from sqlalchemy.sql import and_
 from isbnlib import isbn_from_words,meta
-from isbnlib.registry import bibformatters
+#from isbnlib.registry import bibformatters
 from app.controllers import notification
 from threading import Thread
 from sqlalchemy import desc
@@ -347,11 +347,11 @@ class LoanRequestApi(Resource):
             l = Book_loan.query.filter_by(book_id=args['book_id'],
                                           user_id=g.user.id,
                                           loan_status='requested').first()
-            if l==None:
+            book = Book.query.get_or_404(args['book_id'])
+            if l==None and not (not book.is_organization and g.user.id==book.user_id):
                 loan = Book_loan(book_id=args['book_id'],user_id=g.user.id)
                 loan.loan_status = 'requested'
                 loan.scored = False
-                book = Book.query.get_or_404(loan.book_id)
 
                 # Get the book's owner whether it's an organization or a user
                 if book.is_organization:
@@ -429,6 +429,7 @@ class LoanReplyApi(Resource):
                     loan.loan_date = date.today()
                     return_day = date.today() + timedelta(days=10)
                     book.available = False
+                    book.loan_user = user.id
 
                     # If it falls on a weekend it updates the date
                     # for the next Monday of this weekend
@@ -523,6 +524,7 @@ class ReturnApi(Resource):
             if return_record.owner_confirmation and return_record.user_confirmation:
                 loan_record.loan_status = 'done'
                 book.available = True
+                book.loan_user = None
             else:
                 loan_record.loan_status = 'accepted'
 
@@ -690,6 +692,7 @@ class WishlistApi(Resource):
     def post(self):
         # Required arguments
         self.reqparse.add_argument("title", type=str, required=True, location='json')
+        self.reqparse.add_argument("isbn", type=str, required=True, location='json')
 
         args = self.reqparse.parse_args()
 
@@ -697,16 +700,13 @@ class WishlistApi(Resource):
         if not user: # User not found
             return {'message': 'User not found'}, log__(404,g.user)
         try:
-            isbn = isbn_from_words(args['title'])
-            title = meta(isbn)['Title']
-
-            wish = Wishlist.query.filter_by(isbn=isbn, user_id=user.id).first()
+            wish = Wishlist.query.filter_by(isbn=args['isbn'], user_id=user.id).first()
 
             if wish: # Book already in the wishlist
                 # return {'data': wish.serialize}, log__(200,g.user)
                 return jsonify({'data': wish.serialize})
             else: # If book not in the wishlist
-                new_wish = Wishlist(isbn=isbn, title=title, user_id=user.id)
+                new_wish = Wishlist(isbn=args['isbn'], title=args['title'], user_id=user.id)
                 db.session.add(new_wish)
                 db.session.commit()
                 # return {'data': new_wish.serialize}, log__(201,g.user)

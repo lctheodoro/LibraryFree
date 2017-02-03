@@ -228,9 +228,12 @@ class Book(db.Model):
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
     is_organization = db.Column(db.Boolean, default=False)
     available = db.Column(db.Boolean,default=True)
+    loan_user = db.Column(db.Integer,db.ForeignKey('users.id'))
 
     user = db.relationship('User', foreign_keys=user_id)
     organization = db.relationship('Organization', foreign_keys=organization_id)
+    loan = db.relationship('User', foreign_keys=loan_user)
+
 
 
     @property
@@ -256,6 +259,28 @@ class Book(db.Model):
             'edition': self.edition,
             'year': self.year,
             'language': self.language,
+        } if self.loan_user == None else{
+            'id': self.id,
+            'user' : self.user.serialize,
+            'organization_id' : self.organization_id,
+            'is_organization' : self.is_organization,
+            'available': self.available,
+            'title': self.title,
+            'subtitle': self.subtitle,
+            'isbn10' : self.isbn10,
+            'isbn13' : self.isbn13,
+            'avatarBase64': self.avatarBase64,
+            'avatarUrl': self.avatarUrl,
+            'synopsis': self.synopsis,
+            'publisher': self.publisher,
+            'publisherDate': self.publisherDate,
+            'description': self.description,
+            'author': [a.serialize for a in self.authors],
+            'categories': [c.serialize for c in self.categories],
+            'edition': self.edition,
+            'year': self.year,
+            'language': self.language,
+            'loan_user': self.loan.serialize
         }
 
     def __repr__(self):
