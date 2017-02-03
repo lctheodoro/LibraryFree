@@ -704,7 +704,7 @@ class WishlistApi(Resource):
 
             if wish: # Book already in the wishlist
                 # return {'data': wish.serialize}, log__(200,g.user)
-                return jsonify({'data': new_wish.serialize})
+                return jsonify({'data': wish.serialize})
             else: # If book not in the wishlist
                 new_wish = Wishlist(isbn=isbn, title=title, user_id=user.id)
                 db.session.add(new_wish)
