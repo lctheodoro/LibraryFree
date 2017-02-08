@@ -322,10 +322,14 @@ class Book_loan(db.Model):
             'id': self.id,
             'loan_date': self.loan_date.strftime('%Y-%m-%d'),
             'return_date': self.return_date.strftime('%Y-%m-%d'),
-            'loan_status': self.loan_status
+            'loan_status': self.loan_status,
+            'book': self.book.serialize,
+            'user_requester':self.user.serialize
         } if self.loan_status == 'accepted' else {
             'id': self.id,
-            'loan_status': self.loan_status
+            'loan_status': self.loan_status,
+            'book': self.book.serialize,
+            'user_requester':self.user.serialize
         }
 
 
@@ -344,7 +348,13 @@ class Book_return(db.Model):
     returned_date = db.Column(db.Date, nullable=False)
     user_confirmation = db.Column(db.Boolean, default=False)
     owner_confirmation = db.Column(db.Boolean, default=False)
+    user_owner = db.Column(db.Integer,db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
+    org_owner = db.Column(db.Integer,db.ForeignKey('organizations.id'))
 
+    user_own = db.relationship('User', foreign_keys=user_owner)
+    user = db.relationship('User', foreign_keys=user_id)
+    organization = db.relationship('Organization', foreign_keys=org_owner)
     book_loan = db.relationship('Book_loan', foreign_keys=book_loan_id)
 
     @property
@@ -354,7 +364,17 @@ class Book_return(db.Model):
             'book_loan': self.book_loan.serialize,
             'returned_date': str(self.returned_date),
             'user_confirmation': self.user_confirmation,
-            'owner_confirmation': self.owner_confirmation
+            'owner_confirmation': self.owner_confirmation,
+            'user_owner': self.user_own.serialize,
+            'user': self.user.serialize
+        }   if self.org_owner == None else {
+            'id': self.id,
+            'book_loan': self.book_loan.serialize,
+            'returned_date': str(self.returned_date),
+            'user_confirmation': self.user_confirmation,
+            'owner_confirmation': self.owner_confirmation,
+            'organization_owner': self.organization.serialize,
+            'user': self.user.serialize
         }
 
     def __repr__(self):
@@ -400,7 +420,9 @@ class Feedback(db.Model):
 
     # Feedback info
     transaction_id = db.Column(db.Integer, db.ForeignKey('book_returns.id'), nullable=False)
-    user = db.Column(db.Enum("owner", "user", name="user_feedback"))
+    user_feedback = db.Column(db.Enum("owner", "user", name="user_feedback"))
+    user_received = db.Column(db.Integer,db.ForeignKey('users.id'), nullable=False)
+    user_submits = db.Column(db.Integer,db.ForeignKey('users.id'),nullable=False)
     user_evaluation = db.Column(db.Integer, nullable=False)
     time_evaluation = db.Column(db.Integer)
     book_evaluation = db.Column(db.Integer)
@@ -408,6 +430,8 @@ class Feedback(db.Model):
     comments = db.Column(db.Text)
     scored = db.Column(db.Integer, default=0)
 
+    user_r = db.relationship('User', foreign_keys=user_received)
+    user_s = db.relationship('User', foreign_keys=user_submits)
     book_return = db.relationship('Book_return', foreign_keys=transaction_id)
 
     @property
@@ -415,6 +439,8 @@ class Feedback(db.Model):
         return {
             'id': self.id,
             'book_return': self.book_return.serialize,
+            'user_R': self.user_r.serialize,
+            'user_S': self.user_s.serialize,
             'user_type': self.user,
             'user_evaluation': self.user_evaluation,
             'time_evaluation': self.time_evaluation,
