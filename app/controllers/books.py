@@ -1,4 +1,4 @@
-from flask import json, g,request
+from flask import json, jsonify, g,request
 from flask_restful import Resource, reqparse
 from app import db, auth, api, log__
 from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, \
