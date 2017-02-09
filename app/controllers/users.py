@@ -284,6 +284,24 @@ class FeedbackApi(Resource):
         self.reqparse.add_argument("comments", type=str, location='json')
 
         super(FeedbackApi, self).__init__()
+    def get(self):
+        try:
+            args = {}
+            args['user_received'] = request.args.get("user_received")
+            args['user_submits'] = request.args.get("user_submits")
+            if(args['user_submits'] and args['user_received']):
+                return {'message': 'Choose only one argument'}, log__(400,g.user)
+            elif(args['user_submits']):
+                feedbacks = Feedback.query.filter_by(user_submits=args['user_submits']).all()
+                return {'data': [f.serialize for f in feedbacks]},log__(200,g.user)
+            elif(args['user_received']):
+                feedbacks = Feedback.query.filter_by(user_id=args['user_received']).all()
+                return {'data':[f.serialize for f in feedbacks]},log__(200,g.user)
+            else:
+                return {'message': 'Bad Request'},log__(400,g.user)
+        except Exception as error:
+            return {'message':'Unexpected Error'},log__(500,g.user)
+
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -295,6 +313,8 @@ class FeedbackApi(Resource):
             # Feedback from user to owner
             if g.user.id == loan.user_id:
                 user = g.user
+                feedback.user_received = book.user_id
+                feedback.user_submits = g.user.id
                 db.session.add(feedback)
                 feedback.user = "user"
             # Feedback from owner to user
@@ -302,6 +322,8 @@ class FeedbackApi(Resource):
                     return { 'message' : 'Organizations cannot be evaluated' }, log__(400,g.user)
             elif book.user_id == g.user.id:
                 user = g.user
+                feedback.user_received = loan.user_id
+                feedback.user_submits = g.user.id
                 db.session.add(feedback)
                 feedback.user = "owner"
             else:

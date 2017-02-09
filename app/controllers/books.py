@@ -54,6 +54,7 @@ class BooksApi(Resource):
         args['language'] = request.args.get("language")
         args['user_id'] = request.args.get("user_id")
         args['organization_id'] = request.args.get("organization_id")
+        args['loan'] = request.args.get("loan")
 
         if(args['authors']):
             args['authors'] = args['authors'].split(',')
@@ -145,7 +146,10 @@ class BooksApi(Resource):
             filters_list.append(
                 Book.organization_id == args['organization_id']
             )
-
+        if args['loan']:
+            filters_list.append(
+                Book.loan_user != None
+            )
         if filters_list == []:
             books = []
         else:
@@ -194,6 +198,8 @@ class BooksApi(Resource):
                     return { 'message': 'Organization not found' }, log__(404,g.user)
                 if g.user not in org.managers and g.user.admin == 0:
                     return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
+            elif args['user_id']!=g.user.id and g.user.admin==0:
+                return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
             elif args['user_id']:
                 book.is_organization = False
                 user = User.query.get_or_404(args['user_id'])
@@ -340,6 +346,26 @@ class LoanRequestApi(Resource):
                                     location='json')
         super(LoanRequestApi,self).__init__()
 
+    def get(self):
+        try:
+            args = {}
+            args['user_id'] = request.args.get("user_id")
+            args['book_id'] = request.args.get("book_id")
+
+            if(args['user_id'] and args['book_id']):
+                return {'message': 'Choose only one argument'}, log__(400,g.user)
+            elif(args['user_id']):
+                loans = Book_loan.query.filter_by(user_id=args['user_id']).all()
+                return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+            elif(args['book_id']):
+                loans = Book_loan.query.filter_by(book_id=args['book_id']).all()
+                return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+            else:
+                return {'message': 'Bad Request'}, log__(400,g.user)
+
+        except Exception as error:
+            return {'message': 'Unexpected Error'}, log__(500,g.user)
+
     def post(self):
         args = self.reqparse.parse_args()
         # Checks if book_loan already exists
@@ -401,7 +427,7 @@ class LoanReplyApi(Resource):
             else:
                 return {'message': 'Unexpected Error'}, log__(500,g.user)
 
-    def put(self,id):
+    def post(self,id):
         args = self.reqparse.parse_args()
 
         loan =  Book_loan.query.get_or_404(id)
@@ -444,7 +470,7 @@ class LoanReplyApi(Resource):
                         user.points_update(5)
                         loan.scored = True
 
-                    Thread(target=notification.send([user],"accepted.html","Loan Reply",book,loan.return_date)).start()
+                        Thread(target=notification.send([user],"accepted.html","Loan Reply",book,loan.return_date)).start()
                     db.session.commit()
                 elif loan.loan_status == 'refused':
                     Thread(target=notification.send([user],"refused.html","Loan Reply",book)).start()
@@ -475,25 +501,48 @@ class ReturnApi(Resource):
         super(ReturnApi, self).__init__()
 
     def get(self):
-        args = {}
-        args['loan_id'] = request.args.get("loan_id")
-        if args['loan_id']:
-            loan_record_search = Book_loan.query.filter_by(id=args['loan_id']).first()
-            if loan_record_search:
-                return_record_search = Book_return.query.filter_by(book_loan_id=loan_record_search.id).first()
-                if return_record_search:
-                    book = Book.query.get(loan_record_search.book_id)
-                    if ((g.user.id != return_record_search.user_id) and g.user.admin==0):
-                        return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
-                    if book.is_organization:
-                        org = Organization.query.get(book.organization_id)
-                        if g.user not in org.managers and g.user.admin == 0:
+        try:
+            args = {}
+            args['loan_id'] = request.args.get("loan_id")
+            args['user_id'] = request.args.get("user_id")
+            args['owner_id'] = request.args.get("owner_id")
+
+            if (args['loan_id'] and args['user_id']) or (args['loan_id'] and
+                args['owner_id']) or (args['user_id'] and args['owner_id']):
+                return {'message': 'Choose only one argument'}, log__(400,g.user)
+            elif args['loan_id']:
+                loan_record_search = Book_loan.query.filter_by(id=args['loan_id']).first()
+                if loan_record_search:
+                    return_record_search = Book_return.query.filter_by(book_loan_id=loan_record_search.id).first()
+                    if return_record_search:
+                        book = Book.query.get(loan_record_search.book_id)
+                        if ((g.user.id != return_record_search.user_id) and g.user.admin==0):
                             return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
-                    else:
-                        if g.user.id != book.user_id and g.user.admin == 0:
-                            return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
-                    return {'data': [return_record_search.serialize]}, log__(200,g.user)
-        return {'message': 'Bad Request'}, log__(400,g.user)
+                        if book.is_organization:
+                            org = Organization.query.get(book.organization_id)
+                            if g.user not in org.managers and g.user.admin == 0:
+                                return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
+                        else:
+                            if g.user.id != book.user_id and g.user.admin == 0:
+                                return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
+                        return {'data': [return_record_search.serialize]}, log__(200,g.user)
+            elif args['user_id']:
+                if g.user.id == int(args['user_id']) or g.user.admin!=0:
+                    return_books = Book_return.query.filter_by(user_id=args['user_id']).all()
+                    return {'data': [r.serialize for r in return_books]},log__(200,g.user)
+                else:
+                    return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
+            elif args['owner_id']:
+                if g.user.id == int(args['owner_id']) or g.user.admin!=0:
+                    return_books = Book_return.query.filter_by(user_owner=args['owner_id']).all()
+                    return {'data': [r.serialize for r in return_books]},log__(200,g.user)
+                else:
+                    return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
+
+            return {'message': 'Bad Request'}, log__(400,g.user)
+        except Exception as error:
+            print(error)
+            return {'message': 'Unexpected Error'},log__(500,g.user)
 
     def post(self):
         try:
@@ -503,11 +552,16 @@ class ReturnApi(Resource):
                 return { 'message': 'Bad Request' }, log__(400,g.user)
             return_record = Book_return.query.filter_by(book_loan_id =
                                                         loan_record.id).first()
+            book = Book.query.get_or_404(loan_record.book_id)
             if not (return_record):
                 return_record = Book_return(book_loan_id = loan_record.id,
                                             returned_date = date.today())
+                if not book.is_organization:
+                    return_record.user_owner = book.user_id
+                else:
+                    return_record.org_owner = book.organization_id
+                return_record.user_id = loan_record.user_id
 
-            book = Book.query.get_or_404(loan_record.book_id)
             if loan_record.user_id==g.user.id:
                 return_record.user_confirmation=True
                 db.session.add(return_record)
@@ -531,6 +585,7 @@ class ReturnApi(Resource):
             db.session.commit()
             return { 'data': return_record.serialize }, log__(201,g.user)
         except Exception as error:
+            print(error)
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
             else:
