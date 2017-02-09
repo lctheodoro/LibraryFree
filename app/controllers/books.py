@@ -197,11 +197,20 @@ class BooksApi(Resource):
                 org = Organization.query.get(args['organization_id'])
             if args['organization_id'] and ((org is None) or (g.user not in org.managers and g.user.admin == 0)):
                 if org is None:
-                    return { 'message': 'Organization not found' }, log__(404,g.user)
+                    # return { 'message': 'Organization not found' }, log__(404,g.user)
+                    response = jsonify({ 'message': 'Organization not found' })
+                    response.status_code = 404
+                    return response
                 if g.user not in org.managers and g.user.admin == 0:
-                    return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
+                    # return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
+                    response = jsonify({ 'message': 'You are not authorized to access this area.' })
+                    response.status_code = 401
+                    return response
             elif args['user_id']!=g.user.id and g.user.admin==0:
-                return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
+                # return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
+                response = jsonify({ 'message': 'You are not authorized to access this area.' })
+                response.status_code = 401
+                return response
             elif args['user_id']:
                 book.is_organization = False
                 user = User.query.get_or_404(args['user_id'])
@@ -211,7 +220,10 @@ class BooksApi(Resource):
 
             db.session.add(book)
             db.session.commit()
-            return { 'data': book.serialize }, log__(201,g.user)
+            # return { 'data': book.serialize }, log__(201,g.user)
+            response = jsonify({ 'data': book.serialize })
+            response.status_code = 201
+            return response
         except Exception as error:
             print(error)
             return { 'message': 'Bad Request' }, log__(400,g.user)
@@ -221,7 +233,10 @@ class CategoriesAPI(Resource):
 
     def get(self):
         categories = Category.query.order_by(desc(Category.qtd)).limit(10).all()
-        return {'data': [c.serialize for c in categories]}, log__(200,g.user)
+        # return {'data': [c.serialize for c in categories]}, log__(200,g.user)
+        response = jsonify({'data': [c.serialize for c in categories]})
+        response.status_code = 200
+        return response
 
 class ModifyBooksApi(Resource):
     decorators = [auth.login_required]
@@ -258,12 +273,21 @@ class ModifyBooksApi(Resource):
                 book_topsearches = Topsearches(isbn10=book.isbn10,isbn13=book.isbn13, title=book.title, times=1)
                 db.session.add(book_topsearches)
                 db.session.commit()
-            return {'data': book.serialize}, log__(200,g.user)
+            # return {'data': book.serialize}, log__(200,g.user)
+            response = jsonify({'data': book.serialize})
+            response.status_code = 200
+            return response
         except Exception as error:
             if str(error)=="404: Not Found":
-                return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+                # return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
+                response = jsonify({ 'message': 'The object you are looking for was not found'})
+                response.status_code = 404
+                return response
             else:
-                return {'message': 'Unexpected error'}, log__(500,g.user)
+                # return {'message': 'Unexpected error'}, log__(500,g.user)
+                response = jsonify({'message': 'Unexpected error'})
+                response.status_code = 500
+                return response
 
     def put(self, id):
         try:
@@ -314,7 +338,7 @@ class ModifyBooksApi(Resource):
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
             else:
                 return { 'message': 'Unexpected Error' }, log__(500,g.user)
-    @is_admin_id
+    # @is_admin_id
     def delete(self, id):
         try:
             book = Book.query.get_or_404(id)
@@ -329,7 +353,10 @@ class ModifyBooksApi(Resource):
             user.points_update(-10)
             db.session.delete(book)
             db.session.commit()
-            return log__(204,g.user)
+            # return log__(204,g.user)
+            response = jsonify({'message': 'Deletado'})
+            response.status_code = 204
+            return response
         except Exception as error:
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
@@ -355,12 +382,21 @@ class LoanRequestApi(Resource):
                 return {'message': 'Choose only one argument'}, log__(400,g.user)
             elif(args['user_id']):
                 loans = Book_loan.query.filter_by(user_id=args['user_id']).all()
-                return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                response = jsonify({'data': [l.serialize for l in loans]})
+                response.status_code = 200
+                return response
             elif(args['book_id']):
                 loans = Book_loan.query.filter_by(book_id=args['book_id']).all()
-                return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                response = jsonify({'data': [l.serialize for l in loans]})
+                response.status_code = 200
+                return response
             else:
-                return {'message': 'Bad Request'}, log__(400,g.user)
+                # return {'message': 'Bad Request'}, log__(400,g.user)
+                response = jsonify({'message': 'Bad Request'})
+                response.status_code = 400
+                return response
 
         except Exception as error:
             return {'message': 'Unexpected Error'}, log__(500,g.user)
@@ -389,8 +425,14 @@ class LoanRequestApi(Resource):
                 db.session.add(loan)
                 db.session.commit()
 
-                return { 'data': loan.serialize }, log__(201,g.user)
-            return { 'message': 'Request already made' }, log__(500,g.user)
+                # return { 'data': loan.serialize }, log__(201,g.user)
+                response = jsonify({ 'data': loan.serialize })
+                response.status_code = 201
+                return response
+            # return { 'message': 'Request already made' }, log__(500,g.user)
+            response = jsonify({ 'message': 'Request already made' })
+            response.status_code = 500
+            return response
         except Exception as error:
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
@@ -727,14 +769,19 @@ class WishlistApi(Resource):
         user = User.query.filter_by(id=args['user_id']).first()
 
         if(not user):
-            return {'data': {'message': 'User not found'}}, log__(404,g.user)
+            # return {'data': {'message': 'User not found'}}, log__(404,g.user)
+            response = jsonify({'data': {'message': 'User not found'}})
+            response.status_code = 404
+            return response
 
         try:
             wishlist = Wishlist.query.filter_by(user_id=args['user_id']).all()
             if wishlist:
-                return {'data': [wish.serialize for wish in wishlist]}, log__(200,g.user)
+                # return {'data': [wish.serialize for wish in wishlist]}, log__(200,g.user)
+                jsonify({'data': [wish.serialize for wish in wishlist]})
             else: # Wishlist is empty
-                return {'data': []}, log__(200,g.user)
+                # return {'data': []}, log__(200,g.user)
+                jsonify({'data': []})
         except Exception:
             return {'message': 'Unexpected Error'}, log__(500,g.user)
 
@@ -752,12 +799,19 @@ class WishlistApi(Resource):
             wish = Wishlist.query.filter_by(isbn=args['isbn'], user_id=user.id).first()
 
             if wish: # Book already in the wishlist
-                return {'data': wish.serialize}, log__(200,g.user)
+                # return {'data': wish.serialize}, log__(200,g.user)
+                response = jsonify({'data': wish.serialize})
+                response.status_code = 200
+                return response
             else: # If book not in the wishlist
                 new_wish = Wishlist(isbn=args['isbn'], title=args['title'], user_id=user.id)
                 db.session.add(new_wish)
                 db.session.commit()
-                return {'data': new_wish.serialize}, log__(201,g.user)
+                # return {'data': new_wish.serialize}, log__(201,g.user)
+                response = jsonify({'data': new_wish.serialize})
+                response.status_code = 201
+                return response
+
         except Exception as error:
             print(error)
             return {'message': 'Unexpected Error'}, log__(500,g.user)
