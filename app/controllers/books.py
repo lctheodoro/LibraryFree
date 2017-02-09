@@ -420,7 +420,7 @@ class LoanRequestApi(Resource):
                 else:
                     owner = User.query.get_or_404(book.user_id)
 
-                Thread(target=notification.send([owner],"loanrequest.html","Loan Request",book)).start()
+                Thread(target=notification.send([owner],"loanrequest.html","Loan Request")).start()
 
                 db.session.add(loan)
                 db.session.commit()
