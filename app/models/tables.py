@@ -27,11 +27,12 @@ class User(db.Model):
     # If the user is the manager of a organization, this field is user_id
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
 
+    #organization = db.relationship('Organization',foreign_keys='Organization.id',lazy='subquery')
     # The list of books an user have
     # books = db.relationship('Book', secondary=owned_books, backref='owners')
 
     # The lists of loans the user is participating
-    my_loans = db.relationship('Book_loan', foreign_keys='Book_loan.user_id')
+    my_loans = db.relationship('Book_loan', foreign_keys='Book_loan.user_id',lazy='subquery')
 
     # User evaluation from feedback
     evaluation = db.Column(db.Integer, default=0)
@@ -102,8 +103,8 @@ class User(db.Model):
 
     @property
     def serialize(self):
-        if self.organization:
-            org = self.organization.id
+        if self.organization_id:
+            org = self.organization_id
         else:
             org = None
         return {
@@ -116,7 +117,7 @@ class User(db.Model):
             'evaluation': self.evaluation,
             'points': self.points,
             'medal': self.medals,
-            'organization_id': org,
+            'organization_id': self.organization_id,
             'avatarUri': self.avatarUri,
             'oneSignalUserId': self.oneSignalUserId
         }
@@ -138,7 +139,7 @@ class Organization(db.Model):
     # insert image field
 
     # The organization managers are available in this field
-    managers = db.relationship('User', backref='organization')
+    managers = db.relationship('User', backref='organizations',lazy='subquery')
 
     @property
     def serialize(self):
@@ -217,8 +218,8 @@ class Book(db.Model):
     publisherDate = db.Column(db.String)
     description = db.Column(db.String)
 
-    authors = db.relationship('Author',secondary=author_relationship, backref='books')
-    categories = db.relationship('Category',secondary=category_relationship, backref='books')
+    authors = db.relationship('Author',secondary=author_relationship, backref='books',lazy='subquery')
+    categories = db.relationship('Category',secondary=category_relationship, backref='books',lazy='subquery')
 
     edition = db.Column(db.Integer)
     year = db.Column(db.Integer)
@@ -230,9 +231,9 @@ class Book(db.Model):
     available = db.Column(db.Boolean,default=True)
     loan_user = db.Column(db.Integer,db.ForeignKey('users.id'))
 
-    user = db.relationship('User', foreign_keys=user_id)
-    organization = db.relationship('Organization', foreign_keys=organization_id)
-    loan = db.relationship('User', foreign_keys=loan_user)
+    user = db.relationship('User', foreign_keys=user_id,lazy='subquery')
+    organization = db.relationship('Organization', foreign_keys=organization_id,lazy='subquery')
+    loan = db.relationship('User', foreign_keys=loan_user,lazy='subquery')
 
 
 
@@ -295,9 +296,13 @@ class Book_loan(db.Model):
     # Relationships
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
 
-    book = db.relationship('Book', foreign_keys=book_id)
-    user = db.relationship('User', foreign_keys=user_id)
+    book = db.relationship('Book', foreign_keys=book_id,lazy='subquery')
+    user = db.relationship('User', foreign_keys=user_id,lazy='subquery')
+    owner = db.relationship('User', foreign_keys=owner_id,lazy='subquery')
+    organization = db.relationship('Organization', foreign_keys=organization_id,lazy='subquery')
 
     # Transaction info
     loan_date = db.Column(db.Date)
@@ -324,12 +329,16 @@ class Book_loan(db.Model):
             'return_date': self.return_date.strftime('%Y-%m-%d'),
             'loan_status': self.loan_status,
             'book': self.book.serialize,
-            'user_requester':self.user.serialize
+            'user_requester':self.user.serialize,
+            'owner': self.owner.serialize,
+            'organization': self.organization_id
         } if self.loan_status == 'accepted' else {
             'id': self.id,
             'loan_status': self.loan_status,
             'book': self.book.serialize,
-            'user_requester':self.user.serialize
+            'user_requester': self.user.serialize,
+            'owner': self.owner.serialize,
+            'organization': self.organization_id
         }
 
 
@@ -352,10 +361,10 @@ class Book_return(db.Model):
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
     org_owner = db.Column(db.Integer,db.ForeignKey('organizations.id'))
 
-    user_own = db.relationship('User', foreign_keys=user_owner)
-    user = db.relationship('User', foreign_keys=user_id)
-    organization = db.relationship('Organization', foreign_keys=org_owner)
-    book_loan = db.relationship('Book_loan', foreign_keys=book_loan_id)
+    user_own = db.relationship('User', foreign_keys=user_owner,lazy='subquery')
+    user = db.relationship('User', foreign_keys=user_id,lazy='subquery')
+    organization = db.relationship('Organization', foreign_keys=org_owner,lazy='subquery')
+    book_loan = db.relationship('Book_loan', foreign_keys=book_loan_id,lazy='subquery')
 
     @property
     def serialize(self):
@@ -391,7 +400,7 @@ class Delayed_return(db.Model):
     book_loan_id = db.Column(db.Integer, db.ForeignKey('book_loans.id'))
     requested_date = db.Column(db.Date, nullable=False)
 
-    book_loan = db.relationship('Book_loan', foreign_keys=book_loan_id)
+    book_loan = db.relationship('Book_loan', foreign_keys=book_loan_id,lazy='subquery')
 
     # Request status:
     # waiting - waiting owner reply
@@ -430,9 +439,9 @@ class Feedback(db.Model):
     comments = db.Column(db.Text)
     scored = db.Column(db.Integer, default=0)
 
-    user_r = db.relationship('User', foreign_keys=user_received)
-    user_s = db.relationship('User', foreign_keys=user_submits)
-    book_return = db.relationship('Book_return', foreign_keys=transaction_id)
+    user_r = db.relationship('User', foreign_keys=user_received,lazy='subquery')
+    user_s = db.relationship('User', foreign_keys=user_submits,lazy='subquery')
+    book_return = db.relationship('Book_return', foreign_keys=transaction_id,lazy='subquery')
 
     @property
     def serialize(self):
@@ -461,7 +470,7 @@ class Wishlist(db.Model):
     title = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'),nullable=False)
 
-    user = db.relationship('User', foreign_keys=user_id)
+    user = db.relationship('User', foreign_keys=user_id,lazy='subquery')
 
     @property
     def serialize(self):
