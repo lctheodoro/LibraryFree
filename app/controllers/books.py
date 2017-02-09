@@ -385,7 +385,7 @@ class LoanRequestApi(Resource):
                 else:
                     owner = User.query.get_or_404(book.user_id)
 
-                Thread(target=notification.send([owner],"loanrequest.html","Loan Request",book)).start()
+                Thread(target=notification.send([owner],"loanrequest.html","Loan Request")).start()
 
                 db.session.add(loan)
                 db.session.commit()
@@ -470,7 +470,7 @@ class LoanReplyApi(Resource):
                         user.points_update(5)
                         loan.scored = True
 
-                        Thread(target=notification.send([user],"accepted.html","Loan Reply",book,loan.return_date)).start()
+                        Thread(target=notification.send([user],"accepted.html","Loan Reply")).start()
                     db.session.commit()
                 elif loan.loan_status == 'refused':
                     Thread(target=notification.send([user],"refused.html","Loan Reply",book)).start()
