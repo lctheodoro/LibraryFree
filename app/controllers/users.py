@@ -72,7 +72,10 @@ class UsersApi(Resource):
             # we should return serialized objects because they are ready to
             # be converted to JSON
             # an HTTP status code is also important
-            return {'data': [u.serialize for u in user]},log__(200,g.user)
+            # return {'data': [u.serialize for u in user]},log__(200,g.user)
+            response = jsonify({'data': [u.serialize for u in user]})
+            response.status_code = 200
+            return response
         else:
             return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
 

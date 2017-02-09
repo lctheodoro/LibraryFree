@@ -155,7 +155,10 @@ class BooksApi(Resource):
         else:
             filtering = and_(*filters_list)
             books = Book.query.filter(filtering).all()
-        return {'data': [book.serialize for book in books]}, log__(200,g.user)
+        # return {'data': [book.serialize for book in books]}, log__(200,g.user)
+        response = jsonify({'data': [book.serialize for book in books]})
+        response.status_code = 200
+        return response
 
     def post(self):
         try:
