@@ -120,7 +120,11 @@ class ModifyUsersApi(Resource):
     def get(self, id):
         try:
             user = User.query.get_or_404(id)
-            return {'data': user.serialize}, log__(200,g.user)
+            # return {'data': user.serialize}, log__(200,g.user)
+            response = jsonify({'data': user.serialize})
+            response.status_code = 200
+            return response
+
         except Exception as error:
             print("ERROR: " + str(error))
             if str(error)=="404: Not Found":
@@ -130,7 +134,7 @@ class ModifyUsersApi(Resource):
     # this decorator verify if the object belongs to the user
     # if so, it can be edited, else the user is unauthorized
     @is_user
-    def put(self, id):
+    def post(self, id):
         try:
             user = User.query.get_or_404(id)
             args = self.reqparse.parse_args()
@@ -155,7 +159,10 @@ class ModifyUsersApi(Resource):
                         setattr(user, key, value)
             user.check_register()
             db.session.commit()
-            return {'data': user.serialize}, log__(200,g.user)
+            # return {'data': user.serialize}, log__(200,g.user)
+            response = jsonify({'data': user.serialize})
+            response.status_code = 200
+            return response
         except Exception as error:
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
