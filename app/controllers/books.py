@@ -395,7 +395,10 @@ class LoanRequestApi(Resource):
                 elif args['user_type'].lower() == "user":
                     loans = Book_loan.query.filter_by(user_id=args['user_id'],
                                                         loan_status='requested').all()
-                    return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                    # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                    response = jsonify({'data': [l.serialize for l in loans]})
+                    response.status_code = 200
+                    return response
                 print("DEU RUIM")
                 return {'message': 'Bad Request'}, log__(400,g.user)
             elif args['user_id']:
@@ -404,12 +407,21 @@ class LoanRequestApi(Resource):
                         loans = Book_loan.query.filter_by(organization_id=args['user_id']).all()
                     else:
                         loans = Book_loan.query.filter_by(owner_id=args['user_id']).all()
-                    return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                    # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                    response = jsonify({'data': [l.serialize for l in loans]})
+                    response.status_code = 200
+                    return response
                 elif args['user_type'].lower() == "user":
                     loans = Book_loan.query.filter_by(user_id=args['user_id'],).all()
-                    return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                    # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                    response = jsonify({'data': [l.serialize for l in loans]})
+                    response.status_code = 200
+                    return response
                 print("DEU RUIM")
-                return {'message': 'Bad Request'}, log__(400,g.user)
+                # return {'message': 'Bad Request'}, log__(400,g.user)
+                response = jsonify({'message': 'Bad Request'})
+                response.status_code = 400
+                return response
             elif args['book_id']:
                 loans = Book_loan.query.filter_by(book_id=args['book_id']).all()
                 # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
@@ -453,10 +465,19 @@ class LoanRequestApi(Resource):
 
                 db.session.add(loan)
                 db.session.commit()
-                return { 'data': loan.serialize }, log__(201,g.user)
+                # return { 'data': loan.serialize }, log__(201,g.user)
+                response = jsonify({ 'data': loan.serialize })
+                response.status_code = 201
+                return response
             elif not book.is_organization and g.user.id==book.user_id:
                 return { 'message': 'The book owner can not borrow it'},log__(400,g.user)
-            return { 'message': 'Request already made' }, log__(500,g.user)
+                response = jsonify({ 'message': 'The book owner can not borrow it'})
+                response.status_code = 400
+                return response
+            # return { 'message': 'Request already made' }, log__(500,g.user)
+            response = jsonify({ 'message': 'Request already made' })
+            response.status_code = 500
+            return response
         except Exception as error:
             print(error)
             if str(error)=="404: Not Found":
@@ -484,12 +505,18 @@ class LoanReplyApi(Resource):
                 return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
 
             loan = Book_loan.query.get_or_404(id)
-            return { 'data': loan.serialize }, log__(200,g.user)
+            # return { 'data': loan.serialize }, log__(200,g.user)
+            response = jsonify({ 'data': loan.serialize })
+            response.status_code = 200
+            return response
         except Exception as error:
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
             else:
-                return {'message': 'Unexpected Error'}, log__(500,g.user)
+                # return {'message': 'Unexpected Error'}, log__(500,g.user)
+                response = jsonify({'message': 'Unexpected Error'})
+                response.status_code = 500
+                return response
 
     def post(self,id):
         args = self.reqparse.parse_args()
@@ -546,7 +573,10 @@ class LoanReplyApi(Resource):
                 else:
                     return {'data':'Bad Request'}, log__(400,g.user)
                 print(loan.book)
-                return { 'data': loan.serialize }, log__(201,g.user)
+                # return { 'data': loan.serialize }, log__(201,g.user)
+                response = jsonify({ 'data': loan.serialize })
+                response.status_code = 201
+                return response
             except Exception as error:
                 if str(error)=="404: Not Found":
                     return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
