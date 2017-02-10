@@ -377,16 +377,40 @@ class LoanRequestApi(Resource):
             args = {}
             args['user_id'] = request.args.get("user_id")
             args['book_id'] = request.args.get("book_id")
+            args['open'] = request.args.get("open")
+            args['user_type'] = request.args.get("user_type")
+            args['is_org'] = request.args.get("is_org")
 
-            if(args['user_id'] and args['book_id']):
+            if args['user_id'] and args['book_id']:
                 return {'message': 'Choose only one argument'}, log__(400,g.user)
-            elif(args['user_id']):
-                loans = Book_loan.query.filter_by(user_id=args['user_id']).all()
-                # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
-                response = jsonify({'data': [l.serialize for l in loans]})
-                response.status_code = 200
-                return response
-            elif(args['book_id']):
+            elif args['user_id'] and args['open']:
+                if args['user_type'].lower() == 'owner':
+                    if args['is_org']:
+                        loans = Book_loan.query.filter_by(organization_id=args['user_id'],
+                                                        loan_status='requested').all()
+                    else:
+                        loans = Book_loan.query.filter_by(owner_id=args['user_id'],
+                                                        loan_status='requested').all()
+                    return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                elif args['user_type'].lower() == "user":
+                    loans = Book_loan.query.filter_by(user_id=args['user_id'],
+                                                        loan_status='requested').all()
+                    return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                print("DEU RUIM")
+                return {'message': 'Bad Request'}, log__(400,g.user)
+            elif args['user_id']:
+                if args['user_type'].lower() == 'owner':
+                    if args['is_org']:
+                        loans = Book_loan.query.filter_by(organization_id=args['user_id']).all()
+                    else:
+                        loans = Book_loan.query.filter_by(owner_id=args['user_id']).all()
+                    return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                elif args['user_type'].lower() == "user":
+                    loans = Book_loan.query.filter_by(user_id=args['user_id'],).all()
+                    return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                print("DEU RUIM")
+                return {'message': 'Bad Request'}, log__(400,g.user)
+            elif args['book_id']:
                 loans = Book_loan.query.filter_by(book_id=args['book_id']).all()
                 # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
                 response = jsonify({'data': [l.serialize for l in loans]})
@@ -399,6 +423,7 @@ class LoanRequestApi(Resource):
                 return response
 
         except Exception as error:
+            print(error)
             return {'message': 'Unexpected Error'}, log__(500,g.user)
 
     def post(self):
@@ -410,7 +435,11 @@ class LoanRequestApi(Resource):
                                           loan_status='requested').first()
             book = Book.query.get_or_404(args['book_id'])
             if l==None and not (not book.is_organization and g.user.id==book.user_id):
-                loan = Book_loan(book_id=args['book_id'],user_id=g.user.id)
+                if book.is_organization:
+                    loan = Book_loan(book_id=args['book_id'],user_id=g.user.id,
+                                        organization_id=book.organization_id)
+                else:
+                    loan = Book_loan(book_id=args['book_id'],user_id=g.user.id,owner_id=book.user_id)
                 loan.loan_status = 'requested'
                 loan.scored = False
 
@@ -420,20 +449,16 @@ class LoanRequestApi(Resource):
                 else:
                     owner = User.query.get_or_404(book.user_id)
 
-                Thread(target=notification.send([owner],"loanrequest.html","Loan Request")).start()
+                #Thread(target=notification.send([owner],"loanrequest.html","Loan Request",book)).start()
 
                 db.session.add(loan)
                 db.session.commit()
-
-                # return { 'data': loan.serialize }, log__(201,g.user)
-                response = jsonify({ 'data': loan.serialize })
-                response.status_code = 201
-                return response
-            # return { 'message': 'Request already made' }, log__(500,g.user)
-            response = jsonify({ 'message': 'Request already made' })
-            response.status_code = 500
-            return response
+                return { 'data': loan.serialize }, log__(201,g.user)
+            elif not book.is_organization and g.user.id==book.user_id:
+                return { 'message': 'The book owner can not borrow it'},log__(400,g.user)
+            return { 'message': 'Request already made' }, log__(500,g.user)
         except Exception as error:
+            print(error)
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
             else:
@@ -486,7 +511,7 @@ class LoanReplyApi(Resource):
         if loan.loan_status != args['loan_status']:
             try:
                 user = User.query.get_or_404(loan.user_id)
-                print(user,"\n",user.name)
+
                 loan.loan_status = args['loan_status']
 
                 # Create the date of return
@@ -508,17 +533,19 @@ class LoanReplyApi(Resource):
                     if not loan.scored:
                         user.points_update(5)
                         loan.scored = True
+                    print(loan.loan_date,"\n",loan.return_date)
 
-                        Thread(target=notification.send([user],"accepted.html","Loan Reply",book,loan.return_date)).start()
+                    #Thread(target=notification.send([user],"accepted.html","Loan Reply",book,loan.return_date)).start()
                     db.session.commit()
                 elif loan.loan_status == 'refused':
-                    Thread(target=notification.send([user],"refused.html","Loan Reply",book)).start()
+                    #Thread(target=notification.send([user],"refused.html","Loan Reply",book)).start()
                     db.session.commit()
                 elif loan.loan_status == 'queue':
-                    Thread(target=notification.send([user],"queue.html","Loan Reply",book)).start()
+                    #Thread(target=notification.send([user],"queue.html","Loan Reply",book)).start()
                     db.session.commit()
                 else:
                     return {'data':'Bad Request'}, log__(400,g.user)
+                print(loan.book)
                 return { 'data': loan.serialize }, log__(201,g.user)
             except Exception as error:
                 if str(error)=="404: Not Found":
@@ -710,9 +737,9 @@ class DelayApi(Resource):
                 db.session.commit()
                 users_mail = User.query.filter_by(id=loan_delay.user_id).first()
 
-                Thread(target=notification.send([users_mail], "email.html",
-                                                delay_record.status,
-                                                book,delay_record.requested_date)).start()
+                #Thread(target=notification.send([users_mail], "email.html",
+                #                                delay_record.status,
+                #                                book,delay_record.requested_date)).start()
 
                 return { 'data': delay_record.serialize }, log__(201,g.user)
             else:
