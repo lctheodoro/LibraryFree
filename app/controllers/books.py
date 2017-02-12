@@ -475,7 +475,7 @@ class LoanRequestApi(Resource):
                 response.status_code = 400
                 return response
             # return { 'message': 'Request already made' }, log__(500,g.user)
-            response = jsonify({ 'message': 'Request already made', 'data': l.id.serialize })
+            response = jsonify({ 'message': 'Request already made', 'loan': l.serialize })
             response.status_code = 500
             return response
         except Exception as error:
