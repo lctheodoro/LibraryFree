@@ -391,7 +391,10 @@ class LoanRequestApi(Resource):
                     else:
                         loans = Book_loan.query.filter_by(owner_id=args['user_id'],
                                                         loan_status='requested').all()
-                    return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                    # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
+                    response = jsonify({'data': [l.serialize for l in loans]})
+                    response.status_code = 200
+                    return response
                 elif args['user_type'].lower() == "user":
                     loans = Book_loan.query.filter_by(user_id=args['user_id'],
                                                         loan_status='requested').all()
