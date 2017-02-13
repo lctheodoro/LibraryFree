@@ -644,7 +644,10 @@ class ReturnApi(Resource):
             args = self.reqparse.parse_args()
             loan_record = Book_loan.query.filter_by(id=args['loan_id']).first()
             if not loan_record.loan_status == 'accepted':
-                return { 'message': 'Bad Request' }, log__(400,g.user)
+                # return { 'message': 'Bad Request' }, log__(400,g.user)
+                response = jsonify({ 'message': 'Bad Request' })
+                response.status_code = 400
+                return response
             return_record = Book_return.query.filter_by(book_loan_id =
                                                         loan_record.id).first()
             book = Book.query.get_or_404(loan_record.book_id)
@@ -669,7 +672,10 @@ class ReturnApi(Resource):
                 return_record.owner_confirmation=True
                 db.session.add(return_record)
             else:
-                return { 'data': { 'message': 'Bad Request' } }, log__(400,g.user)
+                # return { 'data': { 'message': 'Bad Request' } }, log__(400,g.user)
+                response = jsonify({ 'message': 'Bad Request' })
+                response.status_code = 400
+                return response
             if return_record.owner_confirmation and return_record.user_confirmation:
                 loan_record.loan_status = 'done'
                 book.available = True
