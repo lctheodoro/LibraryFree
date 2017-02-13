@@ -505,6 +505,7 @@ class LoanReplyApi(Resource):
                 return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
 
             loan = Book_loan.query.get_or_404(id)
+            # Gustavo comment \/
             # return { 'data': loan.serialize }, log__(200,g.user)
             response = jsonify({ 'data': loan.serialize })
             response.status_code = 200
@@ -550,10 +551,11 @@ class LoanReplyApi(Resource):
 
                     # If it falls on a weekend it updates the date
                     # for the next Monday of this weekend
-                    if return_day.strftime('%A') == 'Sunday':
-                        return_day += timedelta(days=1)
-                    elif return_day.strftime('%A') == 'Saturday':
-                        return_day += timedelta(days=2)
+                    # Gustavo comment \/
+                    # if return_day.strftime('%A') == 'Sunday':
+                    #     return_day += timedelta(days=1)
+                    # elif return_day.strftime('%A') == 'Saturday':
+                    #     return_day += timedelta(days=2)
                     loan.return_date = return_day
 
                     # Gamefication
@@ -644,8 +646,8 @@ class ReturnApi(Resource):
             args = self.reqparse.parse_args()
             loan_record = Book_loan.query.filter_by(id=args['loan_id']).first()
             print(loan_record.loan_status)
-            # if not loan_record.loan_status == 'accepted':
-            #     return { 'message': 'Bad Request!' }, log__(400,g.user)
+            if not loan_record.loan_status == 'accepted':
+                return { 'message': 'Bad Request!' }, log__(400,g.user)
             return_record = Book_return.query.filter_by(book_loan_id =
                                                         loan_record.id).first()
             book = Book.query.get_or_404(loan_record.book_id)
