@@ -643,8 +643,9 @@ class ReturnApi(Resource):
         try:
             args = self.reqparse.parse_args()
             loan_record = Book_loan.query.filter_by(id=args['loan_id']).first()
+            print(loan_record.loan_status)
             if not loan_record.loan_status == 'accepted':
-                return { 'message': 'Bad Request' }, log__(400,g.user)
+                return { 'message': 'Bad Request!' }, log__(400,g.user)
             return_record = Book_return.query.filter_by(book_loan_id =
                                                         loan_record.id).first()
             book = Book.query.get_or_404(loan_record.book_id)
