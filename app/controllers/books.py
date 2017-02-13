@@ -684,7 +684,10 @@ class ReturnApi(Resource):
                 loan_record.loan_status = 'accepted'
 
             db.session.commit()
-            return { 'data': return_record.serialize }, log__(201,g.user)
+            # return { 'data': return_record.serialize }, log__(201,g.user)
+            response = jsonify({ 'data': return_record.serialize })
+            response.status_code = 201
+            return response
         except Exception as error:
             print(error)
             if str(error)=="404: Not Found":
