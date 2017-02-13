@@ -645,7 +645,7 @@ class ReturnApi(Resource):
             loan_record = Book_loan.query.filter_by(id=args['loan_id']).first()
             if not loan_record.loan_status == 'accepted':
                 # return { 'message': 'Bad Request' }, log__(400,g.user)
-                response = jsonify({ 'message': 'Bad Request' })
+                response = jsonify({ 'message': 'Bad Request!' })
                 response.status_code = 400
                 return response
             return_record = Book_return.query.filter_by(book_loan_id =
