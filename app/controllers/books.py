@@ -644,13 +644,9 @@ class ReturnApi(Resource):
             args = self.reqparse.parse_args()
             loan_record = Book_loan.query.filter_by(id=args['loan_id']).first()
             if not loan_record.loan_status == 'accepted':
-                # return { 'message': 'Bad Request' }, log__(400,g.user)
-                response = jsonify({ 'message': 'Bad Request!' })
-                response.status_code = 400
-                return response
+                return { 'message': 'Bad Request' }, log__(400,g.user)
             return_record = Book_return.query.filter_by(book_loan_id =
                                                         loan_record.id).first()
-            print('estou aqui')
             book = Book.query.get_or_404(loan_record.book_id)
             if not (return_record):
                 return_record = Book_return(book_loan_id = loan_record.id,
@@ -673,10 +669,7 @@ class ReturnApi(Resource):
                 return_record.owner_confirmation=True
                 db.session.add(return_record)
             else:
-                # return { 'data': { 'message': 'Bad Request' } }, log__(400,g.user)
-                response = jsonify({ 'message': 'Bad Request' })
-                response.status_code = 400
-                return response
+                return { 'data': { 'message': 'Bad Request' } }, log__(400,g.user)
             if return_record.owner_confirmation and return_record.user_confirmation:
                 loan_record.loan_status = 'done'
                 book.available = True
@@ -695,7 +688,6 @@ class ReturnApi(Resource):
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
             else:
                 return {'message': 'Unexpected Error'}, log__(500,g.user)
-
 
 class DelayApi(Resource):
     decorators = [auth.login_required]
