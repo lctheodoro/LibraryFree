@@ -366,7 +366,6 @@ class LoanRequestApi(Resource):
                     loans = Book_loan.query.filter_by(user_id=args['user_id'],
                                                         loan_status='requested').all()
                     return {'data': [l.serialize for l in loans]}, log__(200,g.user)
-                print("DEU RUIM")
                 return {'message': 'Bad Request'}, log__(400,g.user)
             elif args['user_id']:
                 if args['user_type'].lower() == 'owner':
@@ -378,7 +377,6 @@ class LoanRequestApi(Resource):
                 elif args['user_type'].lower() == "user":
                     loans = Book_loan.query.filter_by(user_id=args['user_id'],).all()
                     return {'data': [l.serialize for l in loans]}, log__(200,g.user)
-                print("DEU RUIM")
                 return {'message': 'Bad Request'}, log__(400,g.user)
             elif args['book_id']:
                 loans = Book_loan.query.filter_by(book_id=args['book_id']).all()
@@ -501,16 +499,16 @@ class LoanReplyApi(Resource):
 
                     #Thread(target=notification.send([user],"accepted.html","Loan Reply",book,loan.return_date)).start()
                     db.session.commit()
+                    return { 'data': loan.serialize }, log__(201,g.user)
                 elif loan.loan_status == 'refused':
                     #Thread(target=notification.send([user],"refused.html","Loan Reply",book)).start()
                     db.session.commit()
+                    return { 'data': loan.serialize }, log__(201,g.user)
                 elif loan.loan_status == 'queue':
                     #Thread(target=notification.send([user],"queue.html","Loan Reply",book)).start()
                     db.session.commit()
-                else:
-                    return {'data':'Bad Request'}, log__(400,g.user)
-                print(loan.book)
-                return { 'data': loan.serialize }, log__(201,g.user)
+                    return { 'data': loan.serialize }, log__(201,g.user)
+                return {'data':'Bad Request'}, log__(400,g.user)
             except Exception as error:
                 if str(error)=="404: Not Found":
                     return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
