@@ -650,6 +650,7 @@ class ReturnApi(Resource):
                 return response
             return_record = Book_return.query.filter_by(book_loan_id =
                                                         loan_record.id).first()
+            print('estou aqui')
             book = Book.query.get_or_404(loan_record.book_id)
             if not (return_record):
                 return_record = Book_return(book_loan_id = loan_record.id,
