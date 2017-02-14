@@ -306,10 +306,16 @@ class FeedbackApi(Resource):
                 return {'message': 'Choose only one argument'}, log__(400,g.user)
             elif(args['user_submits']):
                 feedbacks = Feedback.query.filter_by(user_submits=args['user_submits']).all()
-                return {'data': [f.serialize for f in feedbacks]},log__(200,g.user)
+                # return {'data': [f.serialize for f in feedbacks]},log__(200,g.user)
+                response = jsonify({'data':[f.serialize for f in feedbacks]})
+                response.status_code = 200
+                return response
             elif(args['user_received']):
                 feedbacks = Feedback.query.filter_by(user_id=args['user_received']).all()
-                return {'data':[f.serialize for f in feedbacks]},log__(200,g.user)
+                # return {'data':[f.serialize for f in feedbacks]},log__(200,g.user)
+                response = jsonify({'data':[f.serialize for f in feedbacks]})
+                response.status_code = 200
+                return response
             else:
                 return {'message': 'Bad Request'},log__(400,g.user)
         except Exception as error:
