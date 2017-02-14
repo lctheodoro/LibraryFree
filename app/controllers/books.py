@@ -849,12 +849,18 @@ class WishlistApi(Resource):
             wish = Wishlist.query.filter_by(isbn=args['isbn'], user_id=user.id).first()
 
             if wish: # Book already in the wishlist
-                return {'data': wish.serialize}, log__(200,g.user)
+                # return {'data': wish.serialize}, log__(200,g.user)
+                response = jsonify({'data': wish.serialize})
+                response.status_code = 200
+                return response
             else: # If book not in the wishlist
                 new_wish = Wishlist(isbn=args['isbn'], title=args['title'], user_id=user.id)
                 db.session.add(new_wish)
                 db.session.commit()
-                return {'data': new_wish.serialize}, log__(201,g.user)
+                # return {'data': new_wish.serialize}, log__(201,g.user)
+                response = jsonify({'data': new_wish.serialize})
+                response.status_code = 201
+                return response
         except Exception as error:
             print(error)
             return {'message': 'Unexpected Error'}, log__(500,g.user)
