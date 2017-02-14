@@ -555,10 +555,10 @@ class LoanReplyApi(Resource):
                     # If it falls on a weekend it updates the date
                     # for the next Monday of this weekend
                     # Gustavo comment \/
-                    # if return_day.strftime('%A') == 'Sunday':
-                    #     return_day += timedelta(days=1)
-                    # elif return_day.strftime('%A') == 'Saturday':
-                    #     return_day += timedelta(days=2)
+                    if return_day.strftime('%A') == 'Sunday':
+                        return_day += timedelta(days=1)
+                    elif return_day.strftime('%A') == 'Saturday':
+                        return_day += timedelta(days=2)
                     loan.return_date = return_day
 
                     # Gamefication
