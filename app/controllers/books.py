@@ -823,9 +823,15 @@ class WishlistApi(Resource):
         try:
             wishlist = Wishlist.query.filter_by(user_id=args['user_id']).all()
             if wishlist:
-                return {'data': [wish.serialize for wish in wishlist]}, log__(200,g.user)
+                # return {'data': [wish.serialize for wish in wishlist]}, log__(200,g.user)
+                response = jsonify({'data': [wish.serialize for wish in wishlist]})
+                response.status_code = 200
+                return response
             else: # Wishlist is empty
-                return {'data': []}, log__(200,g.user)
+                # return {'data': []}, log__(200,g.user)
+                response = jsonify({'data': []})
+                response.status_code = 200
+                return response
         except Exception:
             return {'message': 'Unexpected Error'}, log__(500,g.user)
 
