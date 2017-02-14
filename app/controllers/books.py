@@ -859,9 +859,13 @@ class TopsearchesAPI(Resource):
     def get(self):
         top_searches = [t.serialize for t in Topsearches.query.all()]
         # Sorting first by the times, after by the alfabetic order of the title
-        return { 'data' :
-                sorted(top_searches, key=lambda t: (-t['times'], t['title'])) }, log__(200)
+        # return { 'data' :
+        #         sorted(top_searches, key=lambda t: (-t['times'], t['title'])) }, log__(200)
 
+        response = jsonify({ 'data' :
+                sorted(top_searches, key=lambda t: (-t['times'], t['title'])) })
+        response.status_code = 200
+        return response
 
 api.add_resource(BooksApi, '/api/v1/books', endpoint='books')
 api.add_resource(TopsearchesAPI, '/api/v1/books/top', endpoint='top')
