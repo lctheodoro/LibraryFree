@@ -404,7 +404,10 @@ class Ranking(Resource):
     def get(self):
         users = [u.serialize for u in User.query.all()]
         # Sorting first by the points, after by the alfabetic order of the names
-        return { 'data' : sorted(users, key=lambda t: (-t['points'], t['name'])) }, log__(200)
+        # return { 'data' : sorted(users, key=lambda t: (-t['points'], t['name'])) }, log__(200)
+        response = jsonify({ 'data' : sorted(users, key=lambda t: (-t['points'], t['name'])) })
+        response.status_code = 200
+        return response
 
 
 # for each resource we need to specify an URI and an endpoint
