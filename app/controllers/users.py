@@ -319,7 +319,7 @@ class FeedbackApi(Resource):
             else:
                 return {'message': 'Bad Request'},log__(400,g.user)
         except Exception as error:
-            return {'message': error},log__(500,g.user)
+            return {'message': "Unexpected error!"},log__(500,g.user)
 
 
     def post(self):
@@ -362,7 +362,10 @@ class FeedbackApi(Resource):
                 feedback.scored += 8
 
             db.session.commit()
-            return { 'data': feedback.serialize }, log__(200,g.user)
+            # return { 'data': feedback.serialize }, log__(200,g.user)
+            response = jsonify({ 'data': feedback.serialize })
+            response.status_code = 200
+            return response
         except Exception as error:
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
