@@ -311,7 +311,7 @@ class FeedbackApi(Resource):
                 response.status_code = 200
                 return response
             elif(args['user_received']):
-                feedbacks = Feedback.query.filter_by(user_id=args['user_received']).all()
+                feedbacks = Feedback.query.filter_by(user_received=args['user_received']).all()
                 # return {'data':[f.serialize for f in feedbacks]},log__(200,g.user)
                 response = jsonify({'data':[f.serialize for f in feedbacks]})
                 response.status_code = 200
