@@ -319,7 +319,7 @@ class FeedbackApi(Resource):
             else:
                 return {'message': 'Bad Request'},log__(400,g.user)
         except Exception as error:
-            return {'message': "Unexpected error!"},log__(500,g.user)
+            return {'message': error},log__(500,g.user)
 
 
     def post(self):
