@@ -450,7 +450,7 @@ class Feedback(db.Model):
             'book_return': self.book_return.serialize,
             'user_R': self.user_r.serialize,
             'user_S': self.user_s.serialize,
-            'user_type': self.user,
+            # 'user_type': self.user,
             'user_evaluation': self.user_evaluation,
             'time_evaluation': self.time_evaluation,
             'book_evaluation': self.book_evaluation,
