@@ -185,6 +185,25 @@ class ModifyUsersApi(Resource):
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
             return { 'message': 'Unexpected Error' }, log__(500,g.user)
 
+class ResetPassword(Resource):
+
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("email", type=str, location='json')
+        self.reqparse.add_argument("password", type=str, location='json')
+        super(ResetPassword,self).__init__()
+    def post(self):
+        args = self.reqparse.parse_args()
+
+        user = User.query.filter_by(email=args['email']).first()
+
+        if user == None:
+            return {'message': 'User not found'}, log__(400)
+        else:
+            user.hash_password(args['password'])
+            db.session.commit()
+            return {'message': 'OK'}, log__(200)
+
 
 class OrganizationsApi(Resource):
     decorators = [auth.login_required]
@@ -431,7 +450,7 @@ api.add_resource(FeedbackApi, '/api/v1/feedbacks', endpoint='feedback')
 api.add_resource(ModifyFeedbackApi, '/api/v1/feedbacks/<int:id>',
                  endpoint='modify_feedback')
 api.add_resource(Ranking, '/api/v1/ranking', endpoint='ranking')
-
+api.add_resource(ResetPassword, '/api/v1/users/reset', endpoint='reset')
 # if you want to test any resource, try using CURL in the terminal, like:
 # $ curl -u USERAME:PASSWORD -H "Content-Type: application/json" -d '{"key": "value", "key": "value"}' -X GET/POST/PUT/DELETE -i http://localhost:5000/RESOURCE_URI
 # or try to use a visual tool like Postman

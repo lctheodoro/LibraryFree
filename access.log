@@ -1,7 +1,0 @@
-INFO 2017-02-16 16:32:26,622 127.0.0.1	| 2 - ronistonejunior	| /api/v1/books/borrow - GET - 200
-INFO 2017-02-16 16:41:27,469 127.0.0.1	| 2 - ronistonejunior	| /api/v1/books/borrow - GET - 500
-INFO 2017-02-16 16:44:06,334 127.0.0.1	| Guest	| /api/v1/users - POST - 201
-INFO 2017-02-16 16:45:19,855 127.0.0.1	| Guest	| /api/v1/books - POST - 401
-INFO 2017-02-16 16:45:33,692 127.0.0.1	| 1 - admin	| /api/v1/books - POST - 200
-INFO 2017-02-16 16:45:36,412 127.0.0.1	| 1 - admin	| /api/v1/books - POST - 200
-INFO 2017-02-16 16:46:14,291 127.0.0.1	| 2 - ronistone	| /api/v1/books/borrow - POST - 201
