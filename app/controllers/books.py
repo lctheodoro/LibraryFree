@@ -157,7 +157,7 @@ class BooksApi(Resource):
             books = Book.query.filter(filtering).all()
         # return {'data': [book.serialize for book in books]}, log__(200,g.user)
         response = jsonify({'data': [book.serialize for book in books]})
-        response.status_code = 200
+        response.status_code = log__(200,g.user)
         return response
 
     def post(self):
@@ -213,7 +213,7 @@ class BooksApi(Resource):
             db.session.commit()
             # return { 'data': book.serialize }, log__(201,g.user)
             response = jsonify({ 'data': book.serialize })
-            response.status_code = 200
+            response.status_code = log__(200,g.user)
             return response
         except Exception as error:
             print(error)
@@ -226,7 +226,7 @@ class CategoriesAPI(Resource):
         categories = Category.query.order_by(desc(Category.qtd)).limit(10).all()
         # return {'data': [c.serialize for c in categories]}, log__(200,g.user)
         response = jsonify({'data': [c.serialize for c in categories]})
-        response.status_code = 200
+        response.status_code = log__(200,g.user)
         return response
 
 class ModifyBooksApi(Resource):
@@ -266,7 +266,7 @@ class ModifyBooksApi(Resource):
                 db.session.commit()
             # return {'data': book.serialize}, log__(200,g.user)
             response = jsonify({'data': book.serialize})
-            response.status_code = 200
+            response.status_code = log__(200,g.user)
             return response
         except Exception as error:
             if str(error)=="404: Not Found":
@@ -319,14 +319,14 @@ class ModifyBooksApi(Resource):
             db.session.commit()
             # return {'data': book.serialize}, log__(200,g.user)
             response = jsonify({'data': book.serialize})
-            response.status_code = 200
+            response.status_code = log__(200,g.user)
             return response
         except Exception as error:
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
             else:
                 return { 'message': 'Unexpected Error' }, log__(500,g.user)
-    # @is_admin_id
+    @is_admin_id
     def delete(self, id):
         try:
             book = Book.query.get_or_404(id)
@@ -343,7 +343,7 @@ class ModifyBooksApi(Resource):
             db.session.commit()
             # return log__(204,g.user)
             response = jsonify({'message': "Deletado com sucesso."})
-            response.status_code = 204
+            response.status_code = log__(204,g.user)
             return response
         except Exception as error:
             if str(error)=="404: Not Found":
@@ -374,45 +374,45 @@ class LoanRequestApi(Resource):
             elif args['user_id'] and args['open']:
                 if args['user_type'].lower() == 'owner':
                     if args['is_org']:
-                        loans = Book_loan.query.filter_by(organization_id=args['user_id'],
+                        loans = Book_loan.query.order_by(desc(Book_loan.id)).filter_by(organization_id=args['user_id'],
                                                         loan_status='requested').all()
                     else:
-                        loans = Book_loan.query.filter_by(owner_id=args['user_id'],
+                        loans = Book_loan.query.order_by(desc(Book_loan.id)).filter_by(owner_id=args['user_id'],
                                                         loan_status='requested').all()
                     # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
                     response = jsonify({'data': [l.serialize for l in loans]})
-                    response.status_code = 200
+                    response.status_code = log__(200,g.user)
                     return response
                 elif args['user_type'].lower() == "user":
-                    loans = Book_loan.query.filter_by(user_id=args['user_id'],
+                    loans = Book_loan.query.order_by(desc(Book_loan.id)).filter_by(user_id=args['user_id'],
                                                         loan_status='requested').all()
                     # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
                     response = jsonify({'data': [l.serialize for l in loans]})
-                    response.status_code = 200
+                    response.status_code = log__(200,g.user)
                     return response
                 return {'message': 'Bad Request'}, log__(400,g.user)
             elif args['user_id']:
                 if args['user_type'].lower() == 'owner':
                     if args['is_org']:
-                        loans = Book_loan.query.filter_by(organization_id=args['user_id']).all()
+                        loans = Book_loan.query.order_by(desc(Book_loan.id)).filter_by(organization_id=args['user_id']).all()
                     else:
-                        loans = Book_loan.query.filter_by(owner_id=args['user_id']).all()
+                        loans = Book_loan.query.order_by(desc(Book_loan.id)).filter_by(owner_id=args['user_id']).all()
                     # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
                     response = jsonify({'data': [l.serialize for l in loans]})
-                    response.status_code = 200
+                    response.status_code = log__(200,g.user)
                     return response
                 elif args['user_type'].lower() == "user":
-                    loans = Book_loan.query.filter_by(user_id=args['user_id'],).all()
+                    loans = Book_loan.query.order_by(desc(Book_loan.id)).filter_by(user_id=args['user_id'],).all()
                     # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
                     response = jsonify({'data': [l.serialize for l in loans]})
-                    response.status_code = 200
+                    response.status_code = log__(200,g.user)
                     return response
                 return {'message': 'Bad Request'}, log__(400,g.user)
             elif args['book_id']:
-                loans = Book_loan.query.filter_by(book_id=args['book_id']).all()
+                loans = Book_loan.query.order_by(desc(Book_loan.id)).filter_by(book_id=args['book_id']).all()
                 # return {'data': [l.serialize for l in loans]}, log__(200,g.user)
                 response = jsonify({'data': [l.serialize for l in loans]})
-                response.status_code = 200
+                response.status_code = log__(200,g.user)
                 return response
             else:
                 return {'message': 'Bad Request'}, log__(400,g.user)
@@ -450,7 +450,7 @@ class LoanRequestApi(Resource):
                 db.session.commit()
                 # return { 'data': loan.serialize }, log__(201,g.user)
                 response = jsonify({ 'data': loan.serialize })
-                response.status_code = 201
+                response.status_code = log__(201,g.user)
                 return response
             elif not book.is_organization and g.user.id==book.user_id:
                 return { 'message': 'The book owner can not borrow it'},log__(400,g.user)
@@ -484,7 +484,7 @@ class LoanReplyApi(Resource):
             loan = Book_loan.query.get_or_404(id)
             # return { 'data': loan.serialize }, log__(200,g.user)
             response = jsonify({ 'data': loan.serialize })
-            response.status_code = 200
+            response.status_code = log__(200,g.user)
             return response
         except Exception as error:
             if str(error)=="404: Not Found":
@@ -534,29 +534,23 @@ class LoanReplyApi(Resource):
                     if not loan.scored:
                         user.points_update(5)
                         loan.scored = True
-                    print(loan.loan_date,"\n",loan.return_date)
 
                     #Thread(target=notification.send([user],"accepted.html","Loan Reply",book,loan.return_date)).start()
                     db.session.commit()
-                    # return { 'data': loan.serialize }, log__(201,g.user)
-                    response = jsonify({ 'data': loan.serialize })
-                    response.status_code = 201
-                    return response
                 elif loan.loan_status == 'refused':
                     #Thread(target=notification.send([user],"refused.html","Loan Reply",book)).start()
                     db.session.commit()
-                    # return { 'data': loan.serialize }, log__(201,g.user)
-                    response = jsonify({ 'data': loan.serialize })
-                    response.status_code = 201
-                    return response
                 elif loan.loan_status == 'queue':
                     #Thread(target=notification.send([user],"queue.html","Loan Reply",book)).start()
                     db.session.commit()
+                else:
+                    return {'data':'Bad Request'}, log__(400,g.user)
+                #return { 'data': loan.serialize }, log__(201,g.user)
                     # return { 'data': loan.serialize }, log__(201,g.user)
-                    response = jsonify({ 'data': loan.serialize })
-                    response.status_code = 201
-                    return response
-                return {'data':'Bad Request'}, log__(400,g.user)
+                response = jsonify({ 'data': loan.serialize })
+                response.status_code = log__(201,g.user)
+                return response
+
             except Exception as error:
                 if str(error)=="404: Not Found":
                     return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
@@ -602,14 +596,14 @@ class ReturnApi(Resource):
                                 return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
                         # return {'data': [return_record_search.serialize]}, log__(200,g.user)
                         response = jsonify({'data': [return_record_search.serialize]})
-                        response.status_code = 200
+                        response.status_code = log__(200,g.user)
                         return response
             elif args['user_id']:
                 if g.user.id == int(args['user_id']) or g.user.admin!=0:
                     return_books = Book_return.query.filter_by(user_id=args['user_id']).all()
                     # return {'data': [r.serialize for r in return_books]},log__(200,g.user)
                     response = jsonify({'data': [r.serialize for r in return_books]})
-                    response.status_code = 200
+                    response.status_code = log__(200,g.user)
                     return response
                 else:
                     return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
@@ -618,7 +612,7 @@ class ReturnApi(Resource):
                     return_books = Book_return.query.filter_by(user_owner=args['owner_id']).all()
                     # return {'data': [r.serialize for r in return_books]},log__(200,g.user)
                     response = jsonify({'data': [r.serialize for r in return_books]})
-                    response.status_code = 200
+                    response.status_code = log__(200,g.user)
                     return response
                 else:
                     return {'message': 'You are not authorized to access this area'}, log__(401,g.user)
@@ -669,7 +663,7 @@ class ReturnApi(Resource):
             db.session.commit()
             # return { 'data': return_record.serialize }, log__(201,g.user)
             response = jsonify({ 'data': return_record.serialize })
-            response.status_code = 201
+            response.status_code = log__(201,g.user)
             return response
         except Exception as error:
             print(error)
@@ -825,12 +819,12 @@ class WishlistApi(Resource):
             if wishlist:
                 # return {'data': [wish.serialize for wish in wishlist]}, log__(200,g.user)
                 response = jsonify({'data': [wish.serialize for wish in wishlist]})
-                response.status_code = 200
+                response.status_code = log__(200,g.user)
                 return response
             else: # Wishlist is empty
                 # return {'data': []}, log__(200,g.user)
                 response = jsonify({'data': []})
-                response.status_code = 200
+                response.status_code = log__(200,g.user)
                 return response
         except Exception:
             return {'message': 'Unexpected Error'}, log__(500,g.user)
@@ -851,7 +845,7 @@ class WishlistApi(Resource):
             if wish: # Book already in the wishlist
                 # return {'data': wish.serialize}, log__(200,g.user)
                 response = jsonify({'data': wish.serialize})
-                response.status_code = 200
+                response.status_code = log__(200,g.user)
                 return response
             else: # If book not in the wishlist
                 new_wish = Wishlist(isbn=args['isbn'], title=args['title'], user_id=user.id)
@@ -859,7 +853,7 @@ class WishlistApi(Resource):
                 db.session.commit()
                 # return {'data': new_wish.serialize}, log__(201,g.user)
                 response = jsonify({'data': new_wish.serialize})
-                response.status_code = 201
+                response.status_code = log__(201,g.user)
                 return response
         except Exception as error:
             print(error)

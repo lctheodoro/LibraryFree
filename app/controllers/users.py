@@ -23,7 +23,6 @@ def verify_password(email_or_token, password):
                 return False
         # saves the user in the global object 'user'
         g.user = user
-        log__(200,g.user)
         return True
     else:
         log__(401)
@@ -43,7 +42,7 @@ def get_auth_token():
     user.token = token
     # print({'user': user.serialize})
     response = jsonify({'user': user.serialize, 'token': token})
-    response.status_code = 200
+    response.status_code = log__(200,g.user)
     return response
 
 
@@ -74,7 +73,7 @@ class UsersApi(Resource):
             # an HTTP status code is also important
             # return {'data': [u.serialize for u in user]},log__(200,g.user)
             response = jsonify({'data': [u.serialize for u in user]})
-            response.status_code = 200
+            response.status_code = log__(200,g.user)
             return response
         else:
             return {'message': 'You are not authorized to access this area.'},log__(401,g.user)
@@ -94,7 +93,7 @@ class UsersApi(Resource):
 
             # return {'data': user.serialize}, log__(201)
             response = jsonify({'data': user.serialize})
-            response.status_code = 201
+            response.status_code = log__(201)
             return response
         except Exception as error:
             print(error)
@@ -125,7 +124,7 @@ class ModifyUsersApi(Resource):
             user = User.query.get_or_404(id)
             # return {'data': user.serialize}, log__(200,g.user)
             response = jsonify({'data': user.serialize})
-            response.status_code = 200
+            response.status_code = log__(200,g.user)
             return response
 
         except Exception as error:
@@ -164,7 +163,7 @@ class ModifyUsersApi(Resource):
             db.session.commit()
             # return {'data': user.serialize}, log__(200,g.user)
             response = jsonify({'data': user.serialize})
-            response.status_code = 200
+            response.status_code = log__(200,g.user)
             return response
         except Exception as error:
             if str(error)=="404: Not Found":
@@ -308,13 +307,13 @@ class FeedbackApi(Resource):
                 feedbacks = Feedback.query.filter_by(user_submits=args['user_submits']).all()
                 # return {'data': [f.serialize for f in feedbacks]},log__(200,g.user)
                 response = jsonify({'data':[f.serialize for f in feedbacks]})
-                response.status_code = 200
+                response.status_code = log__(200,g.user)
                 return response
             elif(args['user_received']):
                 feedbacks = Feedback.query.filter_by(user_received=args['user_received']).all()
                 # return {'data':[f.serialize for f in feedbacks]},log__(200,g.user)
                 response = jsonify({'data':[f.serialize for f in feedbacks]})
-                response.status_code = 200
+                response.status_code = log__(200,g.user)
                 return response
             else:
                 return {'message': 'Bad Request'},log__(400,g.user)
@@ -364,7 +363,7 @@ class FeedbackApi(Resource):
             db.session.commit()
             # return { 'data': feedback.serialize }, log__(200,g.user)
             response = jsonify({ 'data': feedback.serialize })
-            response.status_code = 200
+            response.status_code = log__(200,g.user)
             return response
         except Exception as error:
             if str(error)=="404: Not Found":
@@ -415,7 +414,7 @@ class Ranking(Resource):
         # Sorting first by the points, after by the alfabetic order of the names
         # return { 'data' : sorted(users, key=lambda t: (-t['points'], t['name'])) }, log__(200)
         response = jsonify({ 'data' : sorted(users, key=lambda t: (-t['points'], t['name'])) })
-        response.status_code = 200
+        response.status_code = log__(200)
         return response
 
 
