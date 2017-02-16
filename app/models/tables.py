@@ -298,6 +298,7 @@ class Book_loan(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
+    create_date = db.Column(db.Date)
 
     book = db.relationship('Book', foreign_keys=book_id,lazy='subquery')
     user = db.relationship('User', foreign_keys=user_id,lazy='subquery')
@@ -327,6 +328,7 @@ class Book_loan(db.Model):
             'id': self.id,
             'loan_date': self.loan_date.strftime('%Y-%m-%d'),
             'return_date': self.return_date.strftime('%Y-%m-%d'),
+            'create_date': self.create_date.strftime('%Y-%m-%d'),
             'loan_status': self.loan_status,
             'book': self.book.serialize,
             'user_requester':self.user.serialize,
@@ -335,6 +337,7 @@ class Book_loan(db.Model):
         } if self.loan_status == 'accepted' else {
             'id': self.id,
             'loan_status': self.loan_status,
+            'create_date': self.create_date.strftime('%Y-%m-%d'),
             'book': self.book.serialize,
             'user_requester': self.user.serialize,
             'owner': self.owner.serialize,

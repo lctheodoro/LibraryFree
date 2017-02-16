@@ -437,6 +437,7 @@ class LoanRequestApi(Resource):
                     loan = Book_loan(book_id=args['book_id'],user_id=g.user.id,owner_id=book.user_id)
                 loan.loan_status = 'requested'
                 loan.scored = False
+                loan.create_date = date.today()
 
                 # Get the book's owner whether it's an organization or a user
                 if book.is_organization:
