@@ -499,16 +499,15 @@ class LoanReplyApi(Resource):
 
                     #Thread(target=notification.send([user],"accepted.html","Loan Reply",book,loan.return_date)).start()
                     db.session.commit()
-                    return { 'data': loan.serialize }, log__(201,g.user)
                 elif loan.loan_status == 'refused':
                     #Thread(target=notification.send([user],"refused.html","Loan Reply",book)).start()
                     db.session.commit()
-                    return { 'data': loan.serialize }, log__(201,g.user)
                 elif loan.loan_status == 'queue':
                     #Thread(target=notification.send([user],"queue.html","Loan Reply",book)).start()
                     db.session.commit()
-                    return { 'data': loan.serialize }, log__(201,g.user)
-                return {'data':'Bad Request'}, log__(400,g.user)
+                else:
+                    return {'data':'Bad Request'}, log__(400,g.user)
+                return { 'data': loan.serialize }, log__(201,g.user)
             except Exception as error:
                 if str(error)=="404: Not Found":
                     return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
