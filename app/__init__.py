@@ -12,6 +12,7 @@ import logging
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
+app.config['JSON_AS_ASCII'] = False
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
