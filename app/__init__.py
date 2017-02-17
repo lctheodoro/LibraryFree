@@ -12,7 +12,6 @@ import logging
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
-app.config['JSON_AS_ASCII'] = False
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -58,6 +57,7 @@ class UnicodeApi(Api):
         self.representations = {
         'application/json; charset=utf-8': output_json,
         }
+app.config['JSON_AS_ASCII'] = False
 api = UnicodeApi(app, errors=app_errors)
 
 from app.models import tables
