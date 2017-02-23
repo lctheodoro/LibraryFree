@@ -274,7 +274,7 @@ class ModifyBooksApi(Resource):
             else:
                 return {'message': 'Unexpected error'}, log__(500,g.user)
 
-    def put(self, id):
+    def post(self, id):
         try:
             book = Book.query.get_or_404(id)
             if book.is_organization:
