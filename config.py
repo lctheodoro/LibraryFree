@@ -17,6 +17,7 @@ class Config(object):
     MAIL_USE_TSL = False
     MAIL_USERNAME = 'libraryfree@bol.com.br'
     MAIL_PASSWORD = 'Senhadolibrary'
+    JSON_AS_ASCII = False
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
