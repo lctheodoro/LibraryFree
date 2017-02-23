@@ -234,6 +234,7 @@ class ModifyBooksApi(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("title", type=str, location='json')
         self.reqparse.add_argument("subtitle", type=str, location='json')
         self.reqparse.add_argument("isbn10", type=str, location = 'json')
         self.reqparse.add_argument("isbn13", type=str, location = 'json')
