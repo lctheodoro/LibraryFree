@@ -325,7 +325,7 @@ class ModifyBooksApi(Resource):
             if str(error)=="404: Not Found":
                 return { 'message': 'The object you are looking for was not found'}, log__(404,g.user)
             else:
-                return { 'message': 'Unexpected Error' }, log__(500,g.user)
+                return { 'message': error }, log__(500,g.user)
     # @is_admin_id
     def delete(self, id):
         try:
