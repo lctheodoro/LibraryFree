@@ -41,6 +41,9 @@ class BooksApi(Resource):
         # This parameters are specific to the GET method
         # because they are not mandatory
         args = {}
+        args['search'] = request.args.get("search")
+#        args['loan'] = request.args.get("loan")
+        """
         args['title'] = request.args.get("title")
         args['subtitle'] = request.args.get("subtitle")
         args['isbn10'] = request.args.get("isbn10")
@@ -54,13 +57,12 @@ class BooksApi(Resource):
         args['language'] = request.args.get("language")
         args['user_id'] = request.args.get("user_id")
         args['organization_id'] = request.args.get("organization_id")
-        args['loan'] = request.args.get("loan")
 
         if(args['authors']):
             args['authors'] = args['authors'].split(',')
         if(args['categories']):
             args['categories'] = args['categories'].split(',')
-
+        """
         #search_reqparse = reqparse.RequestParser()
         #search_reqparse.add_argument("title", type=str, location='json')
         #search_reqparse.add_argument("subtitle", type=str, location='json')
@@ -80,7 +82,7 @@ class BooksApi(Resource):
         # retrieving the values
         #args = search_reqparse.parse_args()
         filters_list = []
-
+        """
         if args['title']:
             filters_list.append(
                 Book.title.ilike("%{0}%".format(args['title']))
@@ -150,11 +152,28 @@ class BooksApi(Resource):
             filters_list.append(
                 Book.loan_user != None
             )
-        if filters_list == []:
-            books = []
-        else:
-            filtering = and_(*filters_list)
-            books = Book.query.filter(filtering).all()
+            """
+        if args['search']:
+            filters_list += Book.query.filter(Book.title.ilike("%{0}%".format(args['search']))).all()
+
+            filters_list += Book.query.filter(Book.subtitle.ilike("%{0}%".format(args['search']))).all()
+            filters_list += Book.query.filter(Book.authors.any(Author.name.ilike("%{0}%".format(args['search'])))).all()
+            filters_list += Book.query.filter(Book.isbn10.ilike("%{0}%".format(args['search']))).all()
+            filters_list += Book.query.filter(Book.isbn13.ilike("%{0}%".format(args['search']))).all()
+            filters_list += Book.query.filter(Book.publisher.ilike("%{0}%".format(args['search']))).all()
+            filters_list += Book.query.filter(Book.publisherDate.ilike("%{0}%".format(args['search']))).all()
+            filters_list += Book.query.filter(Book.categories.any(Category.name.ilike("%{0}%".format(args['search'])))).all()
+            filters_list += Book.query.filter(Book.language.ilike("%{0}%".format(args['search']))).all()
+            filters_list += Book.query.join(Book.user).filter(User.name.ilike("%{0}%".format(args['search']))).all()
+            filters_list += Book.query.join(Book.organization).filter(Organization.name.ilike("%{0}%".format(args['search']))).all()
+
+#        if args['loan']:
+#            filters_list.append(
+#                Book.loan_user != None
+#            )
+        books = filters_list
+#            filtering = and_(*filters_list)
+#            books = Book.query.filter(filtering).all()
         # return {'data': [book.serialize for book in books]}, log__(200,g.user)
         response = jsonify({'data': [book.serialize for book in books]})
         response.status_code = log__(200,g.user)
@@ -171,6 +190,7 @@ class BooksApi(Resource):
             book = Book(**args)
 
             if author:
+                print(author)
                 for a in author:
                     authors = Author.query.filter_by(name=a).first()
                     if authors is None:
@@ -180,6 +200,7 @@ class BooksApi(Resource):
                     authors.qtd += 1
                     book.authors.append(authors)
             if category:
+                print(category)
                 for c in category:
                     categories = Category.query.filter_by(name=c).first()
                     if categories is None:
