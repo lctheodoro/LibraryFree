@@ -171,7 +171,7 @@ class BooksApi(Resource):
 #            filters_list.append(
 #                Book.loan_user != None
 #            )
-        books = filters_list
+        books = list(set(filters_list))
 #            filtering = and_(*filters_list)
 #            books = Book.query.filter(filtering).all()
         # return {'data': [book.serialize for book in books]}, log__(200,g.user)
