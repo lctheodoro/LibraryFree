@@ -6,7 +6,7 @@ from app.models.tables import Book, Book_loan, Book_return, User, Wishlist, \
                             Category
 from app.models.decorators import is_admin_id
 from datetime import timedelta, date
-from sqlalchemy.sql import and_
+from sqlalchemy.sql import and_, or_
 from isbnlib import isbn_from_words,meta
 #from isbnlib.registry import bibformatters
 from app.controllers import notification
@@ -42,7 +42,7 @@ class BooksApi(Resource):
         # because they are not mandatory
         args = {}
         args['search'] = request.args.get("search")
-#        args['loan'] = request.args.get("loan")
+        args['loan'] = request.args.get("loan")
         """
         args['title'] = request.args.get("title")
         args['subtitle'] = request.args.get("subtitle")
@@ -154,26 +154,56 @@ class BooksApi(Resource):
             )
             """
         if args['search']:
-            filters_list += Book.query.filter(Book.title.ilike("%{0}%".format(args['search']))).all()
-
-            filters_list += Book.query.filter(Book.subtitle.ilike("%{0}%".format(args['search']))).all()
-            filters_list += Book.query.filter(Book.authors.any(Author.name.ilike("%{0}%".format(args['search'])))).all()
-            filters_list += Book.query.filter(Book.isbn10.ilike("%{0}%".format(args['search']))).all()
-            filters_list += Book.query.filter(Book.isbn13.ilike("%{0}%".format(args['search']))).all()
-            filters_list += Book.query.filter(Book.publisher.ilike("%{0}%".format(args['search']))).all()
-            filters_list += Book.query.filter(Book.publisherDate.ilike("%{0}%".format(args['search']))).all()
-            filters_list += Book.query.filter(Book.categories.any(Category.name.ilike("%{0}%".format(args['search'])))).all()
-            filters_list += Book.query.filter(Book.language.ilike("%{0}%".format(args['search']))).all()
-            filters_list += Book.query.join(Book.user).filter(User.name.ilike("%{0}%".format(args['search']))).all()
-            filters_list += Book.query.join(Book.organization).filter(Organization.name.ilike("%{0}%".format(args['search']))).all()
-
-#        if args['loan']:
-#            filters_list.append(
-#                Book.loan_user != None
-#            )
-        books = list(set(filters_list))
-#            filtering = and_(*filters_list)
-#            books = Book.query.filter(filtering).all()
+            filters_list.append(
+                Book.title.ilike("%{0}%".format(args['search']))
+            )
+            filters_list.append(
+                Book.subtitle.ilike("%{0}%".format(args['search']))
+            )
+            filters_list.append(
+                Book.isbn10.ilike("%{0}%".format(args['search']))
+            )
+            filters_list.append(
+                Book.isbn13.ilike("%{0}%".format(args['search']))
+            )
+            filters_list.append(
+                Book.authors.any(Author.name.ilike("%{0}%".format(args['search'])))
+            )
+            filters_list.append(
+                Book.publisher.ilike("%{0}%".format(args['search']))
+            )
+            filters_list.append(
+                Book.publisherDate.ilike("%{0}%".format(args['search']))
+            )
+            filters_list.append(
+                Book.categories.any(Category.name.ilike("%{0}%".format(args['search'])))
+            )
+            #filters_list.append(
+            #    Book.edition == args['search']
+            #)
+            #filters_list.append(
+            #    Book.year == args['search']
+            #)
+            filters_list.append(
+                Book.language.ilike("%{0}%".format(args['search']))
+            )
+            #filters_list.append(
+            #    Book.user.any(User.name.ilike("%{0}%".format(args['search'])))
+            #)
+            #filters_list.append(
+            #    Book.organization.any(Organization.name.ilike("%{0}%".format(args['search'])))
+            #)
+        if args['loan']:
+            filters_list.append(
+                Book.loan_user != None
+            )
+        if filters_list == []:
+            books = []
+        else:
+            filtering = or_(*filters_list)
+            books = Book.query.filter(filtering).all()
+            books += Book.query.join(Book.user).filter(User.name.ilike("%{0}%".format(args['search'])))
+            books = list(set(books))
         # return {'data': [book.serialize for book in books]}, log__(200,g.user)
         response = jsonify({'data': [book.serialize for book in books]})
         response.status_code = log__(200,g.user)
