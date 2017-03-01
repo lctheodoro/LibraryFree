@@ -43,6 +43,7 @@ class BooksApi(Resource):
         args = {}
         args['search'] = request.args.get("search")
         args['loan'] = request.args.get("loan")
+        args['user_id'] = request.args.get("user_id")
         """
         args['title'] = request.args.get("title")
         args['subtitle'] = request.args.get("subtitle")
@@ -55,7 +56,6 @@ class BooksApi(Resource):
         args['edition'] = request.args.get("edition")
         args['year'] = request.args.get("year")
         args['language'] = request.args.get("language")
-        args['user_id'] = request.args.get("user_id")
         args['organization_id'] = request.args.get("organization_id")
 
         if(args['authors']):
