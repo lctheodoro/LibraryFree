@@ -76,7 +76,7 @@ class BooksApi(Resource):
         #search_reqparse.add_argument("year", type=int, location='json')
         #search_reqparse.add_argument("language", type=str, location='json')
         # Also get books owned by a user or organization
-        search_reqparse.add_argument("user_id", type=int, location='json')
+        # search_reqparse.add_argument("user_id", type=int, location='json')
         #search_reqparse.add_argument("organization_id", type=int, location='json')
 
         # retrieving the values
@@ -153,10 +153,7 @@ class BooksApi(Resource):
                 Book.loan_user != None
             )
             """
-        if args['user_id']:
-            filters_list.append(
-                Book.user_id == args['user_id']
-            )
+
         if args['search']:
             filters_list.append(
                 Book.title.ilike("%{0}%".format(args['search']))
@@ -200,6 +197,10 @@ class BooksApi(Resource):
         if args['loan']:
             filters_list.append(
                 Book.loan_user != None
+            )
+        if args['user_id']:
+            filters_list.append(
+                Book.user_id == args['user_id']
             )
         if filters_list == []:
             books = []
