@@ -103,10 +103,6 @@ class User(db.Model):
 
     @property
     def serialize(self):
-        if self.organization_id:
-            org = self.organization_id
-        else:
-            org = None
         return {
             'id': self.id,
             'name': self.name,

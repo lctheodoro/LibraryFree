@@ -492,9 +492,32 @@ class LoanRequestApi(Resource):
                                         organization_id=book.organization_id)
                 else:
                     loan = Book_loan(book_id=args['book_id'],user_id=g.user.id,owner_id=book.user_id)
-                loan.loan_status = 'requested'
-                loan.scored = False
-                loan.create_date = date.today()
+
+                if (not book.is_organization and book.user.admin > 0) and book.available: # Auto-Emprestimo para livros de administradores
+                    loan.loan_status = 'accepted'
+                    loan.scored = False
+                    loan.create_date = date.today()
+                    loan.loan_date = date.today()
+                    return_day = date.today() + timedelta(days=10)
+                    book.available = False
+                    book.loan_user = g.user.id
+
+                    # If it falls on a weekend it updates the date
+                    # for the next Monday of this weekend
+                    if return_day.strftime('%A') == 'Sunday':
+                        return_day += timedelta(days=1)
+                    elif return_day.strftime('%A') == 'Saturday':
+                        return_day += timedelta(days=2)
+                    loan.return_date = return_day
+
+                    # Gamefication
+                    if not loan.scored:
+                        g.user.points_update(5)
+                        loan.scored = True
+                else:
+                    loan.loan_status = 'requested'
+                    loan.scored = False
+                    loan.create_date = date.today()
 
                 # Get the book's owner whether it's an organization or a user
                 if book.is_organization:
@@ -698,7 +721,11 @@ class ReturnApi(Resource):
                     return_record.org_owner = book.organization_id
                 return_record.user_id = loan_record.user_id
 
-            if loan_record.user_id==g.user.id:
+            if loan_record.user_id==g.user.id and (not book.is_organization and loan_record.owner.admin > 0): # Auto-Devolução de livros de administradores
+                return_record.user_confirmation = True
+                return_record.owner_confirmation = True
+                db.session.add(return_record)
+            elif loan_record.user_id==g.user.id:
                 return_record.user_confirmation=True
                 db.session.add(return_record)
             elif book.is_organization:
