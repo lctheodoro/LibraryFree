@@ -121,7 +121,6 @@ class User(db.Model):
     def __repr__(self):
         return "<User %r>" % self.name
 
-
 class Organization(db.Model):
     __tablename__ = "organizations"
 
@@ -148,7 +147,6 @@ class Organization(db.Model):
 
     def __repr__(self):
         return "<Organization %r>" % self.name
-
 
 author_relationship = db.Table('author_relationship',
                                 db.Column('book_id',db.Integer,db.ForeignKey('books.id'),nullable=False),
